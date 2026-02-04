@@ -19,6 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.supermarx.carrierconfig.ui.screens.dashboard.DashboardScreen
+import com.supermarx.carrierconfig.ui.screens.carrierconfig.CarrierConfigScreen
 import com.supermarx.carrierconfig.ui.theme.AccentPrimary
 import com.supermarx.carrierconfig.ui.theme.BackgroundDark
 import com.supermarx.carrierconfig.ui.theme.GlassSurfaceMedium
@@ -46,8 +47,7 @@ fun CCONavHost(
                 DashboardScreen()
             }
             composable(Screen.CarrierConfig.route) {
-                // TODO: CarrierConfigScreen()
-                PlaceholderScreen("CarrierConfig")
+                CarrierConfigScreen()
             }
             composable(Screen.Entitlement.route) {
                 // TODO: EntitlementScreen()

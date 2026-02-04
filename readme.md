@@ -145,7 +145,18 @@ cd magisk-carrier-config-override
 3. View JSON (machine-readable) or TXT (human-readable) format
 4. Share with support or keep for records
 
-## 📁 Project Structure
+## � Documentation
+
+**📖 [Complete Documentation Index](DOCS_MAP.md)** - Quick navigation to all documentation
+
+**Essential Documents**:
+- [Installation Guide](docs/INSTALL.md) - Setup instructions
+- [Safety Guidelines](docs/SAFETY.md) - Important warnings
+- [Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues
+- [Project Status](docs/PROJECT_STATUS.md) - Current development status
+- [Contributing](docs/CONTRIBUTING.md) - How to contribute
+
+## �📁 Project Structure
 
 ```
 magisk-carrier-config-override/
