@@ -20,6 +20,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.supermarx.carrierconfig.ui.screens.dashboard.DashboardScreen
 import com.supermarx.carrierconfig.ui.screens.carrierconfig.CarrierConfigScreen
+import com.supermarx.carrierconfig.ui.screens.entitlement.EntitlementScreen
+import com.supermarx.carrierconfig.ui.screens.diagnostics.DiagnosticsScreen
+import com.supermarx.carrierconfig.ui.screens.settings.SettingsScreen
+import com.supermarx.carrierconfig.ui.screens.about.AboutScreen
 import com.supermarx.carrierconfig.ui.theme.AccentPrimary
 import com.supermarx.carrierconfig.ui.theme.BackgroundDark
 import com.supermarx.carrierconfig.ui.theme.GlassSurfaceMedium
@@ -50,12 +54,24 @@ fun CCONavHost(
                 CarrierConfigScreen()
             }
             composable(Screen.Entitlement.route) {
-                // TODO: EntitlementScreen()
-                PlaceholderScreen("Entitlement")
+                EntitlementScreen()
             }
             composable(Screen.Diagnostics.route) {
-                // TODO: DiagnosticsScreen()
-                PlaceholderScreen("Diagnostics")
+                DiagnosticsScreen()
+            }
+            composable(Screen.Settings.route) {
+                SettingsScreen(
+                    onNavigateToAbout = {
+                        navController.navigate(Screen.About.route)
+                    }
+                )
+            }
+            composable(Screen.About.route) {
+                AboutScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }

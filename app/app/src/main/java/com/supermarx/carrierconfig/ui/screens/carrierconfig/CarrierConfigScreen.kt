@@ -26,6 +26,8 @@ fun CarrierConfigScreen(
     viewModel: CarrierConfigViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    var showAddKeyDialog by remember { mutableStateOf(false) }
+    var showXMLPreview by remember { mutableStateOf(false) }
     
     Scaffold(
         topBar = {
@@ -40,8 +42,17 @@ fun CarrierConfigScreen(
                     containerColor = BackgroundDark.copy(alpha = 0.95f),
                     titleContentColor = TextPrimary
                 ),
-                actions = {
-                    IconButton(onClick = { viewModel.checkPrerequisites() }) {
+                actions = {                    // XML Preview button
+                    IconButton(
+                        onClick = { showXMLPreview = true },
+                        enabled = state.selectedPreset != null
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Code,
+                            contentDescription = "View XML",
+                            tint = if (state.selectedPreset != null) AccentPrimary else TextDisabled
+                        )
+                    }                    IconButton(onClick = { viewModel.checkPrerequisites() }) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Refresh",
@@ -84,9 +95,27 @@ fun CarrierConfigScreen(
                         text = { Text("Keys") }
                     )
                     Tab(
-                        selected = state.currentTab == 2,
-                        onClick = { viewModel.switchTab(2) },
-                        text = { Text("Deploy") }
+                        selected = state.currentT, onAddKey = { showAddKeyDialog = true })
+                    2 -> DeployTab(state, viewModel)
+                }
+            }
+            
+            // Dialogs
+            if (showAddKeyDialog) {
+                AddKeyDialog(
+                    onDismiss = { showAddKeyDialog = false },
+                    onAdd = { key ->
+                        viewModel.addCustomKey(key)
+                        showAddKeyDialog = false
+                    }
+                )
+            }
+            
+            if (showXMLPreview) {
+                XMLPreviewDialog(
+                    xml = viewModel.generateXMLPreview(),
+                    onDismiss = { showXMLPreview = false }
+                )       text = { Text("Deploy") }
                     )
                 }
                 
@@ -188,30 +217,38 @@ private fun PresetCard(
             )
             
             Text(
-                text = "Keys: ${preset.keys.size}",
-                style = MaterialTheme.typography.bodySmall,
-                color = TextHint
-            )
-            
-            if (preset.id == "full_enablement") {
-                StatusChip(
-                    text = "RECOMMENDED",
-                    status = ChipStatus.Success
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun KeysTab(
-    state: CarrierConfigState,
-    viewModel: CarrierConfigViewModel
+                text = "Keys: ${prese,
+    onAddKey: () -> Unit
 ) {
     val allKeys = remember(state.selectedPreset, state.customKeys) {
         viewModel.getSelectedKeys()
     }
     
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        // Header
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Configuration Keys (${allKeys.size})",
+                style = MaterialTheme.typography.titleMedium,
+                color = TextPrimary
+            )
+            
+            // Add custom key button
+            IconButton(onClick = onAddKey) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add custom key",
+                    tint = AccentPrimary
+                )
+            }
     Column(
         modifier = Modifier
             .fillMaxSize()

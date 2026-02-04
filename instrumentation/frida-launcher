@@ -1,0 +1,308 @@
+#!/usr/bin/env python3
+"""
+Frida Launcher for CCO
+
+Manages Frida instrumentation sessions with proper device handling,
+script loading, and RPC communication.
+"""
+
+import argparse
+import json
+import subprocess
+import sys
+import time
+from pathlib import Path
+from typing import Optional
+
+class FridaLauncher:
+    """Launcher for Frida instrumentation sessions"""
+    
+    PACKAGE_NAME = "com.supermarx.carrierconfig"
+    SCRIPT_DIR = Path(__file__).parent / "frida"
+    
+    def __init__(self, device: Optional[str] = None):
+        self.device = device
+        self.script_path = self.SCRIPT_DIR / "agent-enhanced.js"
+    
+    def check_frida_installed(self) -> bool:
+        """Check if frida-tools is installed"""
+        try:
+            subprocess.run(["frida", "--version"], 
+                         capture_output=True, check=True)
+            return True
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            return False
+    
+    def check_frida_server(self) -> bool:
+        """Check if frida-server is running on device"""
+        cmd = ["adb"]
+        if self.device:
+            cmd.extend(["-s", self.device])
+        cmd.extend(["shell", "ps -A | grep frida-server"])
+        
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        return "frida-server" in result.stdout
+    
+    def start_frida_server(self) -> bool:
+        """Start frida-server on device"""
+        print("Starting frida-server...")
+        
+        cmd = ["adb"]
+        if self.device:
+            cmd.extend(["-s", self.device])
+        cmd.extend(["shell", "su -c '/data/local/tmp/frida-server &'"])
+        
+        result = subprocess.run(cmd, capture_output=True)
+        time.sleep(2)  # Wait for server to start
+        
+        return self.check_frida_server()
+    
+    def launch(self, 
+               spawn: bool = True,
+               pause: bool = False,
+               debug: bool = False,
+               config: Optional[dict] = None) -> int:
+        """Launch Frida session"""
+        
+        # Validate prerequisites
+        if not self.check_frida_installed():
+            print("Error: frida-tools not installed", file=sys.stderr)
+            print("Install with: pip install frida-tools", file=sys.stderr)
+            return 1
+        
+        if not self.script_path.exists():
+            print(f"Error: Script not found: {self.script_path}", file=sys.stderr)
+            return 1
+        
+        if not self.check_frida_server():
+            print("⚠ frida-server not running")
+            if not self.start_frida_server():
+                print("Error: Failed to start frida-server", file=sys.stderr)
+                return 1
+        
+        # Build frida command
+        cmd = ["frida", "-U"]
+        
+        if self.device:
+            cmd.extend(["-D", self.device])
+        
+        if spawn:
+            cmd.extend(["-f", self.PACKAGE_NAME])
+        else:
+            cmd.extend(["-n", self.PACKAGE_NAME])
+        
+        cmd.extend(["-l", str(self.script_path)])
+        
+        if pause:
+            cmd.append("--pause")
+        
+        if debug:
+            cmd.append("--debug")
+        
+        # Add config as script parameters
+        if config:
+            config_json = json.dumps(config)
+            cmd.extend(["--parameters", config_json])
+        
+        print(f"Launching Frida session...")
+        print(f"Package: {self.PACKAGE_NAME}")
+        print(f"Script: {self.script_path}")
+        if config:
+            print(f"Config: {config}")
+        print("\nPress Ctrl+C to stop\n")
+        
+        # Launch
+        try:
+            subprocess.run(cmd)
+            return 0
+        except KeyboardInterrupt:
+            print("\n\nFrida session terminated")
+            return 0
+        except Exception as e:
+            print(f"Error: {e}", file=sys.stderr)
+            return 1
+    
+    def attach_rpc(self) -> Optional[object]:
+        """Attach to running app and get RPC interface"""
+        try:
+            import frida
+            
+            device = frida.get_usb_device()
+            session = device.attach(self.PACKAGE_NAME)
+            
+            with open(self.script_path) as f:
+                script_code = f.read()
+            
+            script = session.create_script(script_code)
+            script.load()
+            
+            return script
+        except ImportError:
+            print("Error: frida-tools not installed", file=sys.stderr)
+            print("Install with: pip install frida-tools", file=sys.stderr)
+            return None
+        except Exception as e:
+            print(f"Error attaching to process: {e}", file=sys.stderr)
+            return None
+
+def cmd_launch(args):
+    """Launch Frida session"""
+    launcher = FridaLauncher(args.device)
+    
+    config = {}
+    if args.config:
+        with open(args.config) as f:
+            config = json.load(f)
+    
+    return launcher.launch(
+        spawn=args.spawn,
+        pause=args.pause,
+        debug=args.debug,
+        config=config
+    )
+
+def cmd_rpc(args):
+    """Execute RPC command"""
+    launcher = FridaLauncher(args.device)
+    
+    script = launcher.attach_rpc()
+    if not script:
+        return 1
+    
+    try:
+        # Execute RPC method
+        if args.method == "getStats":
+            result = script.exports.get_stats()
+            print(json.dumps(result, indent=2))
+        
+        elif args.method == "updateConfig":
+            if not args.params:
+                print("Error: --params required for updateConfig", file=sys.stderr)
+                return 1
+            params = json.loads(args.params)
+            result = script.exports.update_config(params)
+            print(f"Config updated: {result}")
+        
+        elif args.method == "dumpCarrierConfig":
+            result = script.exports.dump_carrier_config()
+            print(json.dumps(result, indent=2))
+        
+        elif args.method == "toggleHooks":
+            enabled = args.params.lower() == "true" if args.params else True
+            result = script.exports.toggle_hooks(enabled)
+            print(f"Hooks {'enabled' if enabled else 'disabled'}")
+        
+        else:
+            print(f"Unknown method: {args.method}", file=sys.stderr)
+            return 1
+        
+        return 0
+    
+    except Exception as e:
+        print(f"RPC Error: {e}", file=sys.stderr)
+        return 1
+    finally:
+        script.unload()
+
+def cmd_install_server(args):
+    """Install frida-server on device"""
+    print("Installing frida-server...")
+    
+    # Download frida-server if needed
+    # This is a placeholder - in practice, you'd download the right version
+    server_path = Path("frida-server-android-arm64")
+    
+    if not server_path.exists():
+        print("Error: frida-server binary not found", file=sys.stderr)
+        print("Download from: https://github.com/frida/frida/releases", file=sys.stderr)
+        return 1
+    
+    # Push to device
+    cmd = ["adb"]
+    if args.device:
+        cmd.extend(["-s", args.device])
+    
+    print("Pushing to device...")
+    result = subprocess.run(
+        cmd + ["push", str(server_path), "/data/local/tmp/frida-server"],
+        capture_output=True
+    )
+    
+    if result.returncode != 0:
+        print(f"Error: {result.stderr.decode()}", file=sys.stderr)
+        return 1
+    
+    # Make executable
+    print("Setting permissions...")
+    subprocess.run(
+        cmd + ["shell", "su -c 'chmod 755 /data/local/tmp/frida-server'"]
+    )
+    
+    print("✓ frida-server installed successfully")
+    print("Start with: adb shell 'su -c /data/local/tmp/frida-server &'")
+    
+    return 0
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Frida Launcher for CCO",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Launch with spawning
+  %(prog)s launch --spawn
+  
+  # Attach to running app
+  %(prog)s launch --no-spawn
+  
+  # Get statistics via RPC
+  %(prog)s rpc getStats
+  
+  # Update config
+  %(prog)s rpc updateConfig --params '{"features":{"autoBypass":true}}'
+        """
+    )
+    
+    parser.add_argument("-d", "--device", help="Target device serial")
+    
+    subparsers = parser.add_subparsers(dest="command", help="Commands")
+    
+    # launch command
+    launch_parser = subparsers.add_parser("launch", help="Launch Frida session")
+    launch_parser.add_argument("--spawn", action="store_true", default=True,
+                              help="Spawn app (default)")
+    launch_parser.add_argument("--no-spawn", dest="spawn", action="store_false",
+                              help="Attach to running app")
+    launch_parser.add_argument("--pause", action="store_true",
+                              help="Pause app on start")
+    launch_parser.add_argument("--debug", action="store_true",
+                              help="Enable debug mode")
+    launch_parser.add_argument("-c", "--config", help="Config file (JSON)")
+    
+    # rpc command
+    rpc_parser = subparsers.add_parser("rpc", help="Execute RPC command")
+    rpc_parser.add_argument("method", 
+                           choices=["getStats", "updateConfig", "dumpCarrierConfig", "toggleHooks"],
+                           help="RPC method to call")
+    rpc_parser.add_argument("--params", help="Method parameters (JSON)")
+    
+    # install-server command
+    install_parser = subparsers.add_parser("install-server", 
+                                          help="Install frida-server on device")
+    
+    args = parser.parse_args()
+    
+    if not args.command:
+        parser.print_help()
+        return 1
+    
+    commands = {
+        "launch": cmd_launch,
+        "rpc": cmd_rpc,
+        "install-server": cmd_install_server
+    }
+    
+    return commands[args.command](args)
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -2,8 +2,17 @@
 
 Implementation checklist for the CCO Manager.
 
-**Status**: Milestone 1 & 2 Complete ✅  
+**Status**: Milestones 1 & 2 Complete ✅ | M4 ~70% Complete 🚧  
 **Last Updated**: February 4, 2026
+
+**Recent Updates** (Feb 4, 2026):
+- ✅ Added Settings & Preferences system with DataStore
+- ✅ Implemented Export/Import functionality with kotlinx-serialization
+- ✅ Created About screen with app information
+- ✅ Built comprehensive diagnostics backend (Logcat, Dumpsys, Connectivity Tests)
+- ✅ Added Dashboard FAB with quick actions
+- ✅ Created build automation scripts (dev.sh, build.sh, test.sh, lint.sh)
+- ✅ Integrated all screens into navigation system
 
 ---
 
@@ -17,6 +26,13 @@ Implementation checklist for the CCO Manager.
   - [ ] Set up issue templates
   - [ ] Configure PR templates
   
+- [x] Development Scripts ✅
+  - [x] app/scripts/dev.sh (main development automation)
+  - [x] app/scripts/build.sh (quick build with size display)
+  - [x] app/scripts/test.sh (test runner with device detection)
+  - [x] app/scripts/lint.sh (code style checking)
+  - [x] Comprehensive script documentation
+  
 - [ ] Set up CI/CD pipeline
   - [ ] GitHub Actions / GitLab CI configuration
   - [ ] Automated APK builds
@@ -29,6 +45,7 @@ Implementation checklist for the CCO Manager.
   - [x] QUICKREF.md (quick reference guide)
   - [x] spec-design.md (design system)
   - [x] app/README.md (technical details)
+  - [x] app/scripts/README.md (scripts documentation) ✅
   - [ ] INSTALL.md (installation guide)
   - [ ] SAFETY.md (safety guidelines)
   - [ ] CONTRIBUTING.md
@@ -60,8 +77,9 @@ Implementation checklist for the CCO Manager.
   - [x] Navigation Compose
   - [x] Lifecycle & ViewModel
   - [x] Coroutines & Flow
-  - [ ] Room database (planned)
-  - [ ] DataStore preferences (planned)
+  - [ ] Room database (planned for hook profiles)
+  - [x] DataStore preferences ✅
+  - [x] kotlinx-serialization ✅
   - [x] Gson for JSON
   - [x] libsu 5.2.2 for root operations
   - [ ] accompanist (system UI controller) (planned)
@@ -267,49 +285,65 @@ Implementation checklist for the CCO Manager.
 
 ### 4.4 Diagnostics & Logs Screen
 
-- [ ] UI Layout
-  - [ ] Snapshot button grid
-  - [ ] Log viewer with syntax highlighting
-  - [ ] Export options
-  - [ ] Clear logs button
+- [x] UI Layout ✅
+  - [x] 3-tab interface (Logs, Dumpsys, Tests)
+  - [x] Preview cards for each tab
+  - [x] Coming soon indicators
+  - [x] Glassmorphic design
   
-- [ ] Features
-  - [ ] Logcat radio buffer snapshot
-  - [ ] Logcat main buffer snapshot
-  - [ ] dumpsys ims snapshot
-  - [ ] dumpsys carrier_config snapshot
-  - [ ] getprop filtered snapshot
-  - [ ] Combined ZIP export
-  - [ ] Privacy filter toggle (redact IMSI/phone numbers)
+- [x] Backend Implementation ✅
+  - [x] LogcatRepository (live monitoring + snapshots)
+  - [x] DumpsysRepository (ims, phone, carrier_config, telecom, connectivity)
+  - [x] ConnectivityTestRepository (comprehensive test suite)
+  - [x] DiagnosticsViewModel (state management)
+  - [x] Export functionality integration
   
-- [ ] Business Logic
-  - [ ] LogcatService
-  - [ ] DumpsysService
-  - [ ] GetpropService
-  - [ ] PrivacyRedactor
-  - [ ] ReportGenerator (JSON + TXT)
-  - [ ] ZipExporter
-  - [ ] DiagnosticsViewModel
+- [x] Features Implemented ✅
+  - [x] Logcat filtering (CarrierConfig, IMS, Telephony, WFC, All)
+  - [x] Live logcat monitoring
+  - [x] Log level filtering (Verbose, Debug, Info, Warning, Error, Fatal)
+  - [x] Dumpsys snapshots (multiple services)
+  - [x] IMS info extraction from dumpsys
+  - [x] Connectivity tests (Network, DNS, Internet, Wi-Fi Calling, IMS, Cellular)
+  - [x] Export to JSON + TXT
+  
+- [ ] Remaining UI Integration
+  - [ ] Connect DiagnosticsScreen to ViewModel
+  - [ ] Implement log viewer with scrolling
+  - [ ] Add syntax highlighting for logs
+  - [ ] Implement dumpsys viewer
+  - [ ] Create test results display
+  - [ ] Add export buttons with feedback
 
 ### Settings & About Screen
 
-- [ ] UI Layout
-  - [ ] App theme selector
-  - [ ] Auto-refresh settings
-  - [ ] Privacy options
-  - [ ] Root permission management
-  - [ ] Backend selector (Frida/LSPosed)
-  - [ ] About section (version, license, credits)
+- [x] Settings Screen ✅
+  - [x] General settings (auto-refresh, notifications)
+  - [x] Appearance settings (theme, glass effect)
+  - [x] Advanced settings (debug mode, export directory, cache)
+  - [x] Backup & Data (export/import)
+  - [x] Danger Zone (reset settings)
   
-- [ ] Features
-  - [ ] Clear app data
-  - [ ] Export app settings
-  - [ ] Import app settings
-  - [ ] Check for updates
+- [x] About Screen ✅
+  - [x] App version display
+  - [x] Feature list with cards
+  - [x] Requirements checklist
+  - [x] Developer information
+  - [x] Legal disclaimer
   
-- [ ] Business Logic
-  - [ ] SettingsRepository (DataStore)
-  - [ ] SettingsViewModel
+- [x] Backend Implementation ✅
+  - [x] PreferencesManager (DataStore)
+  - [x] SettingsViewModel (state management)
+  - [x] ExportRepository (configuration export/import)
+  - [x] Snackbar feedback system
+  
+- [ ] Remaining Features
+  - [ ] Theme selector dialog
+  - [ ] Glass strength selector
+  - [ ] Directory picker
+  - [ ] File picker for import
+  - [ ] Cache size calculation
+  - [ ] Update checker
 
 ### Core Services & Utilities
 

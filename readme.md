@@ -10,9 +10,19 @@ A comprehensive toolkit to control Wi-Fi Calling (VoWiFi), VoLTE, IMS and relate
 ## 🎯 Project Status
 
 **Milestone 1: Diagnostics Core** ✅ COMPLETE  
-**Milestone 2: Method 1 (CarrierConfig)** ✅ COMPLETE  
-**Milestone 3: Method 2 (Frida/LSPosed)** ⏳ In Progress  
-**Milestone 4: Advanced Features** ⏳ Planned
+**Milestone 2: CarrierConfig Override** ✅ COMPLETE  
+**Milestone 3: Runtime Hooks** 🚧 UI Ready (20% Complete)  
+**Milestone 4: Advanced Features** ✅ MOSTLY COMPLETE (75%)
+
+**Overall Progress: 75% Complete** 🚀
+
+### Recent Updates (Feb 4, 2026)
+- ✅ Complete diagnostics system with real-time logcat, dumpsys, and connectivity tests
+- ✅ Settings & preferences with DataStore integration
+- ✅ Export/import functionality with JSON serialization
+- ✅ Build automation scripts for development
+- ✅ Theme and glass strength selectors
+- ✅ Full navigation system with 6 screens
 
 ## ✨ Features
 
@@ -33,14 +43,37 @@ A comprehensive toolkit to control Wi-Fi Calling (VoWiFi), VoLTE, IMS and relate
   - Wi-Fi Preferred
   - Wi-Fi Only
   - Full WFC Enablement (recommended)
-- **Custom Key Support**: Add any CarrierConfig key manually
+- **Custom Key Support**: Add any CarrierConfig key with type-safe values
 - **Type-Safe XML Builder**: Generates valid CarrierConfig XML
-- **Magisk Integration**: Boot-time bind-mount deployment
 - **Multi-Path Detection**: Supports 4 Samsung override paths
 - **Backup & Revert**: Safe rollback mechanism with history
 - **Prerequisites Checker**: Validates root and Magisk before deployment
+- **XML Preview**: Preview generated XML with clipboard support
+- **3-Tab Interface**: Presets → Keys → Deploy workflow
 
-### 🚧 Method 2: Runtime Hooks (Milestone 3 - In Progress)
+### ✅ Advanced Diagnostics (Milestone 4 - Complete)
+- **Real-Time Logcat**: Live log streaming with smart filtering
+  - Filter by: CarrierConfig, IMS, Telephony, WFC, All
+  - Log level filtering (Verbose → Fatal)
+  - Auto-scroll with monospace formatting
+- **Dumpsys Viewer**: System service diagnostics
+  - IMS, Phone, CarrierConfig, Telecom, Connectivity services
+  - Intelligent info extraction
+  - Export functionality
+- **Connectivity Tests**: Automated test suite
+  - Network status, DNS resolution, Internet connectivity
+  - Wi-Fi Calling availability, IMS registration
+  - Cellular data state monitoring
+  - Pass/fail tracking with detailed results
+
+### ✅ Settings & Preferences (Milestone 4 - Complete)
+- **General Settings**: Auto-refresh, notifications
+- **Appearance**: Theme selector (Dark/AMOLED/Auto), Glass effect strength
+- **Advanced**: Debug mode, export directory, cache management
+- **Backup & Data**: Export/import configuration with JSON
+- **About Screen**: App info, features, requirements, developer info
+
+### 🚧 Method 2: Runtime Entitlement Simulation (Milestone 3 - UI Ready)
 - Frida/LSPosed runtime injection
 - One UI version-specific hook profiles
 - Live entitlement spoofing

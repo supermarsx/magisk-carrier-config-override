@@ -1,5 +1,6 @@
 package com.supermarx.carrierconfig.ui.screens.dashboard
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -7,12 +8,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.supermarx.carrierconfig.data.model.*
@@ -28,6 +28,7 @@ fun DashboardScreen(
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    var fabExpanded by remember { mutableStateOf(false) }
     
     Scaffold(
         topBar = {
@@ -42,6 +43,28 @@ fun DashboardScreen(
                     containerColor = BackgroundDark.copy(alpha = 0.95f),
                     titleContentColor = TextPrimary
                 )
+            )
+        },
+        floatingActionButton = {
+            QuickActionsBar(
+                expanded = fabExpanded,
+                onExpandChange = { fabExpanded = it },
+                onRunDiagnostics = { 
+                    viewModel.runDiagnostics()
+                    fabExpanded = false
+                },
+                onOpenWFCSettings = { 
+                    viewModel.openWFCSettings()
+                    fabExpanded = false
+                },
+                onExportReport = { 
+                    viewModel.exportReport()
+                    fabExpanded = false
+                },
+                onRefresh = {
+                    viewModel.refresh()
+                    fabExpanded = false
+                }
             )
         }
     ) { paddingValues ->
@@ -446,6 +469,108 @@ private fun ErrorContent(error: String) {
                     color = TextSecondary
                 )
             }
+        }
+    }
+}
+
+/**
+ * Expandable FAB with quick action buttons
+ */
+@Composable
+private fun QuickActionsBar(
+    expanded: Boolean,
+    onExpandChange: (Boolean) -> Unit,
+    onRunDiagnostics: () -> Unit,
+    onOpenWFCSettings: () -> Unit,
+    onExportReport: () -> Unit,
+    onRefresh: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Quick action buttons
+        AnimatedVisibility(
+            visible = expanded,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                QuickActionButton(
+                    icon = Icons.Default.Refresh,
+                    label = "Refresh",
+                    onClick = onRefresh
+                )
+                QuickActionButton(
+                    icon = Icons.Default.Build,
+                    label = "Diagnostics",
+                    onClick = onRunDiagnostics
+                )
+                QuickActionButton(
+                    icon = Icons.Default.Settings,
+                    label = "WFC Settings",
+                    onClick = onOpenWFCSettings
+                )
+                QuickActionButton(
+                    icon = Icons.Default.Share,
+                    label = "Export",
+                    onClick = onExportReport
+                )
+            }
+        }
+        
+        // Main FAB
+        FloatingActionButton(
+            onClick = { onExpandChange(!expanded) },
+            containerColor = AccentPrimary,
+            contentColor = BackgroundDark
+        ) {
+            Icon(
+                imageVector = if (expanded) Icons.Default.Close else Icons.Default.Add,
+                contentDescription = if (expanded) "Close quick actions" else "Open quick actions"
+            )
+        }
+    }
+}
+
+/**
+ * Individual quick action button
+ */
+@Composable
+private fun QuickActionButton(
+    icon: ImageVector,
+    label: String,
+    onClick: () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Surface(
+            color = BackgroundDark.copy(alpha = 0.9f),
+            shape = MaterialTheme.shapes.small,
+            shadowElevation = 2.dp
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = TextPrimary,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+            )
+        }
+        
+        SmallFloatingActionButton(
+            onClick = onClick,
+            containerColor = GlassTint,
+            contentColor = TextPrimary
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label
+            )
         }
     }
 }

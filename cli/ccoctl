@@ -199,6 +199,258 @@ def cmd_devices(args):
         print(f"  - {device}")
     return 0
 
+def cmd_status(args):
+    """Show comprehensive status"""
+    client = CCOClient(args.device)
+    
+    print("=== CCO Status ===\n")
+    
+    # Device info
+    print("Device:")
+    info = client.get_device_info()
+    print(f"  Model: {info.get('manufacturer')} {info.get('model')}")
+    print(f"  Android: {info.get('android_version')} (SDK {info.get('sdk_int')})")
+    print(f"  Rooted: {'Yes' if info.get('rooted') else 'No'}")
+    
+    # App status
+    print("\nCCO App:")
+    installed = client.check_app_installed()
+    print(f"  Installed: {'Yes' if installed else 'No'}")
+    
+    if not installed:
+        print("\n⚠ CCO app is not installed!")
+        return 1
+    
+    # Module status
+    print("\nMagisk Module:")
+    result = client._adb("shell", "test -d /data/adb/cco && echo yes || echo no")
+    module_installed = "yes" in result.stdout
+    print(f"  Installed: {'Yes' if module_installed else 'No'}")
+    
+    if module_installed:
+        # Check active profile
+        result = client._adb("shell", "cat /data/adb/cco/current_profile 2>/dev/null || echo none")
+        profile = result.stdout.strip()
+        print(f"  Active Profile: {profile}")
+    
+    # IMS status
+    print("\nIMS Status:")
+    ims = client.get_ims_status()
+    print(f"  Registered: {'Yes' if ims.get('registered') else 'No'}")
+    print(f"  VoLTE: {'Available' if ims.get('volte_available') else 'Not Available'}")
+    print(f"  VoWiFi: {'Available' if ims.get('vowifi_available') else 'Not Available'}")
+    
+    return 0
+
+def cmd_logs(args):
+    """Fetch and display logs"""
+    client = CCOClient(args.device)
+    
+    filters = []
+    if args.cco:
+        filters.extend(["-s", f"{client.PACKAGE_NAME}:*"])
+    if args.frida:
+        filters.extend(["-s", "Frida:*"])
+    if args.ims:
+        filters.extend(["-s", "IMS*:*"])
+    
+    if not filters:
+        # Default: show CCO and Frida logs
+        filters = ["-s", f"{client.PACKAGE_NAME}:*", "Frida:*", "*:S"]
+    
+    # Stream logs
+    cmd = ["shell", "logcat"] + filters
+    if args.clear:
+        client._adb("logcat", "-c")
+        print("Logs cleared")
+        return 0
+    
+    if args.tail:
+        cmd.extend(["-t", str(args.tail)])
+    
+    try:
+        proc = subprocess.Popen(
+            ["adb"] + (["-s", client.device] if client.device else []) + cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        
+        for line in proc.stdout:
+            print(line, end='')
+    except KeyboardInterrupt:
+        proc.terminate()
+        print("\nLog streaming stopped")
+    
+    return 0
+
+def cmd_frida(args):
+    """Launch Frida instrumentation"""
+    client = CCOClient(args.device)
+    
+    if not client.check_app_installed():
+        print("Error: CCO app not installed", file=sys.stderr)
+        return 1
+    
+    # Check if frida-server is running
+    result = client._adb("shell", "ps -A | grep frida-server")
+    if not result.stdout:
+        print("⚠ frida-server not running, attempting to start...")
+        client._adb("shell", "su -c /data/local/tmp/frida-server &")
+        import time
+        time.sleep(2)
+    
+    # Build frida command
+    script_path = args.script or "instrumentation/frida/agent-enhanced.js"
+    
+    frida_cmd = [
+        "frida",
+        "-U",  # USB device
+        "-f", client.PACKAGE_NAME,  # Spawn app
+        "-l", script_path,  # Load script
+    ]
+    
+    if args.device:
+        frida_cmd.extend(["-D", args.device])
+    
+    if args.pause:
+        frida_cmd.append("--pause")
+    
+    if args.debug:
+        frida_cmd.append("--debug")
+    
+    print(f"Launching Frida with script: {script_path}")
+    print("Press Ctrl+C to stop\n")
+    
+    try:
+        subprocess.run(frida_cmd)
+    except KeyboardInterrupt:
+        print("\nFrida session terminated")
+    except FileNotFoundError:
+        print("Error: frida-tools not found. Install with: pip install frida-tools", file=sys.stderr)
+        return 1
+    
+    return 0
+
+def cmd_test(args):
+    """Run device tests"""
+    client = CCOClient(args.device)
+    
+    print("=== Running Device Tests ===\n")
+    
+    tests = []
+    results = {}
+    
+    # Test 1: Root access
+    if not args.category or args.category == "root":
+        tests.append(("root_access", lambda: check_root(client)))
+    
+    # Test 2: Module installed
+    if not args.category or args.category == "module":
+        tests.append(("module_installed", lambda: check_module(client)))
+    
+    # Test 3: CarrierConfig accessible
+    if not args.category or args.category == "config":
+        tests.append(("carrier_config", lambda: check_carrier_config(client)))
+    
+    # Test 4: IMS available
+    if not args.category or args.category == "ims":
+        tests.append(("ims_available", lambda: check_ims(client)))
+    
+    # Run tests
+    for name, test_func in tests:
+        try:
+            result = test_func()
+            results[name] = result
+            status = "✓" if result else "✗"
+            print(f"[{status}] {name.replace('_', ' ').title()}")
+        except Exception as e:
+            results[name] = False
+            print(f"[✗] {name.replace('_', ' ').title()} - Error: {e}")
+    
+    # Summary
+    passed = sum(1 for r in results.values() if r)
+    total = len(results)
+    print(f"\nResults: {passed}/{total} passed")
+    
+    return 0 if passed == total else 1
+
+def check_root(client):
+    """Check if device is rooted"""
+    result = client._adb("shell", "su -c id")
+    return "uid=0" in result.stdout
+
+def check_module(client):
+    """Check if Magisk module is installed"""
+    result = client._adb("shell", "test -d /data/adb/cco && echo yes || echo no")
+    return "yes" in result.stdout
+
+def check_carrier_config(client):
+    """Check if CarrierConfig is accessible"""
+    result = client._adb("shell", "dumpsys carrier_config")
+    return len(result.stdout) > 100
+
+def check_ims(client):
+    """Check if IMS is available"""
+    result = client._adb("shell", "dumpsys ims")
+    return "ImsService" in result.stdout or "IMS" in result.stdout
+
+def cmd_diagnose(args):
+    """Run comprehensive diagnostics"""
+    client = CCOClient(args.device)
+    
+    print("=== CCO Diagnostics ===\n")
+    print("Collecting device information...")
+    
+    report = {
+        "timestamp": subprocess.check_output(["date", "+%Y-%m-%dT%H:%M:%S"]).decode().strip(),
+        "device": client.get_device_info(),
+        "ims": client.get_ims_status(),
+        "tests": {}
+    }
+    
+    # Run tests
+    print("Running tests...")
+    tests = [
+        ("root", check_root),
+        ("module", check_module),
+        ("carrier_config", check_carrier_config),
+        ("ims", check_ims)
+    ]
+    
+    for name, test_func in tests:
+        try:
+            result = test_func(client)
+            report["tests"][name] = {"passed": result, "error": None}
+        except Exception as e:
+            report["tests"][name] = {"passed": False, "error": str(e)}
+    
+    # Collect logs
+    if args.logs:
+        print("Collecting logs...")
+        result = client._adb("logcat", "-d", "-s", f"{client.PACKAGE_NAME}:*")
+        report["logs"] = result.stdout.split("\n")[:100]  # Last 100 lines
+    
+    # Output
+    if args.output:
+        with open(args.output, 'w') as f:
+            json.dump(report, f, indent=2)
+        print(f"\n✓ Diagnostic report saved to: {args.output}")
+    else:
+        print("\n=== Diagnostic Report ===")
+        print(json.dumps(report, indent=2))
+    
+    # Summary
+    passed = sum(1 for t in report["tests"].values() if t["passed"])
+    total = len(report["tests"])
+    print(f"\nTests: {passed}/{total} passed")
+    
+    if passed < total:
+        print("\n⚠ Some tests failed. Check report for details.")
+        return 1
+    
+    return 0
+
 def main():
     parser = argparse.ArgumentParser(
         description="ccoctl - Samsung VoWiFi/VoLTE Toolkit CLI",
@@ -207,6 +459,12 @@ def main():
     parser.add_argument("-d", "--device", help="Target device serial (for multiple devices)")
     
     subparsers = parser.add_subparsers(dest="command", help="Commands")
+    
+    # devices command
+    devices_parser = subparsers.add_parser("devices", help="List connected devices")
+    
+    # status command
+    status_parser = subparsers.add_parser("status", help="Show comprehensive CCO status")
     
     # info command
     info_parser = subparsers.add_parser("info", help="Show device information")
@@ -224,8 +482,29 @@ def main():
     dumpsys_parser = subparsers.add_parser("dumpsys", help="Show dumpsys output")
     dumpsys_parser.add_argument("type", choices=["ims", "carrier_config"], help="Dumpsys type")
     
-    # devices command
-    devices_parser = subparsers.add_parser("devices", help="List connected devices")
+    # logs command
+    logs_parser = subparsers.add_parser("logs", help="Fetch and display logs")
+    logs_parser.add_argument("--cco", action="store_true", help="Show CCO app logs")
+    logs_parser.add_argument("--frida", action="store_true", help="Show Frida logs")
+    logs_parser.add_argument("--ims", action="store_true", help="Show IMS logs")
+    logs_parser.add_argument("-t", "--tail", type=int, help="Show last N lines")
+    logs_parser.add_argument("--clear", action="store_true", help="Clear logs")
+    
+    # frida command
+    frida_parser = subparsers.add_parser("frida", help="Launch Frida instrumentation")
+    frida_parser.add_argument("-s", "--script", help="Path to Frida script")
+    frida_parser.add_argument("--pause", action="store_true", help="Pause app on start")
+    frida_parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+    
+    # test command
+    test_parser = subparsers.add_parser("test", help="Run device tests")
+    test_parser.add_argument("-c", "--category", choices=["root", "module", "config", "ims"], 
+                            help="Test category to run")
+    
+    # diagnose command
+    diagnose_parser = subparsers.add_parser("diagnose", help="Run comprehensive diagnostics")
+    diagnose_parser.add_argument("-o", "--output", help="Save report to file")
+    diagnose_parser.add_argument("--logs", action="store_true", help="Include logs in report")
     
     args = parser.parse_args()
     
@@ -235,11 +514,16 @@ def main():
     
     # Route to command handlers
     commands = {
+        "devices": cmd_devices,
+        "status": cmd_status,
         "info": cmd_info,
         "deploy": cmd_deploy,
         "export": cmd_export,
         "dumpsys": cmd_dumpsys,
-        "devices": cmd_devices
+        "logs": cmd_logs,
+        "frida": cmd_frida,
+        "test": cmd_test,
+        "diagnose": cmd_diagnose
     }
     
     return commands[args.command](args)
