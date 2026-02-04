@@ -114,13 +114,41 @@ class DeviceRepository @Inject constructor(
      * Get IMS registration status
      */
     suspend fun getIMSStatus(): IMSStatus = withContext(Dispatchers.IO) {
-        // TODO: Implement IMS status detection via dumpsys or reflection
-        // For now, return mock data
+        try {
+            val result = Shell.cmd("dumpsys ims").exec()
+            if (result.isSuccess) {
+                val output = result.out.joinToString("\n")
+                val isRegistered = output.contains("mRegistered=true", ignoreCase = true) ||
+                                 output.contains("ImsRegistered", ignoreCase = true)
+                val voLTEAvailable = output.contains("VOICE", ignoreCase = true) ||
+                                    output.contains("VoLTE", ignoreCase = true)
+                val voWiFiAvailable = output.contains("ePDG", ignoreCase = true) ||
+                                     output.contains("WIFI_CALLING", ignoreCase = true) ||
+                                     output.contains("VoWiFi", ignoreCase = true)
+                
+                val registrationState = when {
+                    isRegistered && voWiFiAvailable -> "REGISTERED_WIFI"
+                    isRegistered -> "REGISTERED_LTE"
+                    else -> "NOT_REGISTERED"
+                }
+                
+                return@withContext IMSStatus(
+                    isRegistered = isRegistered,
+                    isVoLTEAvailable = voLTEAvailable,
+                    isVoWiFiAvailable = voWiFiAvailable,
+                    registrationState = registrationState
+                )
+            }
+        } catch (e: Exception) {
+            // Return default status on error
+        }
+        
+        // Default status if dumpsys fails
         IMSStatus(
             isRegistered = false,
             isVoLTEAvailable = false,
             isVoWiFiAvailable = false,
-            registrationState = "NOT_REGISTERED"
+            registrationState = "UNKNOWN"
         )
     }
     
@@ -130,11 +158,29 @@ class DeviceRepository @Inject constructor(
     suspend fun getWFCUIStatus(): WFCUIStatus = withContext(Dispatchers.IO) {
         val wfcActivityExists = checkWFCActivityExists()
         
-        // TODO: More sophisticated checks
+        // Check if settings page populates (basic heuristic)
+        val pagePopulates = wfcActivityExists && try {
+            val result = Shell.cmd("dumpsys activity top | grep -i wifi").exec()
+            result.isSuccess && result.out.isNotEmpty()
+        } catch (e: Exception) {
+            false
+        }
+        
+        // Check for toggle presence via carrier config
+        val togglePresent = try {
+            val result = Shell.cmd("dumpsys carrier_config | grep -i wfc").exec()
+            result.isSuccess && result.out.any { line ->
+                line.contains("carrier_wfc_ims_available_bool", ignoreCase = true) &&
+                line.contains("true", ignoreCase = true)
+            }
+        } catch (e: Exception) {
+            false
+        }
+        
         WFCUIStatus(
             settingsActivityExists = wfcActivityExists,
-            pagePopulates = false,  // Requires actual inspection
-            togglePresent = false    // Requires actual inspection
+            pagePopulates = pagePopulates,
+            togglePresent = togglePresent
         )
     }
     
@@ -195,9 +241,77 @@ class DeviceRepository @Inject constructor(
     /**
      * Export diagnostic report
      */
-    suspend fun exportReport(state: DashboardState) = withContext(Dispatchers.IO) {
-        // TODO: Implement report export to file
-        // Generate JSON and text reports
+    suspend fun exportReport(state: DashboardState): ExportResult = withContext(Dispatchers.IO) {
+        try {
+            val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US)
+                .format(java.util.Date())
+            
+            val reportText = buildString {
+                appendLine("=== CCO Diagnostic Report ===")
+                appendLine("Generated: ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date())}")
+                appendLine()
+                
+                // Device info
+                state.deviceInfo?.let { device ->
+                    appendLine("[Device Information]")
+                    appendLine("Manufacturer: ${device.manufacturer}")
+                    appendLine("Model: ${device.model}")
+                    appendLine("Android: ${device.androidVersion}")
+                    device.oneUIVersion?.let { appendLine("One UI: $it") }
+                    appendLine("Security Patch: ${device.securityPatch}")
+                    appendLine("Root Status: ${if (device.isRooted) "Rooted" else "Not Rooted"}")
+                    appendLine()
+                }
+                
+                // SIM info
+                if (state.simInfo.isNotEmpty()) {
+                    appendLine("[SIM Information]")
+                    state.simInfo.forEach { sim ->
+                        appendLine("Slot ${sim.slotIndex}: ${sim.carrierName ?: "Unknown"}")
+                        sim.mcc?.let { appendLine("  MCC/MNC: $it/${sim.mnc}") }
+                        appendLine("  Active: ${sim.isActive}")
+                    }
+                    appendLine()
+                }
+                
+                // IMS status
+                state.imsStatus?.let { ims ->
+                    appendLine("[IMS Status]")
+                    appendLine("Registered: ${ims.isRegistered}")
+                    appendLine("VoLTE Available: ${ims.isVoLTEAvailable}")
+                    appendLine("VoWiFi Available: ${ims.isVoWiFiAvailable}")
+                    appendLine("Registration State: ${ims.registrationState}")
+                    appendLine()
+                }
+                
+                // WFC UI status
+                state.wfcUIStatus?.let { wfc ->
+                    appendLine("[WFC UI Status]")
+                    appendLine("Settings Activity: ${wfc.settingsActivityExists}")
+                    appendLine("Page Populates: ${wfc.pagePopulates}")
+                    appendLine("Toggle Present: ${wfc.togglePresent}")
+                    appendLine()
+                }
+                
+                // Blocker analysis
+                appendLine("[Analysis]")
+                appendLine("Detected Blocker: ${state.detectedBlocker}")
+                appendLine()
+                appendLine("=== End Report ===")
+            }
+            
+            // Save to external storage
+            val externalDir = android.os.Environment.getExternalStorageDirectory()
+            val exportDir = java.io.File(externalDir, "CCO/reports")
+            exportDir.mkdirs()
+            
+            val reportFile = java.io.File(exportDir, "diagnostic_report_$timestamp.txt")
+            reportFile.writeText(reportText)
+            
+            ExportResult.Success(reportFile.absolutePath)
+        } catch (e: Exception) {
+            ExportResult.Error("Failed to export report: ${e.message}")
+        }
     }
     
     /**

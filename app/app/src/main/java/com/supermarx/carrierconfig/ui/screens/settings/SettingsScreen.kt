@@ -152,7 +152,9 @@ fun SettingsScreen(
                             icon = Icons.Default.Folder,
                             title = "Export Directory",
                             subtitle = state.exportDirectory.ifEmpty { "/sdcard/CCO/exports" },
-                            onClick = { /* TODO: Directory picker */ }
+                            onClick = {
+                                viewModel.showMessage("Directory picker coming soon. Exports saved to: /sdcard/CCO/exports")
+                            }
                         )
                         
                         HorizontalDivider(color = GlassBorder.copy(alpha = 0.3f))
@@ -184,7 +186,9 @@ fun SettingsScreen(
                             icon = Icons.Default.Upload,
                             title = "Import Configuration",
                             subtitle = "Restore settings from file",
-                            onClick = { /* TODO: File picker */ }
+                            onClick = {
+                                viewModel.showMessage("File picker coming soon. Place config at: /sdcard/CCO/config.json")
+                            }
                         )
                     }
                 }
@@ -207,7 +211,7 @@ fun SettingsScreen(
                             icon = Icons.Default.Description,
                             title = "Licenses",
                             subtitle = "Open source licenses",
-                            onClick = { /* TODO: Licenses screen */ }
+                            onClick = { onNavigateToAbout }
                         )
                         
                         HorizontalDivider(color = GlassBorder.copy(alpha = 0.3f))
@@ -216,7 +220,18 @@ fun SettingsScreen(
                             icon = Icons.Default.Code,
                             title = "Source Code",
                             subtitle = "github.com/supermarsx/cco",
-                            onClick = { /* TODO: Open GitHub */ }
+                            onClick = {
+                                val context = navController.context
+                                val intent = android.content.Intent(
+                                    android.content.Intent.ACTION_VIEW,
+                                    android.net.Uri.parse("https://github.com/supermarsx/magisk-carrier-config-override")
+                                )
+                                try {
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    viewModel.showMessage("Unable to open browser")
+                                }
+                            }
                         )
                     }
                 }

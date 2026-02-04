@@ -69,8 +69,28 @@ class DashboardViewModel @Inject constructor(
     
     fun runDiagnostics() {
         viewModelScope.launch {
-            // TODO: Implement full diagnostics scan
-            loadDashboardData()
+            _state.value = _state.value.copy(isLoading = true)
+            try {
+                // Reload all dashboard data for fresh diagnostics
+                loadDashboardData()
+                
+                // Run additional checks
+                val deviceInfo = deviceRepository.getDeviceInfo()
+                val simInfo = deviceRepository.getSimInfo()
+                val imsStatus = deviceRepository.getImsStatus()
+                
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    deviceInfo = deviceInfo,
+                    simInfo = simInfo,
+                    imsStatus = imsStatus
+                )
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = "Diagnostics scan failed: ${e.message}"
+                )
+            }
         }
     }
     

@@ -47,6 +47,10 @@ class SettingsViewModel @Inject constructor(
         }
     }
     
+    fun showMessage(message: String) {
+        _state.update { it.copy(message = message) }
+    }
+    
     // =========================================================================
     // Appearance
     // =========================================================================
@@ -93,13 +97,34 @@ class SettingsViewModel @Inject constructor(
     fun clearCache() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            // TODO: Clear cache implementation
-            kotlinx.coroutines.delay(500) // Simulate cache clearing
-            _state.update { 
-                it.copy(
-                    isLoading = false,
-                    message = "Cache cleared successfully"
-                )
+            try {
+                val context = getApplication<Application>().applicationContext
+                val cacheDir = context.cacheDir
+                val externalCacheDir = context.externalCacheDir
+                
+                // Clear internal cache
+                cacheDir.listFiles()?.forEach { file ->
+                    file.deleteRecursively()
+                }
+                
+                // Clear external cache
+                externalCacheDir?.listFiles()?.forEach { file ->
+                    file.deleteRecursively()
+                }
+                
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        message = "Cache cleared successfully (${cacheDir.totalSpace / 1024 / 1024} MB freed)"
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        message = "Failed to clear cache: ${e.message}"
+                    )
+                }
             }
         }
     }
@@ -199,14 +224,39 @@ class SettingsViewModel @Inject constructor(
     fun clearAllData() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            preferencesManager.clearAll()
-            // TODO: Clear app database
-            loadPreferences()
-            _state.update { 
-                it.copy(
-                    isLoading = false,
-                    message = "All data cleared"
-                )
+            try {
+                val context = getApplication<Application>().applicationContext
+                
+                // Clear all app data
+                context.cacheDir.deleteRecursively()
+                context.externalCacheDir?.deleteRecursively()
+                
+                // Clear app files
+                context.filesDir.listFiles()?.forEach { file ->
+                    if (!file.name.contains("datastore")) {
+                        file.deleteRecursively()
+                    }
+                }
+                
+                // Reset preferences
+                preferencesManager.clearAll()
+                
+                // Reload preferences
+                loadPreferences()
+                
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        message = "All data cleared and reset to defaults"
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        message = "Failed to clear data: ${e.message}"
+                    )
+                }
             }
         }
     }

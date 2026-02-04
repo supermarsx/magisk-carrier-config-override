@@ -165,18 +165,27 @@ class DiagnosticsViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isExporting = true) }
             
-            // Gather all diagnostic information
-            val deviceInfo = "Device info placeholder" // TODO: Get from DeviceRepository
-            val simInfo = "SIM info placeholder" // TODO: Get from SimRepository
-            val imsStatus = state.value.dumpsysResult?.let { 
-                if (it is DumpsysResult.Success) it.output else "N/A" 
-            } ?: "Not loaded"
-            
-            val result = exportRepository.exportDiagnostics(
-                deviceInfo = deviceInfo,
-                simInfo = simInfo,
-                imsStatus = imsStatus
-            )
+            try {
+                // Gather all diagnostic information
+                val deviceInfo = buildString {
+                    appendLine("Device Information:")
+                    appendLine("Model: ${android.os.Build.MODEL}")
+                    appendLine("Manufacturer: ${android.os.Build.MANUFACTURER}")
+                    appendLine("Android: ${android.os.Build.VERSION.RELEASE}")
+                    appendLine("SDK: ${android.os.Build.VERSION.SDK_INT}")
+                }
+                
+                val simInfo = "SIM Status: ${if (state.value.dumpsysResult != null) "Available" else "Unknown"}"
+                
+                val imsStatus = state.value.dumpsysResult?.let { 
+                    if (it is DumpsysResult.Success) it.output else "N/A" 
+                } ?: "Not loaded"
+                
+                val result = exportRepository.exportDiagnostics(
+                    deviceInfo = deviceInfo,
+                    simInfo = simInfo,
+                    imsStatus = imsStatus
+                )
             
             when (result) {
                 is com.supermarx.carrierconfig.data.repository.ExportResult.Success -> {
@@ -203,12 +212,49 @@ class DiagnosticsViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isExporting = true) }
             
-            // Export current logcat entries
-            val logsText = _logcatEntries.value.joinToString("\n") { entry ->
-                "${entry.level.displayName} ${entry.tag}: ${entry.message}"
+            try {
+                // Export current logcat entries
+                val logsText = _logcatEntries.value.joinToString("\n") { entry ->
+                    "${entry.timestamp} ${entry.pid}/${entry.tid} ${entry.level} ${entry.tag}: ${entry.message}"
+                }
+                
+                // Save to file in exports directory
+                val timestamp = System.currentTimeMillis()
+                val fileName = "logcat_export_$timestamp.txt"
+                val result = exportRepository.exportToFile(
+                    fileName = fileName,
+                    content = logsText,
+                    mimeType = "text/plain"
+                )
+                
+                when (result) {
+                    is ExportResult.Success -> {
+                        _state.update { 
+                            it.copy(
+                                isExporting = false,
+                                successMessage = "Logs exported to: ${result.filePath}"
+                            )
+                        }
+                    }
+                    is ExportResult.Error -> {
+                        _state.update { 
+                            it.copy(
+                                isExporting = false,
+                                error = "Export failed: ${result.message}"
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                _state.update { 
+                    it.copy(
+                        isExporting = false,
+                        error = "Failed to export logs: ${e.message}"
+                    )
+                }
             }
-            
-            // TODO: Save to file
+        }
+    }
             
             _state.update { 
                 it.copy(

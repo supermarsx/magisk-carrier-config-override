@@ -266,7 +266,16 @@ private fun PresetCard(
                 color = TextPrimary
             )
             
-            // TODO: Add custom key button
+            GlassButton(
+                text = "Add Key",
+                onClick = {
+                    // Show dialog to add custom key
+                    viewModel.showMessage("Custom key editor coming soon!")
+                },
+                modifier = Modifier.height(36.dp),
+                containerColor = GlassSurface,
+                contentColor = AccentCyan
+            )
         }
         
         Spacer(modifier = Modifier.height(16.dp))
