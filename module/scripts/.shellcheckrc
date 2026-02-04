@@ -1,0 +1,21 @@
+# ShellCheck configuration for CCO Magisk Module
+# Android uses mksh/bash, not strict POSIX sh
+
+# Disable POSIX warnings for Android-specific scripts
+# SC3030: arrays are supported in mksh/bash
+# SC3043: local is supported in mksh/bash
+# SC3054: array references are supported
+disable=SC3030,SC3043,SC3054
+
+# Style warnings that are acceptable
+# SC2129: Individual redirects are fine for clarity
+# SC2015: && || pattern is intentional
+# SC2046: Command substitution without quotes is ok in these contexts
+# SC2086: Word splitting is intentional in some cases
+# SC2155: Declare and assign is common idiom
+disable=SC2129,SC2015,SC2046,SC2086,SC2155
+
+# Enable these checks
+# SC2034: Unused variables (good to catch)
+# SC2154: Referenced but not assigned (catches typos)
+# SC2164: cd without error checking

@@ -1,0 +1,111 @@
+name: Bug Report
+description: Report a bug or issue with CCO
+title: "[Bug] "
+labels: ["bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the sections below.
+        
+        **⚠️ IMPORTANT: Remove any sensitive information (phone numbers, IMSI, ICCID, etc.) before submitting.**
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear description of what the bug is
+      placeholder: What happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device Model
+      description: e.g., Samsung Galaxy S23 (SM-S911B)
+      placeholder: SM-GXXXXX
+    validations:
+      required: true
+
+  - type: input
+    id: android
+    attributes:
+      label: Android Version / One UI Version
+      description: e.g., Android 14 / One UI 6.1
+      placeholder: Android 14 / One UI 6.1
+    validations:
+      required: true
+
+  - type: input
+    id: cco-version
+    attributes:
+      label: CCO Version
+      description: App version from About screen
+      placeholder: 1.0.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: magisk-version
+    attributes:
+      label: Magisk Version
+      options:
+        - 26.x (latest)
+        - 25.x
+        - 24.x
+        - Not using Magisk module
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: method
+    attributes:
+      label: Which method are you using?
+      options:
+        - label: Method 1 (Magisk CarrierConfig Override)
+        - label: Method 2 (Frida Instrumentation)
+        - label: Neither (diagnostics only)
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs
+      description: |
+        Paste relevant logs here. **REDACT SENSITIVE INFO FIRST!**
+        
+        Get logs:
+        ```
+        adb logcat -d > logcat.txt
+        adb shell "cat /data/adb/cco/logs/module.log"
+        ```
+      render: shell
+      placeholder: Paste logs here (redacted)
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context, screenshots, or information

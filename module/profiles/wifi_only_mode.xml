@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    CCO CarrierConfig Override - Wi-Fi Only Mode Profile
+
+    This profile forces Wi-Fi Only mode for voice calls.
+    Use when you want all calls to go through Wi-Fi exclusively.
+
+    WARNING: May prevent cellular voice calls even when Wi-Fi is unavailable.
+    Only use if you understand the implications.
+-->
+<carrier_config>
+  <!-- Enable Wi-Fi Calling -->
+  <boolean name="carrier_wfc_ims_available_bool" value="true"/>
+  <boolean name="carrier_default_wfc_ims_enabled_bool" value="true"/>
+  <!-- Force Wi-Fi Only mode -->
+  <int name="carrier_default_wfc_ims_mode_int" value="2"/>
+  <int name="carrier_default_wfc_ims_roaming_mode_int" value="2"/>
+  <!-- Support Wi-Fi Only -->
+  <boolean name="carrier_wfc_supports_wifi_only_bool" value="true"/>
+  <!-- Allow user to change mode -->
+  <boolean name="editable_wfc_mode_bool" value="true"/>
+  <boolean name="editable_wfc_roaming_mode_bool" value="true"/>
+  <!-- VoLTE settings -->
+  <boolean name="carrier_volte_available_bool" value="true"/>
+  <boolean name="enhanced_4g_lte_on_by_default_bool" value="true"/>
+  <boolean name="hide_enhanced_4g_lte_bool" value="false"/>
+  <!-- Disable provisioning requirements -->
+  <boolean name="carrier_volte_provisioning_required_bool" value="false"/>
+  <boolean name="carrier_ut_provisioning_required_bool" value="false"/>
+</carrier_config>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    CCO CarrierConfig Override - Aggressive Enable Profile
+
+    This profile uses aggressive settings to force enable Wi-Fi Calling
+    even when carrier blocks or restricts it.
+
+    Use this if the generic profile doesn't work.
+-->
+<carrier_config>
+  <!-- Core Wi-Fi Calling enablement -->
+  <boolean name="carrier_wfc_ims_available_bool" value="true"/>
+  <boolean name="carrier_default_wfc_ims_enabled_bool" value="true"/>
+  <boolean name="editable_wfc_mode_bool" value="true"/>
+  <boolean name="editable_wfc_roaming_mode_bool" value="true"/>
+  <boolean name="carrier_wfc_supports_wifi_only_bool" value="true"/>
+  <!-- Wi-Fi Preferred mode -->
+  <int name="carrier_default_wfc_ims_mode_int" value="1"/>
+  <int name="carrier_default_wfc_ims_roaming_mode_int" value="1"/>
+  <!-- VoLTE enablement -->
+  <boolean name="carrier_volte_available_bool" value="true"/>
+  <boolean name="enhanced_4g_lte_on_by_default_bool" value="true"/>
+  <boolean name="hide_enhanced_4g_lte_bool" value="false"/>
+  <boolean name="ignore_data_enabled_changed_for_video_calls" value="false"/>
+  <!-- Disable all provisioning checks -->
+  <boolean name="carrier_volte_provisioning_required_bool" value="false"/>
+  <boolean name="carrier_ut_provisioning_required_bool" value="false"/>
+  <boolean name="require_entitlement_checks_bool" value="false"/>
+  <!-- Force IMS registration -->
+  <boolean name="ims_reasoninfo_mapping_bool" value="false"/>
+  <boolean name="use_wfc_home_network_mode_in_roaming_network_bool" value="false"/>
+  <!-- Disable carrier restrictions -->
+  <boolean name="disable_charge_indication_bool" value="true"/>
+  <boolean name="show_wfc_location_privacy_policy_bool" value="false"/>
+  <!-- Samsung-specific -->
+  <boolean name="support_wfc_time_condition" value="false"/>
+  <boolean name="block_wfc_activation_condition" value="false"/>
+  <!-- Cross-SIM and additional features -->
+  <boolean name="support_cross_sim_calling_bool" value="true"/>
+  <boolean name="editable_enhanced_4g_lte_bool" value="true"/>
+  <!-- Remove UI restrictions -->
+  <boolean name="hide_carrier_network_settings_bool" value="false"/>
+  <boolean name="world_phone_bool" value="true"/>
+  <!-- Emergency calling over Wi-Fi -->
+  <boolean name="use_only_rsrp_for_lte_signal_bar_bool" value="false"/>
+  <!-- SIM slot configuration -->
+  <boolean name="config_enable_diag_on_ims_apn_bool" value="false"/>
+</carrier_config>

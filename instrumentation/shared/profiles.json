@@ -1,0 +1,80 @@
+{
+  "profiles": [
+    {
+      "id": "oneui6_generic",
+      "name": "Generic Samsung One UI 6",
+      "description": "Generic hook profile for Samsung devices running One UI 6.x",
+      "oneui_versions": ["6.0", "6.1"],
+      "android_versions": ["13", "14"],
+      "targets": [
+        {
+          "package": "com.sec.imsservice",
+          "class": "com.sec.ims.ImsManager",
+          "method": "isWfcEntitled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "Primary Wi-Fi Calling entitlement check"
+        },
+        {
+          "package": "com.sec.imsservice",
+          "class": "com.sec.internal.ims.servicemodules.im.ImsFeature",
+          "method": "isVowifiEnabled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "VoWiFi feature availability check"
+        },
+        {
+          "package": "com.android.phone",
+          "class": "com.android.phone.PhoneUtils",
+          "method": "isWfcModeEditable",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "WFC mode editability check"
+        }
+      ],
+      "carrier_config_overrides": {
+        "carrier_wfc_ims_available_bool": true,
+        "carrier_default_wfc_ims_enabled_bool": true,
+        "editable_wfc_mode_bool": true,
+        "editable_wfc_roaming_mode_bool": true,
+        "carrier_wfc_supports_wifi_only_bool": true
+      }
+    },
+    {
+      "id": "oneui5_generic",
+      "name": "Generic Samsung One UI 5",
+      "description": "Generic hook profile for Samsung devices running One UI 5.x",
+      "oneui_versions": ["5.0", "5.1"],
+      "android_versions": ["13"],
+      "targets": [
+        {
+          "package": "com.sec.imsservice",
+          "class": "com.sec.ims.ImsManager",
+          "method": "isWfcEntitled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "Primary Wi-Fi Calling entitlement check"
+        }
+      ],
+      "carrier_config_overrides": {
+        "carrier_wfc_ims_available_bool": true,
+        "carrier_default_wfc_ims_enabled_bool": true,
+        "editable_wfc_mode_bool": true
+      }
+    },
+    {
+      "id": "custom_record",
+      "name": "Custom Recorded Profile",
+      "description": "User-recorded hook profile from trace analysis",
+      "oneui_versions": ["*"],
+      "android_versions": ["*"],
+      "targets": [],
+      "note": "This profile is populated from record/replay mode"
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "last_updated": "2026-02-04",
+    "schema_version": "1.0"
+  }
+}

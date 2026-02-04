@@ -1,0 +1,8 @@
+# System properties for CCO CarrierConfig Override Module
+# These properties help with IMS/VoWiFi functionality
+
+# Enable IMS debugging (optional, can be disabled)
+# persist.vendor.ims.debug.enable=1
+
+# Force enable CarrierConfig loading
+# persist.vendor.radio.reload_carrier_config=1

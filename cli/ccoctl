@@ -1,0 +1,248 @@
+#!/usr/bin/env python3
+"""
+ccoctl - CarrierConfig Override Command-Line Utility
+
+A CLI companion tool for CCO that provides:
+- Device diagnostics
+- Configuration deployment
+- Status queries
+- Report generation
+
+Designed for ADB-friendly usage and CI/CD integration.
+"""
+
+import argparse
+import json
+import subprocess
+import sys
+from typing import Dict, List, Optional
+
+class CCOClient:
+    """Client for interacting with CCO app via ADB"""
+    
+    PACKAGE_NAME = "com.supermarx.carrierconfig"
+    
+    def __init__(self, device: Optional[str] = None):
+        self.device = device
+        
+    def _adb(self, *args) -> subprocess.CompletedProcess:
+        """Execute ADB command"""
+        cmd = ["adb"]
+        if self.device:
+            cmd.extend(["-s", self.device])
+        cmd.extend(args)
+        return subprocess.run(cmd, capture_output=True, text=True)
+    
+    def check_app_installed(self) -> bool:
+        """Check if CCO app is installed"""
+        result = self._adb("shell", "pm", "list", "packages", self.PACKAGE_NAME)
+        return self.PACKAGE_NAME in result.stdout
+    
+    def get_device_info(self) -> Dict:
+        """Get device information"""
+        info = {}
+        
+        # Basic device info
+        props = [
+            ("manufacturer", "ro.product.manufacturer"),
+            ("model", "ro.product.model"),
+            ("android_version", "ro.build.version.release"),
+            ("sdk_int", "ro.build.version.sdk"),
+            ("build_fingerprint", "ro.build.fingerprint"),
+            ("security_patch", "ro.build.version.security_patch"),
+        ]
+        
+        for key, prop in props:
+            result = self._adb("shell", "getprop", prop)
+            info[key] = result.stdout.strip()
+        
+        # Check root
+        result = self._adb("shell", "su", "-c", "id")
+        info["rooted"] = "uid=0" in result.stdout
+        
+        return info
+    
+    def get_ims_status(self) -> Dict:
+        """Get IMS registration status via dumpsys"""
+        result = self._adb("shell", "dumpsys", "ims")
+        
+        # Parse dumpsys output (simplified)
+        status = {
+            "registered": "REGISTERED" in result.stdout,
+            "volte_available": False,
+            "vowifi_available": False
+        }
+        
+        # More sophisticated parsing would be needed
+        if "VoLTE" in result.stdout or "VOLTE" in result.stdout:
+            status["volte_available"] = True
+        if "VoWiFi" in result.stdout or "VOWIFI" in result.stdout:
+            status["vowifi_available"] = True
+        
+        return status
+    
+    def get_carrier_config(self) -> str:
+        """Get CarrierConfig dump"""
+        result = self._adb("shell", "dumpsys", "carrier_config")
+        return result.stdout
+    
+    def deploy_preset(self, preset_name: str) -> bool:
+        """Deploy a CarrierConfig preset via app intent"""
+        intent = (
+            f"am start -n {self.PACKAGE_NAME}/.ui.MainActivity "
+            f"-a android.intent.action.VIEW "
+            f"-d 'cco://deploy?preset={preset_name}'"
+        )
+        result = self._adb("shell", intent)
+        return result.returncode == 0
+    
+    def export_report(self, output_path: str) -> bool:
+        """Export diagnostic report"""
+        # Trigger export in app
+        intent = (
+            f"am start -n {self.PACKAGE_NAME}/.ui.MainActivity "
+            f"-a android.intent.action.VIEW "
+            f"-d 'cco://export_report'"
+        )
+        self._adb("shell", intent)
+        
+        # Pull from device (assuming fixed location)
+        report_path = "/sdcard/CCO/reports/latest.json"
+        result = self._adb("pull", report_path, output_path)
+        return result.returncode == 0
+    
+    def list_devices(self) -> List[str]:
+        """List connected devices"""
+        result = subprocess.run(["adb", "devices"], capture_output=True, text=True)
+        devices = []
+        for line in result.stdout.split("\n")[1:]:
+            if "\tdevice" in line:
+                devices.append(line.split("\t")[0])
+        return devices
+
+def cmd_info(args):
+    """Show device information"""
+    client = CCOClient(args.device)
+    
+    print("=== Device Information ===")
+    info = client.get_device_info()
+    for key, value in info.items():
+        print(f"{key:20s}: {value}")
+    
+    if args.ims:
+        print("\n=== IMS Status ===")
+        ims = client.get_ims_status()
+        for key, value in ims.items():
+            print(f"{key:20s}: {value}")
+
+def cmd_deploy(args):
+    """Deploy CarrierConfig preset"""
+    client = CCOClient(args.device)
+    
+    if not client.check_app_installed():
+        print(f"Error: CCO app not installed", file=sys.stderr)
+        return 1
+    
+    print(f"Deploying preset: {args.preset}")
+    if client.deploy_preset(args.preset):
+        print("✓ Preset deployed successfully")
+        print("⚠ Reboot required for changes to take effect")
+        return 0
+    else:
+        print("✗ Failed to deploy preset", file=sys.stderr)
+        return 1
+
+def cmd_export(args):
+    """Export diagnostic report"""
+    client = CCOClient(args.device)
+    
+    if not client.check_app_installed():
+        print(f"Error: CCO app not installed", file=sys.stderr)
+        return 1
+    
+    print(f"Exporting report to: {args.output}")
+    if client.export_report(args.output):
+        print("✓ Report exported successfully")
+        return 0
+    else:
+        print("✗ Failed to export report", file=sys.stderr)
+        return 1
+
+def cmd_dumpsys(args):
+    """Show dumpsys output"""
+    client = CCOClient(args.device)
+    
+    if args.type == "ims":
+        result = client._adb("shell", "dumpsys", "ims")
+    elif args.type == "carrier_config":
+        result = client.get_carrier_config()
+        print(result)
+        return 0
+    else:
+        print(f"Unknown dumpsys type: {args.type}", file=sys.stderr)
+        return 1
+    
+    print(result.stdout)
+    return 0
+
+def cmd_devices(args):
+    """List connected devices"""
+    client = CCOClient()
+    devices = client.list_devices()
+    
+    if not devices:
+        print("No devices connected")
+        return 1
+    
+    print("Connected devices:")
+    for device in devices:
+        print(f"  - {device}")
+    return 0
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="ccoctl - Samsung VoWiFi/VoLTE Toolkit CLI",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument("-d", "--device", help="Target device serial (for multiple devices)")
+    
+    subparsers = parser.add_subparsers(dest="command", help="Commands")
+    
+    # info command
+    info_parser = subparsers.add_parser("info", help="Show device information")
+    info_parser.add_argument("--ims", action="store_true", help="Include IMS status")
+    
+    # deploy command
+    deploy_parser = subparsers.add_parser("deploy", help="Deploy CarrierConfig preset")
+    deploy_parser.add_argument("preset", help="Preset name (e.g., 'expose_wfc_ui')")
+    
+    # export command
+    export_parser = subparsers.add_parser("export", help="Export diagnostic report")
+    export_parser.add_argument("-o", "--output", default="cco_report.json", help="Output file path")
+    
+    # dumpsys command
+    dumpsys_parser = subparsers.add_parser("dumpsys", help="Show dumpsys output")
+    dumpsys_parser.add_argument("type", choices=["ims", "carrier_config"], help="Dumpsys type")
+    
+    # devices command
+    devices_parser = subparsers.add_parser("devices", help="List connected devices")
+    
+    args = parser.parse_args()
+    
+    if not args.command:
+        parser.print_help()
+        return 1
+    
+    # Route to command handlers
+    commands = {
+        "info": cmd_info,
+        "deploy": cmd_deploy,
+        "export": cmd_export,
+        "dumpsys": cmd_dumpsys,
+        "devices": cmd_devices
+    }
+    
+    return commands[args.command](args)
+
+if __name__ == "__main__":
+    sys.exit(main())

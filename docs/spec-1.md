@@ -47,19 +47,19 @@ Uses a runtime instrumentation layer to simulate entitlement responses so Samsun
 
 ## 3) Product Components
 
-### A) Android app: `svtt-app`
+### A) Android app: `cco-app`
 
 A user-facing control panel with presets, current state readouts, and test runner.
 
-### B) Magisk module: `svtt-carrierconfig`
+### B) Magisk module: `cco-carrierconfig`
 
 Boot-time bind-mount and file deploy of carrier config override files (Method 1).
 
-### C) Instrumentation bundle: `svtt-entitlement`
+### C) Instrumentation bundle: `cco-entitlement`
 
 Runtime hooks for entitlement decisions, with profiles per firmware/package (Method 2).
 
-### D) CLI utility (optional): `svttctl`
+### D) CLI utility (optional): `ccoctl`
 
 A small companion CLI (adb-friendly) that reads status and triggers app actions via intents.
 
@@ -183,7 +183,7 @@ Module strategy:
 
 1. Detect which paths are read by system (heuristic + logs).
 2. Bind-mount into the detected canonical path.
-3. Keep a copy at `/data/adb/svtt/overrides/<profile>.xml`.
+3. Keep a copy at `/data/adb/cco/overrides/<profile>.xml`.
 
 ### 5.3 Key Set (initial)
 
@@ -217,14 +217,14 @@ Value semantics (best-effort):
 
 1. App collects desired keys.
 2. App writes `override.xml` into app-private storage.
-3. App asks module installer to copy into `/data/adb/svtt/active/override.xml`.
+3. App asks module installer to copy into `/data/adb/cco/active/override.xml`.
 4. Module’s `service.sh` bind-mounts at boot.
 5. App prompts reboot.
 
 ### 5.5 Magisk Module Layout
 
 ```
-svtt-carrierconfig/
+cco-carrierconfig/
   module.prop
   service.sh
   post-fs-data.sh
@@ -236,7 +236,7 @@ svtt-carrierconfig/
 
 **post-fs-data.sh**
 
-- Ensure `/data/adb/svtt` structure exists
+- Ensure `/data/adb/cco` structure exists
 - Set SELinux contexts when possible (`restorecon`) on target paths
 
 **service.sh**
@@ -244,14 +244,14 @@ svtt-carrierconfig/
 - Wait for `/data` mounted
 - Resolve target path
 - Bind-mount override file
-- Emit logs to `/data/adb/svtt/logs/module.log`
+- Emit logs to `/data/adb/cco/logs/module.log`
 
 ### 5.6 Safety / Revert
 
 - “Disable overrides” button toggles module state by:
   - swapping bind source to a blank file or
   - setting a `disable` flag read by `service.sh`
-- Full uninstall removes `/data/adb/svtt` and module.
+- Full uninstall removes `/data/adb/cco` and module.
 
 ---
 
@@ -442,9 +442,9 @@ Acceptance criteria
 
 ## 11) Deliverables
 
-- `svtt-app` (Android)
-- `svtt-carrierconfig` (Magisk module)
-- `svtt-entitlement` (Frida scripts + optional LSPosed)
+- `cco-app` (Android)
+- `cco-carrierconfig` (Magisk module)
+- `cco-entitlement` (Frida scripts + optional LSPosed)
 - Documentation:
   - install
   - safety

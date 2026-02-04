@@ -1,0 +1,6 @@
+id=cco-carrierconfig
+name=CCO CarrierConfig Override
+version=1.0.0
+versionCode=1
+author=supermarsx
+description=CarrierConfig Override Manager - Magisk module that enables Wi-Fi Calling by applying CarrierConfig overrides at boot time.
