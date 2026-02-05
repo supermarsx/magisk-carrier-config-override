@@ -1,6 +1,7 @@
 package com.supermarx.carrierconfig.ui.screens.settings
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.supermarx.carrierconfig.data.datastore.PreferencesManager
 import com.supermarx.carrierconfig.data.repository.ExportRepository
@@ -14,9 +15,10 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
+    application: Application,
     private val preferencesManager: PreferencesManager,
     private val exportRepository: ExportRepository
-) : ViewModel() {
+) : AndroidViewModel(application) {
     
     // =========================================================================
     // State
@@ -27,6 +29,7 @@ class SettingsViewModel @Inject constructor(
     
     init {
         loadPreferences()
+        refreshCacheSize()
     }
     
     // =========================================================================
@@ -102,6 +105,9 @@ class SettingsViewModel @Inject constructor(
                 val cacheDir = context.cacheDir
                 val externalCacheDir = context.externalCacheDir
                 
+                // Calculate size before clearing
+                val sizeBefore = calculateCacheSize()
+                
                 // Clear internal cache
                 cacheDir.listFiles()?.forEach { file ->
                     file.deleteRecursively()
@@ -112,10 +118,12 @@ class SettingsViewModel @Inject constructor(
                     file.deleteRecursively()
                 }
                 
+                val sizeFreed = formatSize(sizeBefore)
                 _state.update { 
                     it.copy(
                         isLoading = false,
-                        message = "Cache cleared successfully (${cacheDir.totalSpace / 1024 / 1024} MB freed)"
+                        cacheSize = 0L,
+                        message = "Cache cleared successfully ($sizeFreed freed)"
                     )
                 }
             } catch (e: Exception) {
@@ -126,6 +134,44 @@ class SettingsViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+    
+    fun refreshCacheSize() {
+        viewModelScope.launch {
+            val size = calculateCacheSize()
+            _state.update { it.copy(cacheSize = size) }
+        }
+    }
+    
+    private fun calculateCacheSize(): Long {
+        val context = getApplication<Application>().applicationContext
+        val cacheDir = context.cacheDir
+        val externalCacheDir = context.externalCacheDir
+        
+        fun getDirectorySize(dir: java.io.File?): Long {
+            if (dir == null || !dir.exists()) return 0L
+            
+            var size = 0L
+            dir.listFiles()?.forEach { file ->
+                size += if (file.isDirectory) {
+                    getDirectorySize(file)
+                } else {
+                    file.length()
+                }
+            }
+            return size
+        }
+        
+        return getDirectorySize(cacheDir) + getDirectorySize(externalCacheDir)
+    }
+    
+    private fun formatSize(bytes: Long): String {
+        return when {
+            bytes < 1024 -> "$bytes B"
+            bytes < 1024 * 1024 -> String.format("%.2f KB", bytes / 1024.0)
+            bytes < 1024 * 1024 * 1024 -> String.format("%.2f MB", bytes / (1024.0 * 1024.0))
+            else -> String.format("%.2f GB", bytes / (1024.0 * 1024.0 * 1024.0))
         }
     }
     
@@ -198,6 +244,55 @@ class SettingsViewModel @Inject constructor(
                             error = result.message
                         )
                     }
+                }
+            }
+        }
+    }
+    
+    fun importConfigurationFromUri(context: android.content.Context, uri: android.net.Uri) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            
+            try {
+                val content = com.supermarx.carrierconfig.util.UriHelper.readTextFromUri(context, uri)
+                
+                if (content == null) {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Failed to read configuration file"
+                        )
+                    }
+                    return@launch
+                }
+                
+                val result = exportRepository.importConfigurationFromString(content)
+                
+                when (result) {
+                    is com.supermarx.carrierconfig.data.repository.ImportResult.Success -> {
+                        loadPreferences()
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                message = "Configuration imported successfully (version ${result.version})"
+                            )
+                        }
+                    }
+                    is com.supermarx.carrierconfig.data.repository.ImportResult.Error -> {
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                error = result.message
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "Import failed: ${e.message}"
+                    )
                 }
             }
         }
@@ -308,6 +403,14 @@ class SettingsViewModel @Inject constructor(
             }
         }
     }
+    
+    // =========================================================================
+    // Utility Functions
+    // =========================================================================
+    
+    fun getFormattedCacheSize(): String {
+        return formatSize(_state.value.cacheSize)
+    }
 }
 
 /**
@@ -326,6 +429,7 @@ data class SettingsState(
     // Advanced
     val debugMode: Boolean = false,
     val exportDirectory: String = "",
+    val cacheSize: Long = 0L,  // Cache size in bytes
     
     // Backup & Data
     val autoBackup: Boolean = false,

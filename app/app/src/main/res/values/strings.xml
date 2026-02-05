@@ -2,4 +2,7 @@
 <resources>
     <string name="app_name">CCO Manager</string>
     <string name="app_full_name">CarrierConfig Override Manager</string>
+    
+    <!-- Launcher icon background -->
+    <color name="ic_launcher_background">#0A0E14</color>
 </resources>

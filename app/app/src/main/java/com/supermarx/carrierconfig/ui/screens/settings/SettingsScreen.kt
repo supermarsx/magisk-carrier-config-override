@@ -1,5 +1,7 @@
 package com.supermarx.carrierconfig.ui.screens.settings
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,10 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.supermarx.carrierconfig.ui.components.*
 import com.supermarx.carrierconfig.ui.theme.*
+import com.supermarx.carrierconfig.util.PickConfigFileContract
+import com.supermarx.carrierconfig.util.PickDirectoryContract
+import com.supermarx.carrierconfig.util.UriHelper
 
 /**
  * Settings and preferences screen
@@ -29,6 +35,27 @@ fun SettingsScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    
+    // Activity result launchers
+    val directoryPickerLauncher = rememberLauncherForActivityResult(
+        contract = PickDirectoryContract()
+    ) { uri: Uri? ->
+        uri?.let {
+            UriHelper.takePersistablePermission(context, it)
+            val path = UriHelper.getDisplayPath(context, it)
+            viewModel.setExportDirectory(path)
+            viewModel.showMessage("Export directory set to: $path")
+        }
+    }
+    
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = PickConfigFileContract()
+    ) { uri: Uri? ->
+        uri?.let {
+            viewModel.importConfigurationFromUri(context, it)
+        }
+    }
     
     // Dialog states
     var showThemeDialog by remember { mutableStateOf(false) }
@@ -153,7 +180,7 @@ fun SettingsScreen(
                             title = "Export Directory",
                             subtitle = state.exportDirectory.ifEmpty { "/sdcard/CCO/exports" },
                             onClick = {
-                                viewModel.showMessage("Directory picker coming soon. Exports saved to: /sdcard/CCO/exports")
+                                directoryPickerLauncher.launch(null)
                             }
                         )
                         
@@ -162,8 +189,11 @@ fun SettingsScreen(
                         SettingsClickableItem(
                             icon = Icons.Default.DeleteSweep,
                             title = "Clear Cache",
-                            subtitle = "Remove temporary files and logs",
-                            onClick = { viewModel.clearCache() }
+                            subtitle = "Current cache size: ${viewModel.getFormattedCacheSize()}",
+                            onClick = { 
+                                viewModel.clearCache()
+                                // Refresh size after clearing (will be 0)
+                            }
                         )
                     }
                 }
@@ -187,7 +217,7 @@ fun SettingsScreen(
                             title = "Import Configuration",
                             subtitle = "Restore settings from file",
                             onClick = {
-                                viewModel.showMessage("File picker coming soon. Place config at: /sdcard/CCO/config.json")
+                                filePickerLauncher.launch(Unit)
                             }
                         )
                     }

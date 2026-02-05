@@ -1,0 +1,353 @@
+#!/usr/bin/env python3
+"""
+CCO Instrumentation CLI
+Command-line tool for managing Frida and LSPosed instrumentation
+"""
+
+import argparse
+import json
+import subprocess
+import sys
+import time
+from pathlib import Path
+from typing import Optional, Dict, Any
+
+class CCOInstrumentationCLI:
+    """Main CLI class for instrumentation management"""
+    
+    def __init__(self):
+        self.instrumentation_dir = Path(__file__).parent.parent
+        self.frida_dir = self.instrumentation_dir / "frida"
+        self.profiles_path = self.instrumentation_dir / "shared" / "profiles.json"
+        self.device_id: Optional[str] = None
+        
+    def run_command(self, cmd: list[str], capture=True) -> subprocess.CompletedProcess:
+        """Run shell command"""
+        if capture:
+            return subprocess.run(cmd, capture_output=True, text=True)
+        else:
+            return subprocess.run(cmd)
+    
+    def check_adb(self) -> bool:
+        """Check if ADB is available"""
+        result = self.run_command(["which", "adb"])
+        return result.returncode == 0
+    
+    def check_frida(self) -> bool:
+        """Check if Frida is available"""
+        result = self.run_command(["which", "frida"])
+        return result.returncode == 0
+    
+    def get_device_id(self) -> Optional[str]:
+        """Get connected device ID"""
+        result = self.run_command(["adb", "devices"])
+        lines = result.stdout.strip().split('\n')[1:]  # Skip header
+        
+        devices = [line.split()[0] for line in lines if line.strip() and 'device' in line]
+        
+        if not devices:
+            print("❌ No devices connected")
+            return None
+        
+        if len(devices) > 1:
+            print(f"Multiple devices found: {devices}")
+            print("Please specify device with -d option")
+            return None
+        
+        return devices[0]
+    
+    def list_profiles(self):
+        """List available hook profiles"""
+        with open(self.profiles_path) as f:
+            data = json.load(f)
+        
+        print("\n📋 Available Profiles:\n")
+        for profile in data['profiles']:
+            print(f"  • {profile['id']}")
+            print(f"    Name: {profile['name']}")
+            print(f"    Description: {profile['description']}")
+            print(f"    OneUI: {', '.join(profile['oneui_versions'])}")
+            print(f"    Android: {', '.join(profile['android_versions'])}")
+            print(f"    Targets: {len(profile['targets'])} hooks")
+            print()
+    
+    def get_profile(self, profile_id: str) -> Optional[Dict[str, Any]]:
+        """Get profile by ID"""
+        with open(self.profiles_path) as f:
+            data = json.load(f)
+        
+        for profile in data['profiles']:
+            if profile['id'] == profile_id:
+                return profile
+        
+        return None
+    
+    def start_frida_session(self, profile_id: str = "oneui6_generic", package: str = "com.sec.imsservice"):
+        """Start Frida instrumentation session"""
+        if not self.check_adb():
+            print("❌ ADB not found. Please install Android platform tools.")
+            return 1
+        
+        if not self.check_frida():
+            print("❌ Frida not found. Install with: pip install frida-tools")
+            return 1
+        
+        device_id = self.device_id or self.get_device_id()
+        if not device_id:
+            return 1
+        
+        profile = self.get_profile(profile_id)
+        if not profile:
+            print(f"❌ Profile '{profile_id}' not found")
+            return 1
+        
+        print(f"\n🚀 Starting Frida session...")
+        print(f"   Device: {device_id}")
+        print(f"   Profile: {profile['name']}")
+        print(f"   Target: {package}")
+        
+        # Check if Frida server is running
+        print("\n📡 Checking Frida server...")
+        result = self.run_command(["frida-ps", "-U"])
+        if result.returncode != 0:
+            print("❌ Frida server not running. Start it with:")
+            print("   adb shell 'su -c /data/local/tmp/frida-server-arm64 &'")
+            return 1
+        
+        print("✅ Frida server running")
+        
+        # Launch Frida with agent
+        agent_path = self.frida_dir / "agent-complete.js"
+        
+        print(f"\n💉 Injecting agent into {package}...")
+        
+        cmd = [
+            "frida",
+            "-U",
+            "-f", package,
+            "-l", str(agent_path),
+            "--runtime=v8"
+        ]
+        
+        if self.device_id:
+            cmd.extend(["-D", self.device_id])
+        
+        print(f"   Command: {' '.join(cmd)}")
+        print("\n🔄 Session starting (Ctrl+C to stop)...\n")
+        
+        return self.run_command(cmd, capture=False).returncode
+    
+    def record_session(self, output_file: str, duration: int = 60):
+        """Record Frida session for later replay"""
+        print(f"\n🎬 Recording session for {duration} seconds...")
+        print(f"   Output: {output_file}")
+        
+        # This would connect to running Frida session and enable recording
+        # Implementation depends on Frida RPC integration
+        
+        print("\n❌ Not implemented yet - requires running Frida session")
+        return 1
+    
+    def install_lsposed_module(self, apk_path: Optional[str] = None):
+        """Install LSPosed module APK"""
+        if not self.check_adb():
+            print("❌ ADB not found")
+            return 1
+        
+        device_id = self.device_id or self.get_device_id()
+        if not device_id:
+            return 1
+        
+        if not apk_path:
+            # Use default build output
+            apk_path = str(self.instrumentation_dir / "lsposed" / "build" / "outputs" / "apk" / "release" / "lsposed-release.apk")
+        
+        apk_file = Path(apk_path)
+        if not apk_file.exists():
+            print(f"❌ APK not found: {apk_path}")
+            print("   Build it first with: cd instrumentation/lsposed && ./gradlew assembleRelease")
+            return 1
+        
+        print(f"\n📦 Installing LSPosed module...")
+        print(f"   APK: {apk_path}")
+        
+        result = self.run_command(["adb", "-s", device_id, "install", "-r", apk_path])
+        
+        if result.returncode == 0:
+            print("✅ Module installed successfully")
+            print("\n⚠️  Next steps:")
+            print("   1. Open LSPosed Manager")
+            print("   2. Enable CCO module")
+            print("   3. Select scope: com.sec.imsservice, com.android.phone, com.android.settings")
+            print("   4. Reboot device")
+            return 0
+        else:
+            print(f"❌ Installation failed: {result.stderr}")
+            return 1
+    
+    def show_device_info(self):
+        """Show device information"""
+        if not self.check_adb():
+            print("❌ ADB not found")
+            return 1
+        
+        device_id = self.device_id or self.get_device_id()
+        if not device_id:
+            return 1
+        
+        print(f"\n📱 Device Information:\n")
+        
+        # Get various device properties
+        props = {
+            "Model": "ro.product.model",
+            "Manufacturer": "ro.product.manufacturer",
+            "Android": "ro.build.version.release",
+            "SDK": "ro.build.version.sdk",
+            "OneUI": "ro.build.version.oneui",
+            "Build": "ro.build.id",
+            "Security Patch": "ro.build.version.security_patch"
+        }
+        
+        for label, prop in props.items():
+            result = self.run_command(["adb", "-s", device_id, "shell", "getprop", prop])
+            value = result.stdout.strip() or "N/A"
+            print(f"   {label}: {value}")
+        
+        # Check root
+        result = self.run_command(["adb", "-s", device_id, "shell", "su", "-c", "id"])
+        has_root = "uid=0" in result.stdout
+        print(f"\n   Root: {'✅ Available' if has_root else '❌ Not available'}")
+        
+        # Check LSPosed
+        result = self.run_command(["adb", "-s", device_id, "shell", "pm", "list", "packages", "org.lsposed.manager"])
+        has_lsposed = "org.lsposed.manager" in result.stdout
+        print(f"   LSPosed: {'✅ Installed' if has_lsposed else '❌ Not installed'}")
+        
+        # Check Frida
+        result = self.run_command(["adb", "-s", device_id, "shell", "ls", "/data/local/tmp/frida-server*"])
+        has_frida = result.returncode == 0
+        print(f"   Frida Server: {'✅ Installed' if has_frida else '❌ Not installed'}")
+        
+        return 0
+    
+    def list_processes(self):
+        """List running processes on device"""
+        if not self.check_frida():
+            print("❌ Frida not found")
+            return 1
+        
+        device_id = self.device_id or self.get_device_id()
+        if not device_id:
+            return 1
+        
+        print("\n📋 Running Processes:\n")
+        
+        result = self.run_command(["frida-ps", "-U", "-a"])
+        print(result.stdout)
+        
+        return result.returncode
+
+def main():
+    """Main entry point"""
+    parser = argparse.ArgumentParser(
+        description="CCO Instrumentation CLI - Manage Frida and LSPosed hooks",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # List available hook profiles
+  cco-instrument profiles
+  
+  # Start Frida session with default profile
+  cco-instrument frida start
+  
+  # Start with specific profile
+  cco-instrument frida start --profile oneui5_generic
+  
+  # Install LSPosed module
+  cco-instrument lsposed install
+  
+  # Show device information
+  cco-instrument device info
+  
+  # List running processes
+  cco-instrument ps
+        """
+    )
+    
+    parser.add_argument("-d", "--device", help="Device ID (if multiple devices)")
+    
+    subparsers = parser.add_subparsers(dest="command", help="Command to execute")
+    
+    # Profiles command
+    subparsers.add_parser("profiles", help="List available hook profiles")
+    
+    # Frida commands
+    frida_parser = subparsers.add_parser("frida", help="Frida instrumentation")
+    frida_sub = frida_parser.add_subparsers(dest="frida_command")
+    
+    frida_start = frida_sub.add_parser("start", help="Start Frida session")
+    frida_start.add_argument("--profile", default="oneui6_generic", help="Profile ID to use")
+    frida_start.add_argument("--package", default="com.sec.imsservice", help="Target package")
+    
+    frida_record = frida_sub.add_parser("record", help="Record session for replay")
+    frida_record.add_argument("-o", "--output", required=True, help="Output file")
+    frida_record.add_argument("-d", "--duration", type=int, default=60, help="Recording duration (seconds)")
+    
+    # LSPosed commands
+    lsposed_parser = subparsers.add_parser("lsposed", help="LSPosed module")
+    lsposed_sub = lsposed_parser.add_subparsers(dest="lsposed_command")
+    
+    lsposed_install = lsposed_sub.add_parser("install", help="Install LSPosed module")
+    lsposed_install.add_argument("--apk", help="Path to APK (optional)")
+    
+    # Device commands
+    device_parser = subparsers.add_parser("device", help="Device management")
+    device_sub = device_parser.add_subparsers(dest="device_command")
+    device_sub.add_parser("info", help="Show device information")
+    
+    # Process list
+    subparsers.add_parser("ps", help="List running processes")
+    
+    args = parser.parse_args()
+    
+    if not args.command:
+        parser.print_help()
+        return 1
+    
+    cli = CCOInstrumentationCLI()
+    cli.device_id = args.device
+    
+    if args.command == "profiles":
+        cli.list_profiles()
+        return 0
+    
+    elif args.command == "frida":
+        if args.frida_command == "start":
+            return cli.start_frida_session(args.profile, args.package)
+        elif args.frida_command == "record":
+            return cli.record_session(args.output, args.duration)
+        else:
+            frida_parser.print_help()
+            return 1
+    
+    elif args.command == "lsposed":
+        if args.lsposed_command == "install":
+            return cli.install_lsposed_module(args.apk)
+        else:
+            lsposed_parser.print_help()
+            return 1
+    
+    elif args.command == "device":
+        if args.device_command == "info":
+            return cli.show_device_info()
+        else:
+            device_parser.print_help()
+            return 1
+    
+    elif args.command == "ps":
+        return cli.list_processes()
+    
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())

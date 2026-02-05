@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CCO Xposed Module</string>
+    <string name="module_description">CarrierConfig Override Xposed hooks for Samsung VoWiFi/VoLTE</string>
+    
+    <string-array name="xposed_scope">
+        <item>android</item>
+        <item>com.android.phone</item>
+        <item>com.sec.imsservice</item>
+        <item>com.samsung.android.ims</item>
+    </string-array>
+</resources>

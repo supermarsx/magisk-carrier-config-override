@@ -1,19 +1,19 @@
 # Development Progress Summary
 
 **Project**: CarrierConfig Override Manager (CCO)  
-**Last Updated**: February 4, 2026  
+**Last Updated**: February 5, 2026  
 **Version**: 1.0.0-alpha
 
 ## 🎯 Overview
 
 This document tracks the implementation progress of the CCO Manager Android app for controlling CarrierConfig behavior and enabling Wi-Fi Calling features.
 
-## 📋 Current Status: **78% Complete** 🚀
+## 📋 Current Status: **90% Complete** 🚀
 
 - **Milestone 1**: ✅ Diagnostics Core (100% Complete)
 - **Milestone 2**: ✅ CarrierConfig Override (100% Complete)
 - **Milestone 3**: 🚧 Runtime Hooks (UI Ready - 20% Complete)
-- **Milestone 4**: ✅ Advanced Features (78% Complete)
+- **Milestone 4**: ✅ Advanced Features (95% Complete)
   - ✅ Settings & Preferences System
   - ✅ About Screen
   - ✅ Export/Import Functionality
@@ -21,9 +21,240 @@ This document tracks the implementation progress of the CCO Manager Android app 
   - ✅ Dashboard FAB & Quick Actions
   - ✅ **Diagnostics Full Implementation (Logcat, Dumpsys, Tests)**
   - ✅ **Comprehensive Test Suite (595+ tests)**
-  - ⏳ Theme Selector & File Pickers
+  - ✅ **Theme & Glass Strength Selectors**
+  - ✅ **Cache Size Calculation & Display**
+  - ✅ **GlassTextField Input Component**
+  - ✅ **Complete Project Documentation (INSTALL.md, CONTRIBUTING.md)**
+  - ✅ **File/Directory Pickers (Activity Result API)**
+  - ✅ **Update Checker with GitHub Releases**
+  - ✅ **Root Operations Wrappers**
+  - ✅ **System Integration (WorkManager, BroadcastReceiver, Notifications)**
+  - ✅ **App Icon & Resources**
+  - ⏳ Device Testing
 
-**Overall Progress**: ~78% Complete 🎯
+**Overall Progress**: ~90% Complete 🎯
+
+**Recent Updates** (Feb 5, 2026 - Final Push):
+- ✅ Implemented Activity Result API for file/directory picking
+- ✅ Created comprehensive root operations wrappers (RootShell, SuFileManager, ServiceRestarter)
+- ✅ Built update checker with GitHub Releases API integration
+- ✅ Added WorkManager background workers (status refresh, update checks)
+- ✅ Created BroadcastReceiver for system events (connectivity, carrier config, airplane mode)
+- ✅ Implemented notification system with 3 channels
+- ✅ Designed and added app launcher icon with glassmorphism theme
+- ✅ Added Hilt WorkManager integration
+- ✅ Updated AndroidManifest with permissions and receivers
+- ✅ Enhanced SettingsViewModel with URI-based import
+
+---
+
+## 🎨 Latest Improvements (Feb 5, 2026)
+
+### UI Components & Polish
+
+1. **GlassTextField Component** ✅
+   - [GlassTextField.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/components/GlassTextField.kt)
+   - Glassmorphic text input with blur effect
+   - Error state with validation messages
+   - Leading/trailing icon support
+   - Placeholder text
+   - Single-line and multi-line variants (GlassTextArea)
+   - Fully integrated with Material 3 theme
+   - Used by AddKeyDialog for custom key entry
+
+2. **Theme Color Additions** ✅
+   - Added `GlassBorder` (20% white) for card borders
+   - Added `GlassSurfaceSubtle` (5% white) for subtle glass effects
+   - Updated Color.kt with complete palette
+
+3. **Cache Management Enhancements** ✅
+   - Added `cacheSize` field to SettingsState
+   - Implemented `calculateCacheSize()` for internal + external cache
+   - Created `formatSize()` helper (B, KB, MB, GB formatting)
+   - Added `refreshCacheSize()` function
+   - Updated SettingsScreen to display cache size in subtitle
+   - Cache size auto-refreshes on init and after clearing
+
+### DeviceRepository Improvements
+
+Implemented 3 TODOs in DeviceRepository.kt:
+
+1. **IMS Status Detection** ✅
+   - Real `dumpsys ims` parsing
+   - Checks for VoLTE and VoWiFi capabilities
+   - Registration state detection (REGISTERED_WIFI, REGISTERED_LTE, NOT_REGISTERED)
+   - Fallback to default status on error
+
+2. **WFC UI Status Checks** ✅
+   - Enhanced `pagePopulates` check via dumpsys activity
+   - Added `togglePresent` detection via carrier_config grep
+   - Better heuristic for WFC settings availability
+
+3. **Report Export Functionality** ✅
+   - Implemented `exportReport(DashboardState)` function
+   - Generates formatted text report with device, SIM, IMS, WFC data
+   - Exports to `/sdcard/CCO/reports/` with timestamp
+   - Returns `ExportResult` for success/error handling
+
+### Documentation
+
+1. **INSTALL.md** ✅ (380+ lines)
+   - Complete installation guide
+   - Prerequisites checklist
+   - 3 installation methods (APK, ADB, Build from Source)
+   - Initial setup walkthrough
+   - Verification steps
+   - Comprehensive troubleshooting section (8 common issues)
+   - Uninstallation guide
+   - Support resources
+
+2. **CONTRIBUTING.md** ✅ (500+ lines)
+   - Code of Conduct
+   - Development setup guide
+   - Project structure overview
+   - Kotlin coding standards
+   - Compose best practices
+   - Error handling guidelines
+   - Testing guide (unit, integration, UI)
+   - Pull request process
+   - Release workflow
+   - Semantic versioning guide
+
+---
+
+## 🚀 Major Implementation Sprint (Feb 5, 2026)
+
+### File & Directory Management
+
+1. **Activity Result Contracts** ✅
+   - [ActivityResultContracts.kt](app/app/src/main/java/com/supermarx/carrierconfig/util/ActivityResultContracts.kt) (135 lines)
+   - `PickDirectoryContract` - System directory picker integration
+   - `PickConfigFileContract` - JSON file picker for imports
+   - `CreateFileContract` - File creation dialog
+   - `UriHelper` - URI utilities (display path, persistable permissions, read/write)
+   - Integrated into SettingsScreen with launchers
+   - Real file system access replacing placeholder messages
+
+2. **Settings Screen Enhancements** ✅
+   - Connected directory picker to export directory setting
+   - Connected file picker to configuration import
+   - URI-based import in SettingsViewModel
+   - Added `importConfigurationFromUri()` function
+   - Enhanced ExportRepository with `importConfigurationFromString()`
+
+### Root Operations & System Control
+
+3. **Root Operations Wrappers** ✅
+   - [RootOperations.kt](app/app/src/main/java/com/supermarx/carrierconfig/util/RootOperations.kt) (380+ lines)
+   - **RootShell**: Centralized shell command execution
+     - Single/multiple command execution
+     - Result parsing with success/error handling
+     - System property read/write
+     - Command availability checking
+   - **SuFileManager**: Safe root file operations
+     - File existence checks (files & directories)
+     - Read/write file content
+     - Copy, move, delete operations
+     - Permission and owner management
+     - Directory listing
+   - **ServiceRestarter**: Android service management
+     - Restart Phone service
+     - Restart IMS service
+     - Restart Telephony stack
+     - Toggle airplane mode (soft restart)
+   - **SystemPropertiesReader**: Property utilities
+     - Android version, API level, device model
+     - One UI version, security patch, CSC code
+     - Pattern-based property search
+
+### Update Management
+
+4. **Update Checker** ✅
+   - [UpdateChecker.kt](app/app/src/main/java/com/supermarx/carrierconfig/util/UpdateChecker.kt) (180 lines)
+   - GitHub Releases API integration
+   - Semantic version comparison
+   - Update availability detection
+   - Release notes parsing
+   - Browser opener for downloads
+   - `UpdateCheckResult` sealed class (UpdateAvailable, UpToDate, Error)
+   - Background checking via WorkManager
+
+### System Integration
+
+5. **Broadcast Receiver** ✅
+   - [SystemEventReceiver.kt](app/app/src/main/java/com/supermarx/carrierconfig/system/SystemEventReceiver.kt) (110 lines)
+   - Monitors 5 system events:
+     - Connectivity changes (WiFi/Cellular)
+     - Carrier config changes
+     - Airplane mode toggles
+     - Boot completion
+     - Phone state changes
+   - Triggers status refresh on relevant events
+   - Shows notifications for carrier config changes
+   - Schedules delayed refresh after airplane mode/boot
+
+6. **WorkManager Background Tasks** ✅
+   - [BackgroundWorkers.kt](app/app/src/main/java/com/supermarx/carrierconfig/system/BackgroundWorkers.kt) (120 lines)
+   - **StatusRefreshWorker**: Periodic status checks (every 6 hours)
+     - Refreshes device, SIM, IMS status
+     - Detects WFC issues
+     - Shows notifications for problems
+   - **UpdateCheckWorker**: Periodic update checks (every 3 days)
+     - Checks GitHub for new releases
+     - Shows notification when update available
+   - Hilt integration for dependency injection
+   - Scheduled automatically on app start
+
+7. **Notification System** ✅
+   - [NotificationHelper.kt](app/app/src/main/java/com/supermarx/carrierconfig/system/NotificationHelper.kt) (160 lines)
+   - 3 notification channels:
+     - **Status Alerts**: WFC/IMS issues (default importance)
+     - **System Events**: Carrier config changes (low importance)
+     - **App Updates**: New versions available (default importance)
+   - Notification types:
+     - Generic notifications with actions
+     - Update notifications with download button
+     - WFC status notifications
+   - Channel creation on app initialization
+
+### Visual Identity
+
+8. **App Icon & Resources** ✅
+   - [ic_launcher_foreground.xml](app/app/src/main/res/drawable/ic_launcher_foreground.xml) (60 lines)
+     - Glassmorphic design matching app theme
+     - WiFi signal arcs in cyan (#00D9FF)
+     - Phone receiver in purple (#B24BF3)
+     - Signal dot in green (#00FF88)
+     - Dark background with gradient overlay
+   - [ic_launcher.xml](app/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml) - Adaptive icon
+   - [ic_launcher_round.xml](app/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml) - Round variant
+   - [ic_notification.xml](app/app/src/main/res/drawable/ic_notification.xml) - Notification icon (monochrome)
+   - [ic_download.xml](app/app/src/main/res/drawable/ic_download.xml) - Download action icon
+
+### Application Infrastructure
+
+9. **CCOApplication Updates** ✅
+   - Implemented `Configuration.Provider` for WorkManager
+   - Injected `HiltWorkerFactory` for Hilt workers
+   - Initialize notification channels on startup
+   - Schedule background workers (status refresh, update checks)
+   - Custom WorkManager configuration
+
+10. **AndroidManifest Updates** ✅
+    - Added permissions:
+      - `POST_NOTIFICATIONS` (Android 13+)
+      - `RECEIVE_BOOT_COMPLETED` (for auto-start)
+    - Registered `SystemEventReceiver` with intent filters:
+      - Connectivity, carrier config, airplane mode, boot, phone state
+    - Removed default WorkManager initialization (using custom)
+
+11. **Build Configuration** ✅
+    - Added Hilt WorkManager integration dependencies
+    - Added `androidx.hilt:hilt-work:1.1.0`
+    - Added `androidx.hilt:hilt-compiler:1.1.0` (KSP)
+    - Added `androidx.documentfile:documentfile:1.0.1` for file picking
+
+---
 
 ## ✅ Completed Milestones
 

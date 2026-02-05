@@ -73,6 +73,17 @@ class ExportRepository @Inject constructor(
             }
             
             val jsonString = file.readText()
+            importConfigurationFromString(jsonString)
+        } catch (e: Exception) {
+            ImportResult.Error("Import failed: ${e.message}")
+        }
+    }
+    
+    /**
+     * Import configuration from JSON string
+     */
+    suspend fun importConfigurationFromString(jsonString: String): ImportResult = withContext(Dispatchers.IO) {
+        try {
             val config = json.decodeFromString<AppConfiguration>(jsonString)
             
             // Apply configuration settings
@@ -86,7 +97,7 @@ class ExportRepository @Inject constructor(
             
             ImportResult.Success(config.version)
         } catch (e: Exception) {
-            ImportResult.Error("Import failed: ${e.message}")
+            ImportResult.Error("Invalid configuration format: ${e.message}")
         }
     }
     
