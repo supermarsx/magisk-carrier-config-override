@@ -79,8 +79,17 @@ A comprehensive toolkit to control Wi-Fi Calling (VoWiFi), VoLTE, IMS and relate
 - **General Settings**: Auto-refresh, notifications
 - **Appearance**: Theme selector (Dark/AMOLED/Auto), Glass effect strength
 - **Advanced**: Debug mode, export directory, cache management
-- **Backup & Data**: Export/import configuration with JSON
+- **Backup & Data**: Export/import app configuration with JSON
 - **About Screen**: App info, features, requirements, developer info
+
+### ✅ Export & Import System (Milestone 4 - Complete)
+- **App Settings Export/Import**: Backup and restore all preferences
+- **CarrierConfig Preset Export/Import**: Share custom presets with community
+- **Hook Profile Export/Import**: Share Frida/LSPosed profiles for different devices
+- **Diagnostics Report Export**: JSON + TXT format for troubleshooting
+- **File Picker Integration**: System UI for selecting import/export locations
+- **JSON Validation**: Automatic schema validation on import
+- **See [EXPORT_IMPORT_GUIDE.md](docs/EXPORT_IMPORT_GUIDE.md)** for detailed usage
 
 ### 🚧 Method 2: Runtime Entitlement Simulation (Milestone 3 - UI Ready)
 - Frida/LSPosed runtime injection
