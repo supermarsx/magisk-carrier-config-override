@@ -1,5 +1,7 @@
 package dev.mars.carrierconfig.ui.screens.carrierconfig
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,11 +13,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.supermarx.carrierconfig.data.model.CarrierConfigPreset
 import com.supermarx.carrierconfig.ui.components.*
 import com.supermarx.carrierconfig.ui.theme.*
+import com.supermarx.carrierconfig.util.CreateFileContract
+import com.supermarx.carrierconfig.util.PickConfigFileContract
 
 /**
  * CarrierConfig Override Screen
@@ -29,6 +34,21 @@ fun CarrierConfigScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    var showExportMenu by remember { mutableStateOf(false) }
+    
+    // File pickers
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = PickConfigFileContract()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.importPreset(context, it) }
+    }
+    
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = CreateFileContract("application/json", "preset.json")
+    ) { uri: Uri? ->
+        uri?.let { viewModel.exportSelectedPreset(context, it) }
+    }
     
     // Show messages
     LaunchedEffect(state.message, state.error) {
@@ -56,6 +76,46 @@ fun CarrierConfigScreen(
                     titleContentColor = TextPrimary
                 ),
                 actions = {
+                    // Import button
+                    IconButton(onClick = { importLauncher.launch(Unit) }) {
+                        Icon(
+                            imageVector = Icons.Default.Upload,
+                            contentDescription = "Import Preset",
+                            tint = TextPrimary
+                        )
+                    }
+                    
+                    // Export button
+                    Box {
+                        IconButton(
+                            onClick = { showExportMenu = true },
+                            enabled = state.selectedPreset != null
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Download,
+                                contentDescription = "Export Preset",
+                                tint = if (state.selectedPreset != null) TextPrimary else TextTertiary
+                            )
+                        }
+                        
+                        DropdownMenu(
+                            expanded = showExportMenu,
+                            onDismissRequest = { showExportMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Export Selected Preset") },
+                                onClick = {
+                                    showExportMenu = false
+                                    exportLauncher.launch("${state.selectedPreset?.id ?: "preset"}.json")
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Default.Download, contentDescription = null)
+                                }
+                            )
+                        }
+                    }
+                    
+                    // Refresh button
                     IconButton(onClick = { viewModel.refreshStatus() }) {
                         Icon(
                             imageVector = Icons.Default.Refresh,

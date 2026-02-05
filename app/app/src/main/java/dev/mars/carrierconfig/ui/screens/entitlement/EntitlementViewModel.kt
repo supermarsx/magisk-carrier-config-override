@@ -1,12 +1,18 @@
 package dev.mars.carrierconfig.ui.screens.entitlement
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.supermarx.carrierconfig.data.repository.FridaRepository
 import com.supermarx.carrierconfig.data.repository.LSPosedRepository
+import com.supermarx.carrierconfig.util.UriHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.mars.carrierconfig.instrumentation.ProfileManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -15,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class EntitlementViewModel @Inject constructor(
     private val fridaRepository: FridaRepository,
-    private val lsposedRepository: LSPosedRepository
+    private val lsposedRepository: LSPosedRepository,
+    private val profileManager: ProfileManager
 ) : ViewModel() {
     
     private val _state = MutableStateFlow(EntitlementState())
@@ -224,5 +231,117 @@ class EntitlementViewModel @Inject constructor(
     
     fun clearMessage() {
         _state.update { it.copy(message = null, error = null) }
+    }
+    
+    /**
+     * Export selected profile to file
+     */
+    fun exportSelectedProfile(context: Context, uri: Uri) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            
+            val selectedProfile = _state.value.selectedProfile
+            if (selectedProfile == null) {
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        error = "No profile selected"
+                    )
+                }
+                return@launch
+            }
+            
+            try {
+                // Get full profile from ProfileManager
+                val fullProfile = withContext(Dispatchers.IO) {
+                    profileManager.getProfile(selectedProfile.id)
+                }
+                
+                if (fullProfile == null) {
+                    _state.update { 
+                        it.copy(
+                            isLoading = false,
+                            error = "Profile not found"
+                        )
+                    }
+                    return@launch
+                }
+                
+                val json = profileManager.exportProfile(fullProfile)
+                withContext(Dispatchers.IO) {
+                    UriHelper.writeTextToUri(context, uri, json)
+                }
+                
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        message = "Profile '${fullProfile.name}' exported successfully"
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        error = "Failed to export profile: ${e.message}"
+                    )
+                }
+            }
+        }
+    }
+    
+    /**
+     * Import profile from file
+     */
+    fun importProfile(context: Context, uri: Uri) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            
+            try {
+                val json = withContext(Dispatchers.IO) {
+                    UriHelper.readTextFromUri(context, uri)
+                }
+                
+                if (json == null) {
+                    _state.update { 
+                        it.copy(
+                            isLoading = false,
+                            error = "Failed to read profile file"
+                        )
+                    }
+                    return@launch
+                }
+                
+                val importedProfile = profileManager.importProfile(json)
+                
+                // Save as custom profile
+                val result = profileManager.saveCustomProfile(importedProfile)
+                
+                if (result.isSuccess) {
+                    // Reload profiles to include the new one
+                    loadProfiles()
+                    
+                    _state.update { 
+                        it.copy(
+                            isLoading = false,
+                            message = "Profile '${importedProfile.name}' imported successfully"
+                        )
+                    }
+                } else {
+                    _state.update { 
+                        it.copy(
+                            isLoading = false,
+                            error = "Failed to save imported profile: ${result.exceptionOrNull()?.message}"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        error = "Failed to import profile: ${e.message}"
+                    )
+                }
+            }
+        }
     }
 }

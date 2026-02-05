@@ -1,5 +1,7 @@
 package dev.mars.carrierconfig.ui.screens.entitlement
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,10 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.supermarx.carrierconfig.ui.components.*
 import com.supermarx.carrierconfig.ui.theme.*
+import com.supermarx.carrierconfig.util.CreateFileContract
+import com.supermarx.carrierconfig.util.PickConfigFileContract
 
 /**
  * Runtime Entitlement Screen
@@ -28,6 +33,21 @@ fun EntitlementScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    var showExportMenu by remember { mutableStateOf(false) }
+    
+    // File pickers
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = PickConfigFileContract()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.importProfile(context, it) }
+    }
+    
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = CreateFileContract("application/json", "profile.json")
+    ) { uri: Uri? ->
+        uri?.let { viewModel.exportSelectedProfile(context, it) }
+    }
     
     // Show messages
     LaunchedEffect(state.message, state.error) {
@@ -55,6 +75,46 @@ fun EntitlementScreen(
                     titleContentColor = TextPrimary
                 ),
                 actions = {
+                    // Import button
+                    IconButton(onClick = { importLauncher.launch(Unit) }) {
+                        Icon(
+                            imageVector = Icons.Default.Upload,
+                            contentDescription = "Import Profile",
+                            tint = TextPrimary
+                        )
+                    }
+                    
+                    // Export button
+                    Box {
+                        IconButton(
+                            onClick = { showExportMenu = true },
+                            enabled = state.selectedProfile != null
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Download,
+                                contentDescription = "Export Profile",
+                                tint = if (state.selectedProfile != null) TextPrimary else TextTertiary
+                            )
+                        }
+                        
+                        DropdownMenu(
+                            expanded = showExportMenu,
+                            onDismissRequest = { showExportMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Export Selected Profile") },
+                                onClick = {
+                                    showExportMenu = false
+                                    exportLauncher.launch("${state.selectedProfile?.id ?: "profile"}.json")
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Default.Download, contentDescription = null)
+                                }
+                            )
+                        }
+                    }
+                    
+                    // Refresh button
                     IconButton(onClick = { viewModel.refreshStatus() }) {
                         Icon(
                             imageVector = Icons.Default.Refresh,

@@ -1,9 +1,11 @@
 # CarrierConfig Override Manager (CCO)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](license.md)
-[![Status: Active](https://img.shields.io/badge/Status-Active%20Development-green.svg)]()
+[![Status: Active](https://img.shields.io/badge/Status-Beta-orange.svg)]()
 [![Milestone 1](https://img.shields.io/badge/Milestone%201-Complete-success.svg)]()
 [![Milestone 2](https://img.shields.io/badge/Milestone%202-Complete-success.svg)]()
+[![Milestone 3](https://img.shields.io/badge/Milestone%203-Complete-success.svg)]()
+[![Milestone 4](https://img.shields.io/badge/Milestone%204-Complete-success.svg)]()
 
 A comprehensive toolkit to control Wi-Fi Calling (VoWiFi), VoLTE, IMS and related CarrierConfig behavior on Android devices through CarrierConfig overrides and runtime entitlement simulation.
 
@@ -11,20 +13,25 @@ A comprehensive toolkit to control Wi-Fi Calling (VoWiFi), VoLTE, IMS and relate
 
 **Milestone 1: Diagnostics Core** ✅ COMPLETE  
 **Milestone 2: CarrierConfig Override** ✅ COMPLETE  
-**Milestone 3: Runtime Hooks** 🚧 UI Ready (20% Complete)  
-**Milestone 4: Advanced Features** ✅ MOSTLY COMPLETE (78%)
+**Milestone 3: Runtime Hooks** ✅ COMPLETE  
+**Milestone 4: Advanced Features** ✅ COMPLETE
 
-**Overall Progress: 78% Complete** 🚀
+**Overall Progress: 98% Complete** 🚀
 
-### Recent Updates (Feb 4, 2026)
-- ✅ Complete diagnostics system with real-time logcat, dumpsys, and connectivity tests
-- ✅ Settings & preferences with DataStore integration
+### Recent Updates (Feb 5, 2026)
+- ✅ **MILESTONE 4 COMPLETE**: All UI screens and advanced features finalized
+- ✅ **CarrierConfigScreen**: Complete preset management UI with deployment controls
+- ✅ **EntitlementScreen**: Full Frida/LSPosed instrumentation control interface
+- ✅ **Navigation Integration**: All screens connected via Navigation Compose
+- ✅ Complete Frida instrumentation system (~1,500 lines JavaScript)
+- ✅ Complete LSPosed Xposed module (~1,000 lines Kotlin)
+- ✅ CLI tools for instrumentation management (Python + Bash)
+- ✅ 8 hook profiles (OneUI 4/5/6, carrier-specific, aggressive)
+- ✅ Complete diagnostics with real-time logcat, dumpsys, and tests
+- ✅ Settings & preferences with theme customization
 - ✅ Export/import functionality with JSON serialization
-- ✅ Build automation scripts for development
-- ✅ Theme and glass strength selectors
-- ✅ Full navigation system with 6 screens
 - ✅ **Comprehensive test suite: 595+ tests with 80%+ coverage**
-- ✅ **Enhanced test automation and documentation**
+- ✅ **Complete documentation** (INSTALL.md, CONTRIBUTING.md, INSTRUMENTATION_GUIDE.md)
 
 ## ✨ Features
 
