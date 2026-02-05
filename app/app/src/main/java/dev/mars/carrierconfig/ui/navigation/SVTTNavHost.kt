@@ -19,6 +19,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dev.mars.carrierconfig.ui.screens.dashboard.DashboardScreen
+import dev.mars.carrierconfig.ui.screens.diagnostics.DiagnosticsScreen
+import dev.mars.carrierconfig.ui.screens.carrierconfig.CarrierConfigScreen
+import dev.mars.carrierconfig.ui.screens.entitlement.EntitlementScreen
 import dev.mars.carrierconfig.ui.theme.AccentPrimary
 import dev.mars.carrierconfig.ui.theme.BackgroundDark
 import dev.mars.carrierconfig.ui.theme.GlassSurfaceMedium
@@ -46,16 +49,13 @@ fun CCONavHost(
                 DashboardScreen()
             }
             composable(Screen.CarrierConfig.route) {
-                // TODO: CarrierConfigScreen()
-                PlaceholderScreen("CarrierConfig")
+                CarrierConfigScreen()
             }
             composable(Screen.Entitlement.route) {
-                // TODO: EntitlementScreen()
-                PlaceholderScreen("Entitlement")
+                EntitlementScreen()
             }
             composable(Screen.Diagnostics.route) {
-                // TODO: DiagnosticsScreen()
-                PlaceholderScreen("Diagnostics")
+                DiagnosticsScreen()
             }
         }
     }

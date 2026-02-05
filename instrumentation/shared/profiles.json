@@ -54,12 +54,231 @@
           "signature": "()Z",
           "return_value": true,
           "description": "Primary Wi-Fi Calling entitlement check"
+        },
+        {
+          "package": "com.sec.imsservice",
+          "class": "com.sec.internal.ims.servicemodules.im.ImsFeature",
+          "method": "isVowifiEnabled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "VoWiFi feature availability check"
+        }
+      ],
+      "carrier_config_overrides": {
+        "carrier_wfc_ims_available_bool": true,
+        "carrier_default_wfc_ims_enabled_bool": true,
+        "editable_wfc_mode_bool": true,
+        "editable_wfc_roaming_mode_bool": true
+      }
+    },
+    {
+      "id": "oneui4_generic",
+      "name": "Generic Samsung One UI 4",
+      "description": "Generic hook profile for Samsung devices running One UI 4.x",
+      "oneui_versions": ["4.0", "4.1"],
+      "android_versions": ["12"],
+      "targets": [
+        {
+          "package": "com.sec.imsservice",
+          "class": "com.sec.ims.ImsManager",
+          "method": "isWfcEntitled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "Primary Wi-Fi Calling entitlement check"
+        },
+        {
+          "package": "com.sec.imsservice",
+          "class": "com.sec.internal.ims.servicemodules.volte2.IVolteServiceModuleInternal",
+          "method": "isVowifiEnabled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "VoWiFi service module check"
+        },
+        {
+          "package": "com.android.phone",
+          "class": "com.android.phone.PhoneUtils",
+          "method": "isWfcModeEditable",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "WFC mode editability"
         }
       ],
       "carrier_config_overrides": {
         "carrier_wfc_ims_available_bool": true,
         "carrier_default_wfc_ims_enabled_bool": true,
         "editable_wfc_mode_bool": true
+      }
+    },
+    {
+      "id": "aggressive_bypass",
+      "name": "Aggressive Bypass (All Hooks)",
+      "description": "Maximum hook coverage for stubborn carriers",
+      "oneui_versions": ["*"],
+      "android_versions": ["*"],
+      "targets": [
+        {
+          "package": "com.sec.imsservice",
+          "class": "com.sec.ims.ImsManager",
+          "method": "isWfcEntitled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "Primary entitlement"
+        },
+        {
+          "package": "com.sec.imsservice",
+          "class": "com.sec.internal.ims.servicemodules.im.ImsFeature",
+          "method": "isVowifiEnabled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "VoWiFi feature"
+        },
+        {
+          "package": "com.sec.imsservice",
+          "class": "com.sec.internal.ims.servicemodules.volte2.IVolteServiceModuleInternal",
+          "method": "isVowifiEnabled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "VoWiFi service"
+        },
+        {
+          "package": "com.android.phone",
+          "class": "com.android.phone.PhoneUtils",
+          "method": "isWfcModeEditable",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "WFC editability"
+        },
+        {
+          "package": "com.android.settings",
+          "class": "com.samsung.android.settings.wifi.WifiCallingSettings",
+          "method": "isWifiCallingSupported",
+          "signature": "(Landroid/content/Context;)Z",
+          "return_value": true,
+          "description": "Settings UI availability"
+        },
+        {
+          "package": "com.android.phone",
+          "class": "android.telephony.CarrierConfigManager",
+          "method": "getConfigForSubId",
+          "signature": "(I)Landroid/os/PersistableBundle;",
+          "return_value": "modified_bundle",
+          "description": "CarrierConfig runtime modification"
+        }
+      ],
+      "carrier_config_overrides": {
+        "carrier_wfc_ims_available_bool": true,
+        "carrier_default_wfc_ims_enabled_bool": true,
+        "editable_wfc_mode_bool": true,
+        "editable_wfc_roaming_mode_bool": true,
+        "carrier_wfc_supports_wifi_only_bool": true,
+        "carrier_promote_wfc_on_call_fail_bool": true,
+        "carrier_wfc_ims_roaming_available_bool": true,
+        "use_wfc_home_network_mode_in_roaming_network_bool": false
+      },
+      "settings_overrides": {
+        "wfc_ims_enabled": 1,
+        "wfc_ims_mode": 2,
+        "wfc_ims_roaming_enabled": 1,
+        "wfc_ims_roaming_mode": 2,
+        "volte_vt_enabled": 1
+      }
+    },
+    {
+      "id": "tmobile_us",
+      "name": "T-Mobile US Specific",
+      "description": "T-Mobile specific hooks (may vary by region)",
+      "oneui_versions": ["*"],
+      "android_versions": ["*"],
+      "carriers": ["310260", "310490"],
+      "targets": [
+        {
+          "package": "com.sec.imsservice",
+          "class": "com.sec.ims.ImsManager",
+          "method": "isWfcEntitled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "IMS entitlement"
+        },
+        {
+          "package": "com.tmobile.pr.adapt",
+          "class": "*",
+          "method": "isEntitled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "T-Mobile entitlement adapter"
+        }
+      ],
+      "carrier_config_overrides": {
+        "carrier_wfc_ims_available_bool": true,
+        "carrier_default_wfc_ims_enabled_bool": true,
+        "editable_wfc_mode_bool": true,
+        "carrier_name_override_bool": true,
+        "carrier_name_string": "T-Mobile"
+      }
+    },
+    {
+      "id": "att_us",
+      "name": "AT&T US Specific",
+      "description": "AT&T specific hooks (requires HD Voice provisioning bypass)",
+      "oneui_versions": ["*"],
+      "android_versions": ["*"],
+      "carriers": ["310410"],
+      "targets": [
+        {
+          "package": "com.sec.imsservice",
+          "class": "com.sec.ims.ImsManager",
+          "method": "isWfcEntitled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "IMS entitlement"
+        },
+        {
+          "package": "com.att.iqi",
+          "class": "*",
+          "method": "isHdVoiceProvisioned",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "AT&T HD Voice check"
+        }
+      ],
+      "carrier_config_overrides": {
+        "carrier_wfc_ims_available_bool": true,
+        "carrier_volte_available_bool": true,
+        "carrier_vt_available_bool": true,
+        "editable_wfc_mode_bool": true,
+        "att_enhanced_vowifi_bool": true
+      }
+    },
+    {
+      "id": "verizon_us",
+      "name": "Verizon US Specific",
+      "description": "Verizon specific hooks (Advanced Calling bypass)",
+      "oneui_versions": ["*"],
+      "android_versions": ["*"],
+      "carriers": ["311480"],
+      "targets": [
+        {
+          "package": "com.sec.imsservice",
+          "class": "com.sec.ims.ImsManager",
+          "method": "isWfcEntitled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "IMS entitlement"
+        },
+        {
+          "package": "com.verizon.services",
+          "class": "*",
+          "method": "isAdvancedCallingEnabled",
+          "signature": "()Z",
+          "return_value": true,
+          "description": "Verizon Advanced Calling"
+        }
+      ],
+      "carrier_config_overrides": {
+        "carrier_wfc_ims_available_bool": true,
+        "carrier_default_wfc_ims_enabled_bool": true,
+        "editable_wfc_mode_bool": true,
+        "carrier_volte_provisioning_required_bool": false
       }
     },
     {
