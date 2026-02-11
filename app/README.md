@@ -229,14 +229,14 @@ app/
 
 ### Export Reports
 - From Dashboard, tap "Export Report"
-- Reports saved to `/sdcard/Android/data/com.svtt.carrierconfig/files/svtt_reports/`
+- Reports saved to `/sdcard/Android/data/com.supermarsx.carrierconfig/files/cco_reports/`
 - Contains JSON and text formats
 
 ## Technical Details
 
 ### CarrierConfig Override Mechanism
 1. App generates XML from selected keys
-2. XML saved to `/data/adb/svtt/active/override.xml`
+2. XML saved to `/data/adb/cco/active/override.xml`
 3. Magisk module bind-mounts XML at boot
 4. System reads override instead of default config
 5. WFC UI appears based on override keys

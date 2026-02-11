@@ -603,7 +603,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
        3. `/data/misc/carrierconfig/override.xml`
        4. `/data/user_de/0/com.android.phone/files/carrierconfig_override.xml`
      - Path detection and validation
-     - SVTT data directory management (`/data/adb/svtt/`)
+     - CCO data directory management (`/data/adb/cco/`)
      - Override deployment with SELinux context
      - Backup system with rotation
      - Revert functionality

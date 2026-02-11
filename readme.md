@@ -211,25 +211,26 @@ cd magisk-carrier-config-override
 
 ```
 magisk-carrier-config-override/
-├── app/                          # ✅ Android app (Milestone 1 & 2)
-│   ├── src/main/
-│   │   ├── java/com/svtt/carrierconfig/
-│   │   │   ├── ui/               # Jetpack Compose UI
-│   │   │   │   ├── theme/        # Glassmorphism theme system
-│   │   │   │   ├── components/   # Reusable glass components
-│   │   │   │   ├── screens/      # Dashboard, Method1
-│   │   │   │   └── navigation/   # NavGraph
-│   │   │   ├── data/             # MVVM data layer
-│   │   │   │   ├── model/        # Data models
-│   │   │   │   └── repository/   # Repositories
-│   │   │   └── di/               # Hilt DI modules
-│   │   └── AndroidManifest.xml
-│   └── build.gradle.kts
-├── magisk-module/                # ⏳ Magisk module (planned)
-├── frida-scripts/                # ⏳ Method 2 hooks (planned)
-├── cli-util/                     # ⏳ CLI utility (planned)
-├── spec-design.md                # Design system spec
-├── TODO-BOOTSTRAP.md             # Implementation roadmap
+├── app/                          # Android app
+│   └── app/src/main/
+│       ├── java/com/supermarsx/carrierconfig/
+│       │   ├── ui/               # Jetpack Compose UI
+│       │   │   ├── theme/        # Glassmorphism theme system
+│       │   │   ├── components/   # Reusable glass components
+│       │   │   ├── screens/      # Dashboard, CarrierConfig, Entitlement, Diagnostics, Settings, About
+│       │   │   └── navigation/   # CCONavHost + Screen routes
+│       │   ├── data/             # MVVM data layer
+│       │   │   ├── model/        # Data models
+│       │   │   ├── repository/   # Repositories
+│       │   │   └── datastore/    # Preferences (DataStore)
+│       │   ├── system/           # Background workers, notifications, events
+│       │   ├── util/             # Root ops, update checker, file contracts
+│       │   └── di/               # Hilt DI modules
+│       └── AndroidManifest.xml
+├── module/                       # Magisk module
+├── instrumentation/              # Runtime hooks (Frida + LSPosed)
+├── cli/                          # CLI utility
+├── docs/                         # Documentation
 └── README.md                     # This file
 ```
 
@@ -245,7 +246,7 @@ magisk-carrier-config-override/
 ### Method 1: CarrierConfig Override Mechanism
 
 1. App generates XML from selected CarrierConfig keys
-2. XML saved to `/data/adb/svtt/active/override.xml`
+2. XML saved to `/data/adb/cco/active/override.xml`
 3. Magisk module bind-mounts XML at boot time
 4. System reads override instead of default config
 5. WFC UI appears based on override keys
@@ -396,7 +397,7 @@ Contributions welcome! Please:
 
 MIT License - See [LICENSE](LICENSE) for details
 
-Copyright (c) 2026 SVTT Project
+Copyright (c) 2026 CCO Project
 
 ## 📞 Support & Community
 
