@@ -7,6 +7,13 @@ set -e
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
+GRADLE_CMD=""
+if [ -f "./gradlew" ]; then
+    GRADLE_CMD="./gradlew"
+elif command -v gradle >/dev/null 2>&1; then
+    GRADLE_CMD="gradle"
+fi
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -28,6 +35,14 @@ echo_error() {
 
 echo_warning() {
     echo -e "${YELLOW}⚠${NC} $1"
+}
+
+require_gradle() {
+    if [ -z "$GRADLE_CMD" ]; then
+        echo_error "Gradle not found. Add ./gradlew to app/ or install 'gradle' on PATH."
+        return 1
+    fi
+    return 0
 }
 
 # Show help
@@ -64,8 +79,9 @@ EOF
 
 # Lint
 run_lint() {
+    require_gradle || return 1
     echo_info "Running Kotlin linter..."
-    ./gradlew detekt || {
+    $GRADLE_CMD detekt || {
         echo_error "Linting failed"
         return 1
     }
@@ -74,8 +90,9 @@ run_lint() {
 
 # Format
 run_format() {
+    require_gradle || return 1
     echo_info "Formatting Kotlin code..."
-    ./gradlew ktlintFormat || {
+    $GRADLE_CMD ktlintFormat || {
         echo_error "Formatting failed"
         return 1
     }
@@ -84,8 +101,9 @@ run_format() {
 
 # Format check
 run_format_check() {
+    require_gradle || return 1
     echo_info "Checking code formatting..."
-    ./gradlew ktlintCheck || {
+    $GRADLE_CMD ktlintCheck || {
         echo_error "Format check failed - run './scripts/dev.sh format' to fix"
         return 1
     }
@@ -94,8 +112,9 @@ run_format_check() {
 
 # Type check
 run_type_check() {
+    require_gradle || return 1
     echo_info "Running type checking and compilation..."
-    ./gradlew compileDebugKotlin || {
+    $GRADLE_CMD compileDebugKotlin || {
         echo_error "Type checking failed"
         return 1
     }
@@ -104,8 +123,9 @@ run_type_check() {
 
 # Test
 run_test() {
+    require_gradle || return 1
     echo_info "Running unit tests..."
-    ./gradlew test || {
+    $GRADLE_CMD test || {
         echo_error "Tests failed"
         return 1
     }
@@ -115,11 +135,16 @@ run_test() {
 # UI Test
 run_test_ui() {
     echo_info "Running instrumented UI tests..."
+    require_gradle || return 1
+    if ! command -v adb >/dev/null 2>&1; then
+        echo_error "adb not found"
+        return 1
+    fi
     if ! adb devices | grep -q "device$"; then
         echo_error "No Android device connected"
         return 1
     fi
-    ./gradlew connectedAndroidTest || {
+    $GRADLE_CMD connectedAndroidTest || {
         echo_error "UI tests failed"
         return 1
     }
@@ -128,12 +153,13 @@ run_test_ui() {
 
 # Build
 run_build() {
+    require_gradle || return 1
     echo_info "Building debug APK..."
-    ./gradlew assembleDebug || {
+    $GRADLE_CMD assembleDebug || {
         echo_error "Build failed"
         return 1
     }
-    APK_PATH=$(find app/app/build/outputs/apk/debug -name "*.apk" | head -1)
+    APK_PATH=$(find app/build/outputs/apk/debug -name "*.apk" | head -1)
     if [ -n "$APK_PATH" ]; then
         echo_success "Build successful: $APK_PATH"
     else
@@ -144,12 +170,13 @@ run_build() {
 
 # Build Release
 run_build_release() {
+    require_gradle || return 1
     echo_info "Building release APK..."
-    ./gradlew assembleRelease || {
+    $GRADLE_CMD assembleRelease || {
         echo_error "Release build failed"
         return 1
     }
-    APK_PATH=$(find app/app/build/outputs/apk/release -name "*.apk" | head -1)
+    APK_PATH=$(find app/build/outputs/apk/release -name "*.apk" | head -1)
     if [ -n "$APK_PATH" ]; then
         echo_success "Release build successful: $APK_PATH"
     else
@@ -161,11 +188,16 @@ run_build_release() {
 # Install
 run_install() {
     echo_info "Building and installing to device..."
+    require_gradle || return 1
+    if ! command -v adb >/dev/null 2>&1; then
+        echo_error "adb not found"
+        return 1
+    fi
     if ! adb devices | grep -q "device$"; then
         echo_error "No Android device connected"
         return 1
     fi
-    ./gradlew installDebug || {
+    $GRADLE_CMD installDebug || {
         echo_error "Installation failed"
         return 1
     }
@@ -174,8 +206,9 @@ run_install() {
 
 # Clean
 run_clean() {
+    require_gradle || return 1
     echo_info "Cleaning build artifacts..."
-    ./gradlew clean || {
+    $GRADLE_CMD clean || {
         echo_error "Clean failed"
         return 1
     }
@@ -196,6 +229,10 @@ run_check_all() {
 
 # ADB logs
 run_adb_logs() {
+    if ! command -v adb >/dev/null 2>&1; then
+        echo_error "adb not found"
+        return 1
+    fi
     if ! adb devices | grep -q "device$"; then
         echo_error "No Android device connected"
         return 1

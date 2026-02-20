@@ -19,13 +19,15 @@ case "$MODE" in
         # Check Kotlin code style
         if command -v ktlint &> /dev/null; then
             echo "Running ktlint..."
-            ktlint "app/app/src/**/*.kt" || {
+            ktlint "app/src/**/*.kt" || {
                 echo -e "${RED}✗ ktlint found issues${NC}"
                 echo "Run './scripts/lint.sh fix' to auto-fix"
                 exit 1
             }
         else
-            echo -e "${YELLOW}⚠ ktlint not installed, skipping${NC}"
+            echo -e "${RED}✗ ktlint not installed${NC}"
+            echo "Install ktlint to run lint checks"
+            exit 1
         fi
         
         echo -e "${GREEN}✓ Code style check passed${NC}"
@@ -35,7 +37,7 @@ case "$MODE" in
         echo "🔧 Fixing code style..."
         
         if command -v ktlint &> /dev/null; then
-            ktlint -F "app/app/src/**/*.kt"
+            ktlint -F "app/src/**/*.kt"
             echo -e "${GREEN}✓ Code style fixed${NC}"
         else
             echo -e "${RED}✗ ktlint not installed${NC}"

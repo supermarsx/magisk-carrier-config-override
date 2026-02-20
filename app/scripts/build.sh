@@ -7,9 +7,12 @@ echo "🔨 Building CCO App..."
 
 cd "$(dirname "$0")/.."
 
-# Check if gradlew exists
-if [ ! -f "./gradlew" ]; then
-    echo "❌ gradlew not found. Run from app directory."
+if [ -f "./gradlew" ]; then
+    GRADLE_CMD="./gradlew"
+elif command -v gradle >/dev/null 2>&1; then
+    GRADLE_CMD="gradle"
+else
+    echo "❌ Gradle not found. Add ./gradlew to app/ or install 'gradle'."
     exit 1
 fi
 
@@ -17,10 +20,10 @@ fi
 # ./gradlew clean
 
 # Build debug APK
-./gradlew assembleDebug
+$GRADLE_CMD assembleDebug
 
 # Find the APK
-APK_PATH=$(find app/app/build/outputs/apk/debug -name "*.apk" 2>/dev/null | head -1)
+APK_PATH=$(find app/build/outputs/apk/debug -name "*.apk" 2>/dev/null | head -1)
 
 if [ -n "$APK_PATH" ]; then
     echo "✅ Build successful!"
@@ -31,7 +34,7 @@ if [ -n "$APK_PATH" ]; then
     echo "📊 Size: $SIZE"
     
     # Offer to install if device connected
-    if adb devices | grep -q "device$"; then
+    if command -v adb >/dev/null 2>&1 && adb devices | grep -q "device$"; then
         echo ""
         read -p "📱 Install to device? (y/n) " -n 1 -r
         echo

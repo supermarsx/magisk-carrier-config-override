@@ -6,9 +6,11 @@ Command-line tool for managing Frida and LSPosed instrumentation
 
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Dict, Any
 
@@ -16,7 +18,7 @@ class CCOInstrumentationCLI:
     """Main CLI class for instrumentation management"""
     
     def __init__(self):
-        self.instrumentation_dir = Path(__file__).parent.parent
+        self.instrumentation_dir = Path(__file__).parent
         self.frida_dir = self.instrumentation_dir / "frida"
         self.profiles_path = self.instrumentation_dir / "shared" / "profiles.json"
         self.device_id: Optional[str] = None
@@ -30,13 +32,11 @@ class CCOInstrumentationCLI:
     
     def check_adb(self) -> bool:
         """Check if ADB is available"""
-        result = self.run_command(["which", "adb"])
-        return result.returncode == 0
+        return shutil.which("adb") is not None
     
     def check_frida(self) -> bool:
         """Check if Frida is available"""
-        result = self.run_command(["which", "frida"])
-        return result.returncode == 0
+        return shutil.which("frida") is not None
     
     def get_device_id(self) -> Optional[str]:
         """Get connected device ID"""
@@ -139,14 +139,86 @@ class CCOInstrumentationCLI:
     
     def record_session(self, output_file: str, duration: int = 60):
         """Record Frida session for later replay"""
+        if duration <= 0:
+            print("❌ Duration must be greater than 0 seconds")
+            return 1
+
+        if not self.check_adb():
+            print("❌ ADB not found. Please install Android platform tools.")
+            return 1
+
+        if not self.check_frida():
+            print("❌ Frida not found. Install with: pip install frida-tools")
+            return 1
+
+        device_id = self.device_id or self.get_device_id()
+        if not device_id:
+            return 1
+
+        agent_path = self.frida_dir / "agent-complete.js"
+        if not agent_path.exists():
+            print(f"❌ Agent file not found: {agent_path}")
+            return 1
+
+        output_path = Path(output_file).expanduser().resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
         print(f"\n🎬 Recording session for {duration} seconds...")
-        print(f"   Output: {output_file}")
-        
-        # This would connect to running Frida session and enable recording
-        # Implementation depends on Frida RPC integration
-        
-        print("\n❌ Not implemented yet - requires running Frida session")
-        return 1
+        print(f"   Device: {device_id}")
+        print(f"   Agent: {agent_path}")
+        print(f"   Output: {output_path}")
+
+        cmd = [
+            "frida",
+            "-U",
+            "-f", "com.sec.imsservice",
+            "-l", str(agent_path),
+            "--runtime=v8"
+        ]
+        if self.device_id:
+            cmd.extend(["-D", self.device_id])
+
+        print(f"   Command: {' '.join(cmd)}")
+        print("   Capturing process output...")
+
+        started_at = datetime.now(timezone.utc)
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True
+        )
+
+        captured = ""
+        try:
+            captured, _ = proc.communicate(timeout=duration)
+        except subprocess.TimeoutExpired:
+            proc.terminate()
+            try:
+                tail, _ = proc.communicate(timeout=10)
+                captured = (captured or "") + (tail or "")
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                tail, _ = proc.communicate()
+                captured = (captured or "") + (tail or "")
+
+        ended_at = datetime.now(timezone.utc)
+        metadata = {
+            "device": device_id,
+            "duration_seconds": duration,
+            "started_at_utc": started_at.isoformat(),
+            "ended_at_utc": ended_at.isoformat(),
+            "return_code": proc.returncode,
+            "command": cmd
+        }
+
+        output_path.write_text(
+            json.dumps(metadata, indent=2) + "\n\n----- FRIDA OUTPUT -----\n" + (captured or ""),
+            encoding="utf-8"
+        )
+
+        print(f"✅ Recording saved: {output_path}")
+        return 0
     
     def install_lsposed_module(self, apk_path: Optional[str] = None):
         """Install LSPosed module APK"""
@@ -249,6 +321,11 @@ class CCOInstrumentationCLI:
 
 def main():
     """Main entry point"""
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
     parser = argparse.ArgumentParser(
         description="CCO Instrumentation CLI - Manage Frida and LSPosed hooks",
         formatter_class=argparse.RawDescriptionHelpFormatter,

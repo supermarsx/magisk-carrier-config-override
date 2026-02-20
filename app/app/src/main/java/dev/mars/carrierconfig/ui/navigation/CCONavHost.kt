@@ -1,7 +1,6 @@
 package dev.mars.carrierconfig.ui.navigation
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -121,7 +120,7 @@ fun CCOBottomNavigation(navController: NavHostController) {
 sealed class NavigationItem(
     val screen: Screen,
     val title: String,
-    val icon: Int  // Resource ID placeholder
+    val icon: Int
 ) {
     object Dashboard : NavigationItem(Screen.Dashboard, "Dashboard", android.R.drawable.ic_menu_info_details)
     object CarrierConfig : NavigationItem(Screen.CarrierConfig, "Config", android.R.drawable.ic_menu_edit)

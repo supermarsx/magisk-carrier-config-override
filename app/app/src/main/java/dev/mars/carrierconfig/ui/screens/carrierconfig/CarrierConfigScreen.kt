@@ -344,7 +344,6 @@ private fun PresetCard(
     }
 }
 
-// State and ViewModel placeholder
 data class CarrierConfigState(
     val isLoading: Boolean = false,
     val isOverrideActive: Boolean = false,

@@ -7,6 +7,14 @@ set -e
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
+if [ -f "./gradlew" ]; then
+    GRADLE_CMD="./gradlew"
+elif command -v gradle >/dev/null 2>&1; then
+    GRADLE_CMD="gradle"
+else
+    GRADLE_CMD=""
+fi
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -51,14 +59,18 @@ fi
 
 # Function to run unit tests
 run_unit_tests() {
+    if [ -z "$GRADLE_CMD" ]; then
+        echo -e "${RED}✗ Gradle not found. Add ./gradlew to app/ or install 'gradle'.${NC}"
+        return 1
+    fi
     echo -e "${YELLOW}▶ Running Unit Tests...${NC}"
     echo ""
     
     if [[ "$COVERAGE" == "coverage" ]]; then
         echo -e "${BLUE}  • With code coverage enabled${NC}"
-        ./gradlew test jacocoTestReport --continue
+        $GRADLE_CMD test jacocoTestReport --continue
     else
-        ./gradlew test --continue
+        $GRADLE_CMD test --continue
     fi
     
     local EXIT_CODE=$?
@@ -73,19 +85,23 @@ run_unit_tests() {
 
 # Function to run integration tests
 run_integration_tests() {
+    if [ -z "$GRADLE_CMD" ]; then
+        echo -e "${RED}✗ Gradle not found. Add ./gradlew to app/ or install 'gradle'.${NC}"
+        return 1
+    fi
     echo -e "${YELLOW}▶ Running Integration Tests...${NC}"
     echo ""
     
     # Check if device/emulator is connected
-    if ! adb devices | grep -q "device$"; then
+    if ! command -v adb >/dev/null 2>&1 || ! adb devices | grep -q "device$"; then
         echo -e "${RED}✗ No Android device/emulator detected${NC}"
-        echo -e "${YELLOW}  Please connect a device or start an emulator${NC}"
+        echo -e "${YELLOW}  Please install adb and connect a device/emulator${NC}"
         return 1
     fi
     
     echo -e "${BLUE}  • Device detected: $(adb devices | grep device | head -1 | awk '{print $1}')${NC}"
     
-    ./gradlew connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.supermarx.carrierconfig.integration.RepositoryIntegrationTest
+    $GRADLE_CMD connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.supermarx.carrierconfig.integration.RepositoryIntegrationTest
     
     local EXIT_CODE=$?
     if [ $EXIT_CODE -eq 0 ]; then
@@ -99,20 +115,24 @@ run_integration_tests() {
 
 # Function to run UI tests
 run_ui_tests() {
+    if [ -z "$GRADLE_CMD" ]; then
+        echo -e "${RED}✗ Gradle not found. Add ./gradlew to app/ or install 'gradle'.${NC}"
+        return 1
+    fi
     echo -e "${YELLOW}▶ Running UI Tests...${NC}"
     echo ""
     
     # Check if device/emulator is connected
-    if ! adb devices | grep -q "device$"; then
+    if ! command -v adb >/dev/null 2>&1 || ! adb devices | grep -q "device$"; then
         echo -e "${RED}✗ No Android device/emulator detected${NC}"
-        echo -e "${YELLOW}  Please connect a device or start an emulator${NC}"
+        echo -e "${YELLOW}  Please install adb and connect a device/emulator${NC}"
         return 1
     fi
     
     echo -e "${BLUE}  • Device detected: $(adb devices | grep device | head -1 | awk '{print $1}')${NC}"
     echo -e "${BLUE}  • Running Compose UI tests${NC}"
     
-    ./gradlew connectedAndroidTest
+    $GRADLE_CMD connectedAndroidTest
     
     local EXIT_CODE=$?
     if [ $EXIT_CODE -eq 0 ]; then
@@ -126,10 +146,14 @@ run_ui_tests() {
 
 # Function to run quick tests
 run_quick_tests() {
+    if [ -z "$GRADLE_CMD" ]; then
+        echo -e "${RED}✗ Gradle not found. Add ./gradlew to app/ or install 'gradle'.${NC}"
+        return 1
+    fi
     echo -e "${YELLOW}▶ Running Quick Unit Tests (Repository layer only)...${NC}"
     echo ""
     
-    ./gradlew test --tests "*Repository*Test" --continue
+    $GRADLE_CMD test --tests "*Repository*Test" --continue
     
     local EXIT_CODE=$?
     if [ $EXIT_CODE -eq 0 ]; then
@@ -158,7 +182,7 @@ show_test_results() {
         echo ""
     fi
     
-    if adb devices | grep -q "device$"; then
+    if command -v adb >/dev/null 2>&1 && adb devices | grep -q "device$"; then
         echo -e "${YELLOW}Android Test Report:${NC}"
         echo "  file://$(pwd)/app/build/reports/androidTests/connected/index.html"
         echo ""
@@ -167,8 +191,12 @@ show_test_results() {
 
 # Function to clean test artifacts
 clean_tests() {
+    if [ -z "$GRADLE_CMD" ]; then
+        echo -e "${RED}✗ Gradle not found. Add ./gradlew to app/ or install 'gradle'.${NC}"
+        return 1
+    fi
     echo -e "${YELLOW}▶ Cleaning test artifacts...${NC}"
-    ./gradlew cleanTest cleanTestDebugUnitTest
+    $GRADLE_CMD cleanTest cleanTestDebugUnitTest
     echo -e "${GREEN}✓ Cleaned${NC}"
     echo ""
 }
