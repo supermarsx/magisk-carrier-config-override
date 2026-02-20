@@ -403,7 +403,7 @@ All imports are validated for:
 - Forces VoLTE provisioning
 - Unlocks WFC mode selection
 
-**Download**: [s24_ultra_tmobile.json](link)
+**Download**: Add your shared file URL here (example filename: `s24_ultra_tmobile.json`).
 
 **Installation**:
 1. Open CCO Manager
@@ -456,9 +456,9 @@ diff baseline.json modified.json
 ## 🔗 Related Documentation
 
 - [INSTALL.md](INSTALL.md) - Installation and setup
-- [INSTRUMENTATION_GUIDE.md](INSTRUMENTATION_GUIDE.md) - Hook profiles guide
+- [INSTRUMENTATION_GUIDE.md](../instrumentation/INSTRUMENTATION_GUIDE.md) - Hook profiles guide
 - [CONTRIBUTING.md](CONTRIBUTING.md) - How to contribute profiles
-- [README.md](../readme.md) - Main documentation
+- [README.md](../README.md) - Main documentation
 
 ---
 

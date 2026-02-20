@@ -268,7 +268,7 @@ echo $?  # 0 = success, 1 = failure
 
 ## 🔗 See Also
 
-- [Development Scripts](../scripts/README.md) - Build and development tools
+- [Development Scripts](../docs/SCRIPTS.md) - Build and development tools
 - [Module Documentation](../docs/README.md) - User and developer docs
 - [Integration Tests](../scripts/integration-test.sh) - End-to-end testing
 

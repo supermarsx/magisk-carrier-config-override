@@ -315,8 +315,8 @@ Priority 4: /data/user_de/0/com.android.phone/files/carrierconfig_override.xml
 ### Documentation
 - [Main README](README.md) - Project overview
 - [App README](app/README.md) - Technical details
-- [Design Spec](spec-design.md) - UI/UX design system
-- [Bootstrap TODO](TODO-BOOTSTRAP.md) - Implementation roadmap
+- [Design Spec](docs/spec-design.md) - UI/UX design system
+- [Bootstrap TODO](todo-bootstrap.md) - Implementation roadmap
 - [Progress Summary](PROGRESS.md) - Development status
 
 ### Community

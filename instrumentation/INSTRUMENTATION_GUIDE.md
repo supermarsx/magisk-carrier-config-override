@@ -512,4 +512,4 @@ To add device-specific profiles:
 
 ## License
 
-See [LICENSE](../LICENSE) for details.
+See [license.md](../license.md) for details.

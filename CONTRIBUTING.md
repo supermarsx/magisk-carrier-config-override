@@ -518,7 +518,7 @@ PATCH: Bug fixes
 
 2. **Update Changelog**
    ```markdown
-   # CHANGELOG.md
+   # docs/CHANGELOG.md
    
    ## [1.2.3] - 2026-02-05
    
@@ -559,7 +559,7 @@ PATCH: Bug fixes
 ## Recognition
 
 Contributors are recognized in:
-- [CHANGELOG.md](CHANGELOG.md)
+- [docs/CHANGELOG.md](docs/CHANGELOG.md)
 - [README.md](README.md) Contributors section
 - GitHub commit history
 

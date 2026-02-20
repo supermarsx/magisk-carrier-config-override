@@ -264,7 +264,7 @@ The app uses a glassmorphism dark theme with:
 - **Warning**: Amber (#FFB020)
 - **Error**: Red-pink (#FF3366)
 
-All specifications in [spec-design.md](../spec-design.md).
+All specifications in [docs/spec-design.md](../docs/spec-design.md).
 
 ## License
 

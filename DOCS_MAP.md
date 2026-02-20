@@ -15,7 +15,7 @@
 
 | Topic | Document |
 |-------|----------|
-| Project overview | [readme.md](readme.md) |
+| Project overview | [README.md](README.md) |
 | Current status | [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) |
 | App development | [PROGRESS.md](PROGRESS.md) |
 | Module development | [module/docs/DEVELOPMENT_SUMMARY.md](module/docs/DEVELOPMENT_SUMMARY.md) |

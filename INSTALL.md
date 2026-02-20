@@ -317,7 +317,7 @@ After successful installation:
 
 1. **Read Documentation**
    - [User Guide](docs/README.md)
-   - [Method 1: CarrierConfig Override](docs/METHOD1.md)
+   - [Quick Reference](QUICKREF.md)
    - [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
 
 2. **Join Community**
@@ -336,7 +336,7 @@ After successful installation:
 
 Need help? Check these resources:
 
-- **FAQ**: [docs/FAQ.md](docs/FAQ.md)
+- **Quick Reference**: [QUICKREF.md](QUICKREF.md)
 - **Troubleshooting**: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 - **GitHub Issues**: Report bugs and feature requests
 - **XDA Forum**: Community support and discussions
