@@ -26,7 +26,7 @@ Common issues and solutions for CCO.
 adb shell "df -h /data"
 
 # Uninstall old version
-adb uninstall com.supermarx.carrierconfig
+adb uninstall dev.mars.carrierconfig
 
 # Try installing again
 adb install -r cco-app.apk
@@ -43,7 +43,7 @@ adb logcat | grep -i "package"
 1. Settings → Apps → CCO → Permissions → Grant manually
 2. For phone permission on Android 13+:
    ```bash
-   adb shell "pm grant com.supermarx.carrierconfig android.permission.READ_PHONE_STATE"
+   adb shell "pm grant dev.mars.carrierconfig android.permission.READ_PHONE_STATE"
    ```
 
 ---

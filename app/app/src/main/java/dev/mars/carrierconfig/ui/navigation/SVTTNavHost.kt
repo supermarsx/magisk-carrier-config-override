@@ -1,6 +1,7 @@
 package dev.mars.carrierconfig.ui.navigation
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -128,24 +129,3 @@ sealed class NavigationItem(
     object Diagnostics : NavigationItem(Screen.Diagnostics, "Diagnostics", android.R.drawable.ic_menu_search)
 }
 
-/**
- * Temporary placeholder for unimplemented screens
- */
-@Composable
-fun PlaceholderScreen(name: String) {
-    androidx.compose.foundation.layout.Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = androidx.compose.ui.Alignment.Center
-    ) {
-        Text(
-            text = "$name Screen\nComing Soon",
-            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium,
-            color = TextSecondary,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-        )
-    }
-}
-
-// Extension for Box
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize

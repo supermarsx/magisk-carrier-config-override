@@ -20,7 +20,7 @@ fi
 ./gradlew assembleDebug
 
 # Find the APK
-APK_PATH=$(find app/build/outputs/apk/debug -name "*.apk" 2>/dev/null | head -1)
+APK_PATH=$(find app/app/build/outputs/apk/debug -name "*.apk" 2>/dev/null | head -1)
 
 if [ -n "$APK_PATH" ]; then
     echo "✅ Build successful!"

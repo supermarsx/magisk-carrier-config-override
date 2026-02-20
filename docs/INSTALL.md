@@ -154,7 +154,7 @@ frida-ps -U
 
 ### Remove App
 ```bash
-adb uninstall com.supermarx.carrierconfig
+adb uninstall dev.mars.carrierconfig
 # Or: Settings → Apps → CCO → Uninstall
 ```
 

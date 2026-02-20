@@ -4,8 +4,8 @@ Toolkit for Samsung CarrierConfig override workflows, Magisk module deployment, 
 
 ## Repository Status
 
-This repository currently contains multiple code paths from parallel development tracks:
-- `app/src/main/...` (`com.svtt.*`) and `app/app/src/main/...` (`com.supermarx.*`, `dev.mars.*`)
+This repository currently contains in-progress namespace migration work:
+- canonical app module at `app/app/src/main/...` with `dev.mars.*` entrypoints and shared `com.supermarx.*` internals
 - root-level docs with both current and historical milestone/session notes
 
 Treat this as an active integration state, not a finalized release branch.

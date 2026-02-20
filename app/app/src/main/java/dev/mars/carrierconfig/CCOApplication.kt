@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig
+package dev.mars.carrierconfig
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

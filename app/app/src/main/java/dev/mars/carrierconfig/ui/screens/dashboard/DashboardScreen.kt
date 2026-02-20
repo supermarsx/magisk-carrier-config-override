@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.screens.dashboard
+package dev.mars.carrierconfig.ui.screens.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,7 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.supermarx.carrierconfig.data.model.*
 import com.supermarx.carrierconfig.ui.components.*
-import com.supermarx.carrierconfig.ui.theme.*
+import com.supermarx.carrierconfig.ui.screens.dashboard.DashboardViewModel
+import dev.mars.carrierconfig.ui.theme.*
 
 /**
  * Main dashboard screen showing device status and WFC availability

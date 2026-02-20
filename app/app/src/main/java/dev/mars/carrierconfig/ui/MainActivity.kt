@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui
+package dev.mars.carrierconfig.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,8 +9,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
-import com.supermarx.carrierconfig.ui.navigation.CCONavHost
-import com.supermarx.carrierconfig.ui.theme.CCOTheme
+import dev.mars.carrierconfig.ui.navigation.CCONavHost
+import dev.mars.carrierconfig.ui.theme.CCOTheme
 
 /**
  * Main Activity for CCO app

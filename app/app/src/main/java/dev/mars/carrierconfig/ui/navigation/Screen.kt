@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.navigation
+package dev.mars.carrierconfig.ui.navigation
 
 /**
  * Navigation routes for CCO app screens

@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.theme
+package dev.mars.carrierconfig.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.theme
+package dev.mars.carrierconfig.ui.theme
 
 import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme

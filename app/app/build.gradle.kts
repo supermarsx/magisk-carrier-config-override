@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.supermarx.carrierconfig"
+    namespace = "dev.mars.carrierconfig"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.supermarx.carrierconfig"
+        applicationId = "dev.mars.carrierconfig"
         minSdk = 33  // Android 13
         targetSdk = 35
         versionCode = 1

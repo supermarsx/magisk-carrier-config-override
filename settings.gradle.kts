@@ -15,5 +15,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SVTT CarrierConfig"
+rootProject.name = "CarrierConfigOverride"
 include(":app")
+project(":app").projectDir = file("app/app")

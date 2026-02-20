@@ -20,7 +20,7 @@ from typing import Dict, List, Optional
 class CCOClient:
     """Client for interacting with CCO app via ADB"""
     
-    PACKAGE_NAME = "com.supermarx.carrierconfig"
+    PACKAGE_NAME = "dev.mars.carrierconfig"
     
     def __init__(self, device: Optional[str] = None):
         self.device = device
