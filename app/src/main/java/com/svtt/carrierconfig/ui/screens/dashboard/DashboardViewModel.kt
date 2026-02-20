@@ -77,6 +77,7 @@ class DashboardViewModel @Inject constructor(
     
     fun refresh() {
         loadDashboard()
+    }
     
     suspend fun exportReport(): ExportResult {
         return try {
@@ -96,6 +97,5 @@ class DashboardViewModel @Inject constructor(
                 error = "Failed to export: ${e.message}"
             )
         }
-    }
     }
 }

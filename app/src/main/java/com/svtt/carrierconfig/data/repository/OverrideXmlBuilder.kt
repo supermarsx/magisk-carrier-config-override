@@ -44,19 +44,38 @@ class OverrideXmlBuilder @Inject constructor() {
     private fun formatKeyAsXml(key: CarrierConfigKey): String {
         return when (key.type) {
             ConfigValueType.BOOLEAN -> {
-                val value = if (key.value as Boolean) "true" else "false"
+                val boolValue = when (val raw = key.value) {
+                    is Boolean -> raw
+                    is String -> raw.toBooleanStrictOrNull() ?: false
+                    else -> false
+                }
+                val value = if (boolValue) "true" else "false"
                 """<boolean name="${key.key}" value="$value" />"""
             }
             ConfigValueType.INTEGER -> {
-                """<int name="${key.key}" value="${key.value}" />"""
+                val intValue = when (val raw = key.value) {
+                    is Int -> raw
+                    is Number -> raw.toInt()
+                    is String -> raw.toIntOrNull() ?: 0
+                    else -> 0
+                }
+                """<int name="${key.key}" value="$intValue" />"""
             }
             ConfigValueType.STRING -> {
                 """<string name="${key.key}">${escapeXml(key.value.toString())}</string>"""
             }
             ConfigValueType.STRING_ARRAY -> {
+                val values: List<String> = when (val raw = key.value) {
+                    is List<*> -> raw.mapNotNull { it?.toString() }
+                    is Array<*> -> raw.mapNotNull { it?.toString() }
+                    is String -> raw.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                    else -> emptyList()
+                }
                 buildString {
-                    append("""<string-array name="${key.key}" num="0">""")
-                    // TODO: Handle array values if needed
+                    append("""<string-array name="${key.key}" num="${values.size}">""")
+                    values.forEach { item ->
+                        append("""<item value="${escapeXml(item)}" />""")
+                    }
                     append("</string-array>")
                 }
             }
