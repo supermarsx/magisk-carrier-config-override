@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.topjohnwu.superuser.Shell
 import com.svtt.carrierconfig.data.model.*
 import com.svtt.carrierconfig.ui.components.*
 import com.svtt.carrierconfig.ui.theme.*
@@ -586,7 +587,9 @@ private fun DeployTab(
                 GlassButton(
                     text = "Reboot Now",
                     onClick = {
-                        // TODO: Implement reboot
+                        scope.launch {
+                            Shell.cmd("reboot").exec()
+                        }
                         showRebootDialog = false
                     }
                 )
