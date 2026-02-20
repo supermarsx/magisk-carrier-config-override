@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.system
+package dev.mars.carrierconfig.system
 
 import android.content.BroadcastReceiver
 import android.content.Context

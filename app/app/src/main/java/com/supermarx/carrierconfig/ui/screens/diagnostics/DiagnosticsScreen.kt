@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.supermarx.carrierconfig.data.repository.*
+import dev.mars.carrierconfig.data.repository.*
 import com.supermarx.carrierconfig.ui.components.*
 import com.supermarx.carrierconfig.ui.theme.*
 

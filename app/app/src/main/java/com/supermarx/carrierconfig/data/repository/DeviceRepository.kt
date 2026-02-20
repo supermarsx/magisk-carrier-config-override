@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.data.repository
+package dev.mars.carrierconfig.data.repository
 
 import android.content.Context
 import android.content.Intent
@@ -8,7 +8,7 @@ import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
 import com.topjohnwu.superuser.Shell
 import dagger.hilt.android.qualifiers.ApplicationContext
-import com.supermarx.carrierconfig.data.model.*
+import dev.mars.carrierconfig.data.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

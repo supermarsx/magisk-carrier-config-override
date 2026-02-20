@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.di
+package dev.mars.carrierconfig.di
 
 import android.content.Context
 import dagger.Module
@@ -6,7 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import com.supermarx.carrierconfig.data.repository.DeviceRepository
+import dev.mars.carrierconfig.data.repository.DeviceRepository
 import javax.inject.Singleton
 
 /**

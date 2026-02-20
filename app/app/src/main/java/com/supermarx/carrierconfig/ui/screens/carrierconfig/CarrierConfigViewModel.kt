@@ -2,8 +2,8 @@ package com.supermarx.carrierconfig.ui.screens.carrierconfig
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.supermarx.carrierconfig.data.model.*
-import com.supermarx.carrierconfig.data.repository.CarrierConfigRepository
+import dev.mars.carrierconfig.data.model.*
+import dev.mars.carrierconfig.data.repository.CarrierConfigRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

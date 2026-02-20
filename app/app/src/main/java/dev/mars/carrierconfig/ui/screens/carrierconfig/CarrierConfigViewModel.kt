@@ -5,9 +5,9 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
-import com.supermarx.carrierconfig.data.model.CarrierConfigPreset
-import com.supermarx.carrierconfig.data.repository.CarrierConfigRepository
-import com.supermarx.carrierconfig.util.UriHelper
+import dev.mars.carrierconfig.data.model.CarrierConfigPreset
+import dev.mars.carrierconfig.data.repository.CarrierConfigRepository
+import dev.mars.carrierconfig.util.UriHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*

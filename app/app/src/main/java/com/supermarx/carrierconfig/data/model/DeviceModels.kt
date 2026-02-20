@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.data.model
+package dev.mars.carrierconfig.data.model
 
 /**
  * Device information data model

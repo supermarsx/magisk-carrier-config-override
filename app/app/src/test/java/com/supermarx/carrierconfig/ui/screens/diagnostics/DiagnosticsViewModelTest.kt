@@ -1,10 +1,10 @@
-package com.supermarx.carrierconfig.ui.screens.diagnostics
+package dev.mars.carrierconfig.ui.screens.diagnostics
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.supermarx.carrierconfig.data.repository.ConnectivityTestRepository
-import com.supermarx.carrierconfig.data.repository.DumpsysRepository
-import com.supermarx.carrierconfig.data.repository.ExportRepository
-import com.supermarx.carrierconfig.data.repository.LogcatRepository
+import dev.mars.carrierconfig.data.repository.ConnectivityTestRepository
+import dev.mars.carrierconfig.data.repository.DumpsysRepository
+import dev.mars.carrierconfig.data.repository.ExportRepository
+import dev.mars.carrierconfig.data.repository.LogcatRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf

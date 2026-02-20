@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.data.repository
+package dev.mars.carrierconfig.data.repository
 
 import android.content.Context
 import com.topjohnwu.superuser.Shell

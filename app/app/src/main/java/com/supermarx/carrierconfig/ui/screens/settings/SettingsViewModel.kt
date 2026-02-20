@@ -3,8 +3,8 @@ package com.supermarx.carrierconfig.ui.screens.settings
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.supermarx.carrierconfig.data.datastore.PreferencesManager
-import com.supermarx.carrierconfig.data.repository.ExportRepository
+import dev.mars.carrierconfig.data.datastore.PreferencesManager
+import dev.mars.carrierconfig.data.repository.ExportRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

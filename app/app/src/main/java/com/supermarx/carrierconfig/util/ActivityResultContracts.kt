@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.util
+package dev.mars.carrierconfig.util
 
 import android.content.Context
 import android.content.Intent

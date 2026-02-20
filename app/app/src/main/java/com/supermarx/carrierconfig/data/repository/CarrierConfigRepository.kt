@@ -1,7 +1,7 @@
-package com.supermarx.carrierconfig.data.repository
+package dev.mars.carrierconfig.data.repository
 
 import android.content.Context
-import com.supermarx.carrierconfig.data.model.*
+import dev.mars.carrierconfig.data.model.*
 import com.topjohnwu.superuser.Shell
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

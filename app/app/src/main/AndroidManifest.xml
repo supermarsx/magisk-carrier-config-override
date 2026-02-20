@@ -59,7 +59,7 @@
 
         <!-- Broadcast receiver for system events -->
         <receiver
-            android:name="com.supermarx.carrierconfig.system.SystemEventReceiver"
+            android:name="dev.mars.carrierconfig.system.SystemEventReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

@@ -4,9 +4,9 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.supermarx.carrierconfig.data.repository.FridaRepository
-import com.supermarx.carrierconfig.data.repository.LSPosedRepository
-import com.supermarx.carrierconfig.util.UriHelper
+import dev.mars.carrierconfig.data.repository.FridaRepository
+import dev.mars.carrierconfig.data.repository.LSPosedRepository
+import dev.mars.carrierconfig.util.UriHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mars.carrierconfig.instrumentation.ProfileManager
 import kotlinx.coroutines.Dispatchers

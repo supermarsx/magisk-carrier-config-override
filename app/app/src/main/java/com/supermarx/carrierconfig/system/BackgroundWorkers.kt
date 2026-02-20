@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.system
+package dev.mars.carrierconfig.system
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -9,7 +9,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import com.supermarx.carrierconfig.data.repository.DeviceRepository
+import dev.mars.carrierconfig.data.repository.DeviceRepository
 import java.util.concurrent.TimeUnit
 
 /**

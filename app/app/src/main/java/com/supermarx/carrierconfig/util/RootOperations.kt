@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.util
+package dev.mars.carrierconfig.util
 
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers

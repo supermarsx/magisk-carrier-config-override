@@ -2,7 +2,7 @@ package com.supermarx.carrierconfig.ui.screens.diagnostics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.supermarx.carrierconfig.data.repository.*
+import dev.mars.carrierconfig.data.repository.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

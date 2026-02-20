@@ -3,8 +3,8 @@ package com.supermarx.carrierconfig.ui.screens.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import com.supermarx.carrierconfig.data.model.DashboardState
-import com.supermarx.carrierconfig.data.repository.DeviceRepository
+import dev.mars.carrierconfig.data.model.DashboardState
+import dev.mars.carrierconfig.data.repository.DeviceRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

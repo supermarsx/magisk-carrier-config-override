@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.supermarx.carrierconfig.data.model.ConfigKey
-import com.supermarx.carrierconfig.data.model.ConfigValue
+import dev.mars.carrierconfig.data.model.ConfigKey
+import dev.mars.carrierconfig.data.model.ConfigValue
 import com.supermarx.carrierconfig.ui.theme.*
 
 /**
