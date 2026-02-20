@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.screens.diagnostics
+package dev.mars.carrierconfig.ui.screens.diagnostics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -188,7 +188,7 @@ class DiagnosticsViewModel @Inject constructor(
                 )
             
             when (result) {
-                is com.supermarx.carrierconfig.data.repository.ExportResult.Success -> {
+                is dev.mars.carrierconfig.data.repository.ExportResult.Success -> {
                     _state.update { 
                         it.copy(
                             isExporting = false,
@@ -196,7 +196,7 @@ class DiagnosticsViewModel @Inject constructor(
                         )
                     }
                 }
-                is com.supermarx.carrierconfig.data.repository.ExportResult.Error -> {
+                is dev.mars.carrierconfig.data.repository.ExportResult.Error -> {
                     _state.update { 
                         it.copy(
                             isExporting = false,

@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.screens.carrierconfig
+package dev.mars.carrierconfig.ui.screens.carrierconfig
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -16,8 +16,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mars.carrierconfig.data.model.*
-import com.supermarx.carrierconfig.ui.components.*
-import com.supermarx.carrierconfig.ui.screens.dashboard.DashboardViewModel
+import dev.mars.carrierconfig.ui.components.*
+import dev.mars.carrierconfig.ui.screens.dashboard.DashboardViewModel
 import dev.mars.carrierconfig.ui.theme.*
 
 /**

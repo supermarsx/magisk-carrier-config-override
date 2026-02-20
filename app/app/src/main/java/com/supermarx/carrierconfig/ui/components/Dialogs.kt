@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.components
+package dev.mars.carrierconfig.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.supermarx.carrierconfig.ui.theme.*
+import dev.mars.carrierconfig.ui.theme.*
 
 /**
  * Theme selection dialog

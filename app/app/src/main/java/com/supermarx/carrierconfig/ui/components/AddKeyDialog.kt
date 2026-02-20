@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.components
+package dev.mars.carrierconfig.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import dev.mars.carrierconfig.data.model.ConfigKey
 import dev.mars.carrierconfig.data.model.ConfigValue
-import com.supermarx.carrierconfig.ui.theme.*
+import dev.mars.carrierconfig.ui.theme.*
 
 /**
  * Dialog for adding custom configuration keys

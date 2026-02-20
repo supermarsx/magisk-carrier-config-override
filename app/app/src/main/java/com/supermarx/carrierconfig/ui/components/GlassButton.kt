@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.components
+package dev.mars.carrierconfig.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -15,10 +15,10 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.supermarx.carrierconfig.ui.theme.AccentPrimary
-import com.supermarx.carrierconfig.ui.theme.AccentPrimaryGlow
-import com.supermarx.carrierconfig.ui.theme.GlassSurfaceMedium
-import com.supermarx.carrierconfig.ui.theme.TextPrimary
+import dev.mars.carrierconfig.ui.theme.AccentPrimary
+import dev.mars.carrierconfig.ui.theme.AccentPrimaryGlow
+import dev.mars.carrierconfig.ui.theme.GlassSurfaceMedium
+import dev.mars.carrierconfig.ui.theme.TextPrimary
 
 /**
  * Primary glassmorphic button with gradient and glow effect

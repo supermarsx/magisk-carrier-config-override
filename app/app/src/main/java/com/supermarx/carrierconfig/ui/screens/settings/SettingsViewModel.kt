@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.screens.settings
+package dev.mars.carrierconfig.ui.screens.settings
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -202,7 +202,7 @@ class SettingsViewModel @Inject constructor(
             )
             
             when (result) {
-                is com.supermarx.carrierconfig.data.repository.ExportResult.Success -> {
+                is dev.mars.carrierconfig.data.repository.ExportResult.Success -> {
                     _state.update { 
                         it.copy(
                             isLoading = false,
@@ -210,7 +210,7 @@ class SettingsViewModel @Inject constructor(
                         )
                     }
                 }
-                is com.supermarx.carrierconfig.data.repository.ExportResult.Error -> {
+                is dev.mars.carrierconfig.data.repository.ExportResult.Error -> {
                     _state.update { 
                         it.copy(
                             isLoading = false,
@@ -228,7 +228,7 @@ class SettingsViewModel @Inject constructor(
             val result = exportRepository.importConfiguration(filePath)
             
             when (result) {
-                is com.supermarx.carrierconfig.data.repository.ImportResult.Success -> {
+                is dev.mars.carrierconfig.data.repository.ImportResult.Success -> {
                     loadPreferences() // Reload after import
                     _state.update { 
                         it.copy(
@@ -237,7 +237,7 @@ class SettingsViewModel @Inject constructor(
                         )
                     }
                 }
-                is com.supermarx.carrierconfig.data.repository.ImportResult.Error -> {
+                is dev.mars.carrierconfig.data.repository.ImportResult.Error -> {
                     _state.update { 
                         it.copy(
                             isLoading = false,
@@ -254,7 +254,7 @@ class SettingsViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true) }
             
             try {
-                val content = com.supermarx.carrierconfig.util.UriHelper.readTextFromUri(context, uri)
+                val content = dev.mars.carrierconfig.util.UriHelper.readTextFromUri(context, uri)
                 
                 if (content == null) {
                     _state.update {
@@ -269,7 +269,7 @@ class SettingsViewModel @Inject constructor(
                 val result = exportRepository.importConfigurationFromString(content)
                 
                 when (result) {
-                    is com.supermarx.carrierconfig.data.repository.ImportResult.Success -> {
+                    is dev.mars.carrierconfig.data.repository.ImportResult.Success -> {
                         loadPreferences()
                         _state.update {
                             it.copy(
@@ -278,7 +278,7 @@ class SettingsViewModel @Inject constructor(
                             )
                         }
                     }
-                    is com.supermarx.carrierconfig.data.repository.ImportResult.Error -> {
+                    is dev.mars.carrierconfig.data.repository.ImportResult.Error -> {
                         _state.update {
                             it.copy(
                                 isLoading = false,

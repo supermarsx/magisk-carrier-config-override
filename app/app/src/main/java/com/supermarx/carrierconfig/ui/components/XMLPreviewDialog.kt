@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.components
+package dev.mars.carrierconfig.ui.components
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.supermarx.carrierconfig.ui.theme.*
+import dev.mars.carrierconfig.ui.theme.*
 
 /**
  * Dialog for previewing generated XML configuration

@@ -6,7 +6,7 @@ import androidx.navigation.compose.rememberNavController
 import dev.mars.carrierconfig.data.repository.ConnectivityTestRepository
 import dev.mars.carrierconfig.data.repository.DumpsysRepository
 import dev.mars.carrierconfig.data.repository.LogcatRepository
-import com.supermarx.carrierconfig.ui.theme.CarrierConfigTheme
+import dev.mars.carrierconfig.ui.theme.CarrierConfigTheme
 import org.junit.Rule
 import org.junit.Test
 

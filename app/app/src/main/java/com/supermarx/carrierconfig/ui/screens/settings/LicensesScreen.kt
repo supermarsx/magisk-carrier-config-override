@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.screens.settings
+package dev.mars.carrierconfig.ui.screens.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,9 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.supermarx.carrierconfig.ui.components.GlassmorphicCard
-import com.supermarx.carrierconfig.ui.components.GlassButton
-import com.supermarx.carrierconfig.ui.theme.*
+import dev.mars.carrierconfig.ui.components.GlassmorphicCard
+import dev.mars.carrierconfig.ui.components.GlassButton
+import dev.mars.carrierconfig.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

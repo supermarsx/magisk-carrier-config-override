@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.components
+package dev.mars.carrierconfig.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,11 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.supermarx.carrierconfig.ui.theme.AccentError
-import com.supermarx.carrierconfig.ui.theme.AccentSuccess
-import com.supermarx.carrierconfig.ui.theme.AccentWarning
-import com.supermarx.carrierconfig.ui.theme.BackgroundDeepDark
-import com.supermarx.carrierconfig.ui.theme.TextPrimary
+import dev.mars.carrierconfig.ui.theme.AccentError
+import dev.mars.carrierconfig.ui.theme.AccentSuccess
+import dev.mars.carrierconfig.ui.theme.AccentWarning
+import dev.mars.carrierconfig.ui.theme.BackgroundDeepDark
+import dev.mars.carrierconfig.ui.theme.TextPrimary
 
 /**
  * Status chip component with color-coded states

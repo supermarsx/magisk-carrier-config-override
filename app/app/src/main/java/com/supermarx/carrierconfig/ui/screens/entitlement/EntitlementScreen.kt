@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.screens.entitlement
+package dev.mars.carrierconfig.ui.screens.entitlement
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,8 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
-import com.supermarx.carrierconfig.ui.components.*
-import com.supermarx.carrierconfig.ui.theme.*
+import dev.mars.carrierconfig.ui.components.*
+import dev.mars.carrierconfig.ui.theme.*
 
 /**
  * Entitlement (Method 2) - Runtime hooks screen

@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.screens.diagnostics
+package dev.mars.carrierconfig.ui.screens.diagnostics
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -19,8 +19,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mars.carrierconfig.data.repository.*
-import com.supermarx.carrierconfig.ui.components.*
-import com.supermarx.carrierconfig.ui.theme.*
+import dev.mars.carrierconfig.ui.components.*
+import dev.mars.carrierconfig.ui.theme.*
 
 /**
  * Advanced Diagnostics screen with real-time monitoring

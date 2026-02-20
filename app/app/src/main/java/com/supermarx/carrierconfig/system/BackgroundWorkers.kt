@@ -116,10 +116,10 @@ class UpdateCheckWorker @AssistedInject constructor(
     
     override suspend fun doWork(): Result {
         return try {
-            val result = com.supermarx.carrierconfig.util.UpdateChecker.checkForUpdates(applicationContext)
+            val result = dev.mars.carrierconfig.util.UpdateChecker.checkForUpdates(applicationContext)
             
             when (result) {
-                is com.supermarx.carrierconfig.util.UpdateCheckResult.UpdateAvailable -> {
+                is dev.mars.carrierconfig.util.UpdateCheckResult.UpdateAvailable -> {
                     NotificationHelper.showUpdateNotification(
                         applicationContext,
                         version = result.latestVersion,

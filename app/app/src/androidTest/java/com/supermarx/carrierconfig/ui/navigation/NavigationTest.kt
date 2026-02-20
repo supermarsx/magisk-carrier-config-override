@@ -3,7 +3,7 @@ package dev.mars.carrierconfig.ui.navigation
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.supermarx.carrierconfig.ui.theme.CarrierConfigTheme
+import dev.mars.carrierconfig.ui.theme.CarrierConfigTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

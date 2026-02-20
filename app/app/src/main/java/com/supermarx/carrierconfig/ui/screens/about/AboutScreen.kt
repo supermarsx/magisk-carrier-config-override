@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.screens.about
+package dev.mars.carrierconfig.ui.screens.about
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.supermarx.carrierconfig.ui.components.*
-import com.supermarx.carrierconfig.ui.theme.*
+import dev.mars.carrierconfig.ui.components.*
+import dev.mars.carrierconfig.ui.theme.*
 
 /**
  * About screen showing app information

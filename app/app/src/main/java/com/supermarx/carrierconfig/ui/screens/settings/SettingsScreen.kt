@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.screens.settings
+package dev.mars.carrierconfig.ui.screens.settings
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -18,8 +18,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.supermarx.carrierconfig.ui.components.*
-import com.supermarx.carrierconfig.ui.theme.*
+import dev.mars.carrierconfig.ui.components.*
+import dev.mars.carrierconfig.ui.theme.*
 import dev.mars.carrierconfig.util.PickConfigFileContract
 import dev.mars.carrierconfig.util.PickDirectoryContract
 import dev.mars.carrierconfig.util.UriHelper

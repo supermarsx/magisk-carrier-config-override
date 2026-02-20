@@ -8,7 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.supermarx.carrierconfig.R
+import dev.mars.carrierconfig.R
 
 /**
  * Notification helper for system alerts and updates

@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.screens.carrierconfig
+package dev.mars.carrierconfig.ui.screens.carrierconfig
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,8 +14,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mars.carrierconfig.data.model.*
-import com.supermarx.carrierconfig.ui.components.*
-import com.supermarx.carrierconfig.ui.theme.*
+import dev.mars.carrierconfig.ui.components.*
+import dev.mars.carrierconfig.ui.theme.*
 
 /**
  * CarrierConfig override configuration screen

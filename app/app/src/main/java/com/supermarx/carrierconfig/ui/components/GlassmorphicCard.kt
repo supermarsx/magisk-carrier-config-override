@@ -1,4 +1,4 @@
-package com.supermarx.carrierconfig.ui.components
+package dev.mars.carrierconfig.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,8 +16,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.supermarx.carrierconfig.ui.theme.GlassSurface
-import com.supermarx.carrierconfig.ui.theme.GlassSurfaceMedium
+import dev.mars.carrierconfig.ui.theme.GlassSurface
+import dev.mars.carrierconfig.ui.theme.GlassSurfaceMedium
 
 /**
  * Glassmorphic card component with blur effect and transparency
