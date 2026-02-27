@@ -188,9 +188,27 @@ def cmd_rpc(args):
             print(json.dumps(result, indent=2))
         
         elif args.method == "toggleHooks":
-            enabled = args.params.lower() == "true" if args.params else True
-            result = script.exports.toggle_hooks(enabled)
-            print(f"Hooks {'enabled' if enabled else 'disabled'}")
+            category = "ims"
+            enabled = True
+            if args.params:
+                try:
+                    parsed = json.loads(args.params)
+                    if isinstance(parsed, dict):
+                        category = parsed.get("category", category)
+                        enabled = bool(parsed.get("enabled", enabled))
+                    else:
+                        raise ValueError("Expected JSON object")
+                except Exception:
+                    # Backward-compatible plain format: "category=true"
+                    if "=" in args.params:
+                        k, v = args.params.split("=", 1)
+                        category = k.strip() or category
+                        enabled = v.strip().lower() == "true"
+                    else:
+                        enabled = args.params.strip().lower() == "true"
+
+            result = script.exports.toggle_hooks(category, enabled)
+            print(f"{category} hooks {'enabled' if enabled else 'disabled'}")
         
         else:
             print(f"Unknown method: {args.method}", file=sys.stderr)

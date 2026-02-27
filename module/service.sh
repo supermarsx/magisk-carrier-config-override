@@ -83,15 +83,15 @@ if command -v detect_override_path > /dev/null 2>&1; then
     log_info "Path detected via function: $TARGET_PATH"
 else
     # Fallback: manual detection
-    CANDIDATE_PATHS=(
-        "/data/vendor/carrierconfig/override.xml"
-        "/data/vendor/carrierconfig/override_carrier.xml"
-        "/data/misc/carrierconfig/override.xml"
-        "/data/user_de/0/com.android.phone/files/carrierconfig_override.xml"
-    )
+    CANDIDATE_PATHS="
+/data/vendor/carrierconfig/override.xml
+/data/vendor/carrierconfig/override_carrier.xml
+/data/misc/carrierconfig/override.xml
+/data/user_de/0/com.android.phone/files/carrierconfig_override.xml
+"
 
     TARGET_PATH=""
-    for path in "${CANDIDATE_PATHS[@]}"; do
+    for path in $CANDIDATE_PATHS; do
         dir=$(dirname "$path")
         if [ -d "$dir" ]; then
             TARGET_PATH="$path"
