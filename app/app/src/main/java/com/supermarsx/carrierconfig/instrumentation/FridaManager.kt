@@ -2,6 +2,7 @@ package com.supermarsx.carrierconfig.instrumentation
 
 import android.content.Context
 import com.topjohnwu.superuser.Shell
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -18,7 +19,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class FridaManager @Inject constructor(
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) {
     companion object {
         private const val TAG = "FridaManager"
@@ -67,7 +68,11 @@ class FridaManager @Inject constructor(
             
             // Copy frida-server from assets to temp
             val tempFile = File(context.cacheDir, "frida-server-arm64")
-            context.assets.open("frida-server-arm64").use { input ->
+            val fridaBinary = openAssetText("frida-server-arm64", "instrumentation/frida-server-arm64")
+                ?: return@withContext Result.failure(
+                    IllegalStateException("Missing frida-server-arm64 asset")
+                )
+            fridaBinary.use { input ->
                 tempFile.outputStream().use { output ->
                     input.copyTo(output)
                 }
@@ -176,13 +181,22 @@ class FridaManager @Inject constructor(
             Timber.tag(TAG).d("Deploying agent with profile: $profile")
             
             // Copy agent from assets
-            val agentContent = context.assets.open("instrumentation/agent-complete.js").bufferedReader().use {
+            val agentContent = openAssetText(
+                "frida/agent-complete.js",
+                "instrumentation/agent-complete.js"
+            )
+            if (agentContent == null) {
+                return@withContext Result.failure(
+                    IllegalStateException("Missing Frida agent asset (agent-complete.js)")
+                )
+            }
+            val agentBody = agentContent.bufferedReader().use {
                 it.readText()
             }
             
             // Write to temp file
             val tempFile = File(context.cacheDir, "cco-agent.js")
-            tempFile.writeText(agentContent)
+            tempFile.writeText(agentBody)
             
             // Push to device
             val result = Shell.cmd(
@@ -261,5 +275,16 @@ class FridaManager @Inject constructor(
     private fun getFridaPid(): Int? {
         val result = Shell.cmd("su -c 'pgrep -f frida-server'").exec()
         return result.out.firstOrNull()?.toIntOrNull()
+    }
+
+    private fun openAssetText(vararg candidates: String): java.io.InputStream? {
+        for (path in candidates) {
+            try {
+                return context.assets.open(path)
+            } catch (_: Exception) {
+                // Try next candidate
+            }
+        }
+        return null
     }
 }

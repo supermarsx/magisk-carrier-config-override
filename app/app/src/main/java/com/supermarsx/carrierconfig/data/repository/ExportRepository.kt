@@ -142,6 +142,22 @@ class ExportRepository @Inject constructor(
             ExportResult.Error("Export failed: ${e.message}")
         }
     }
+
+    /**
+     * Export arbitrary plain-text content.
+     */
+    suspend fun exportTextFile(
+        prefix: String,
+        extension: String,
+        content: String
+    ): ExportResult = withContext(Dispatchers.IO) {
+        try {
+            val file = saveToFile(content, prefix, extension, EXPORT_DIR)
+            ExportResult.Success(file.absolutePath)
+        } catch (e: Exception) {
+            ExportResult.Error("Export failed: ${e.message}")
+        }
+    }
     
     /**
      * Save content to file with timestamp

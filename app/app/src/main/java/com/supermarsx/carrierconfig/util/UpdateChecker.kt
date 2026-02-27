@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.net.URL
@@ -15,8 +16,10 @@ import java.net.URL
  */
 object UpdateChecker {
     
-    private const val GITHUB_API_URL = "https://api.github.com/repos/YOUR_USERNAME/cco-manager/releases/latest"
-    private const val GITHUB_RELEASES_URL = "https://github.com/YOUR_USERNAME/cco-manager/releases"
+    private const val GITHUB_API_URL =
+        "https://api.github.com/repos/supermarsx/magisk-carrier-config-override/releases/latest"
+    private const val GITHUB_RELEASES_URL =
+        "https://github.com/supermarsx/magisk-carrier-config-override/releases"
     
     private val json = Json {
         ignoreUnknownKeys = true
@@ -154,15 +157,18 @@ sealed class UpdateCheckResult {
  */
 @Serializable
 private data class GitHubRelease(
+    @SerialName("tag_name")
     val tagName: String,
     val name: String,
     val body: String? = null,
+    @SerialName("published_at")
     val publishedAt: String? = null,
     val assets: List<GitHubAsset> = emptyList()
 ) {
     @Serializable
     data class GitHubAsset(
         val name: String,
+        @SerialName("browser_download_url")
         val browserDownloadUrl: String,
         val size: Long
     )

@@ -79,7 +79,7 @@ fun CarrierConfigScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("CarrierConfig Override") },
+                title = { Text("Carrier Configuration") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = BackgroundDark.copy(alpha = 0.95f),
                     titleContentColor = TextPrimary

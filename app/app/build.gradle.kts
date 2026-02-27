@@ -59,6 +59,12 @@ android {
         buildConfig = true
     }
 
+    sourceSets {
+        getByName("main") {
+            assets.srcDirs("src/main/assets", "../../instrumentation")
+        }
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.10"
     }
@@ -118,6 +124,7 @@ dependencies {
 
     // Gson (for legacy JSON handling)
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.jakewharton.timber:timber:5.0.1")
 
     // LibSU - Root Operations
     implementation("com.github.topjohnwu.libsu:core:5.2.2")

@@ -74,3 +74,11 @@ fun CCOTheme(
         content = content
     )
 }
+
+@Composable
+fun CarrierConfigTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    CCOTheme(darkTheme = darkTheme, content = content)
+}

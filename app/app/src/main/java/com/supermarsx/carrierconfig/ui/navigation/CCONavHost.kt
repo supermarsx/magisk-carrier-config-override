@@ -18,10 +18,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.supermarsx.carrierconfig.ui.screens.about.AboutScreen
 import com.supermarsx.carrierconfig.ui.screens.dashboard.DashboardScreen
 import com.supermarsx.carrierconfig.ui.screens.diagnostics.DiagnosticsScreen
 import com.supermarsx.carrierconfig.ui.screens.carrierconfig.CarrierConfigScreen
 import com.supermarsx.carrierconfig.ui.screens.entitlement.EntitlementScreen
+import com.supermarsx.carrierconfig.ui.screens.settings.SettingsScreen
 import com.supermarsx.carrierconfig.ui.theme.AccentPrimary
 import com.supermarsx.carrierconfig.ui.theme.BackgroundDark
 import com.supermarsx.carrierconfig.ui.theme.GlassSurfaceMedium
@@ -33,7 +35,8 @@ import com.supermarsx.carrierconfig.ui.theme.TextSecondary
  */
 @Composable
 fun CCONavHost(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    startDestination: String = Screen.Dashboard.route
 ) {
     Scaffold(
         bottomBar = {
@@ -42,7 +45,7 @@ fun CCONavHost(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Dashboard.route,
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Dashboard.route) {
@@ -56,6 +59,14 @@ fun CCONavHost(
             }
             composable(Screen.Diagnostics.route) {
                 DiagnosticsScreen()
+            }
+            composable(Screen.Settings.route) {
+                SettingsScreen(
+                    onNavigateToAbout = { navController.navigate(Screen.About.route) }
+                )
+            }
+            composable(Screen.About.route) {
+                AboutScreen(onNavigateBack = { navController.popBackStack() })
             }
         }
     }
@@ -73,7 +84,8 @@ fun CCOBottomNavigation(navController: NavHostController) {
         NavigationItem.Dashboard,
         NavigationItem.CarrierConfig,
         NavigationItem.Entitlement,
-        NavigationItem.Diagnostics
+        NavigationItem.Diagnostics,
+        NavigationItem.Settings
     )
     
     NavigationBar(
@@ -124,7 +136,15 @@ sealed class NavigationItem(
 ) {
     object Dashboard : NavigationItem(Screen.Dashboard, "Dashboard", android.R.drawable.ic_menu_info_details)
     object CarrierConfig : NavigationItem(Screen.CarrierConfig, "Config", android.R.drawable.ic_menu_edit)
-    object Entitlement : NavigationItem(Screen.Entitlement, "Hooks", android.R.drawable.ic_menu_manage)
+    object Entitlement : NavigationItem(Screen.Entitlement, "Entitlement", android.R.drawable.ic_menu_manage)
     object Diagnostics : NavigationItem(Screen.Diagnostics, "Diagnostics", android.R.drawable.ic_menu_search)
+    object Settings : NavigationItem(Screen.Settings, "Settings", android.R.drawable.ic_menu_preferences)
+}
+
+@Composable
+fun AppNavigation(
+    startDestination: String = Screen.Dashboard.route
+) {
+    CCONavHost(startDestination = startDestination)
 }
 

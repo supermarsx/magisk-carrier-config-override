@@ -30,7 +30,7 @@ fun AboutScreen(
             TopAppBar(
                 title = { 
                     Text(
-                        "About",
+                        "About CCO",
                         style = MaterialTheme.typography.headlineSmall
                     ) 
                 },
@@ -38,7 +38,7 @@ fun AboutScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = "Navigate back",
                             tint = TextPrimary
                         )
                     }

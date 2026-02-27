@@ -137,3 +137,18 @@ class UpdateCheckWorker @AssistedInject constructor(
         }
     }
 }
+
+/**
+ * Convenience scheduler for all periodic background work.
+ */
+object BackgroundWorkers {
+    fun scheduleAll(context: Context) {
+        StatusRefreshWorker.schedule(context)
+        UpdateCheckWorker.schedule(context)
+    }
+
+    fun cancelAll(context: Context) {
+        StatusRefreshWorker.cancel(context)
+        UpdateCheckWorker.cancel(context)
+    }
+}

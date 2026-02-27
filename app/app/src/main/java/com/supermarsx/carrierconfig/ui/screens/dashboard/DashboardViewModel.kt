@@ -76,8 +76,8 @@ class DashboardViewModel @Inject constructor(
                 
                 // Run additional checks
                 val deviceInfo = deviceRepository.getDeviceInfo()
-                val simInfo = deviceRepository.getSimInfo()
-                val imsStatus = deviceRepository.getImsStatus()
+                val simInfo = deviceRepository.getSIMInfo()
+                val imsStatus = deviceRepository.getIMSStatus()
                 
                 _state.value = _state.value.copy(
                     isLoading = false,

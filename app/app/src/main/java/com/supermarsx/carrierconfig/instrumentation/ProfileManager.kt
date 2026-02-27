@@ -2,6 +2,7 @@ package com.supermarsx.carrierconfig.instrumentation
 
 import android.content.Context
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +24,10 @@ class ProfileManager @Inject constructor(
 ) {
     companion object {
         private const val TAG = "ProfileManager"
-        private const val PROFILES_PATH = "instrumentation/profiles.json"
+        private val PROFILE_PATH_CANDIDATES = listOf(
+            "shared/profiles.json",
+            "instrumentation/shared/profiles.json"
+        )
     }
     
     data class ProfileDatabase(
@@ -35,11 +39,15 @@ class ProfileManager @Inject constructor(
         val id: String,
         val name: String,
         val description: String,
+        @SerializedName("oneui_versions")
         val oneuiVersions: List<String>,
+        @SerializedName("android_versions")
         val androidVersions: List<String>,
         val carriers: List<String>? = null,
         val targets: List<HookTarget>,
+        @SerializedName("carrier_config_overrides")
         val carrierConfigOverrides: Map<String, Any>? = null,
+        @SerializedName("settings_overrides")
         val settingsOverrides: Map<String, Int>? = null,
         val note: String? = null
     )
@@ -49,13 +57,16 @@ class ProfileManager @Inject constructor(
         val `class`: String,
         val method: String,
         val signature: String,
+        @SerializedName("return_value")
         val returnValue: Any,
         val description: String
     )
     
     data class Metadata(
         val version: String,
+        @SerializedName("last_updated")
         val lastUpdated: String,
+        @SerializedName("schema_version")
         val schemaVersion: String
     )
     
@@ -70,7 +81,7 @@ class ProfileManager @Inject constructor(
         }
         
         try {
-            val json = context.assets.open("shared/$PROFILES_PATH").bufferedReader().use {
+            val json = openProfilesAsset().bufferedReader().use {
                 it.readText()
             }
             
@@ -181,5 +192,16 @@ class ProfileManager @Inject constructor(
                 )
             )
         )
+    }
+
+    private fun openProfilesAsset(): InputStream {
+        for (path in PROFILE_PATH_CANDIDATES) {
+            try {
+                return context.assets.open(path)
+            } catch (_: Exception) {
+                // Try next path
+            }
+        }
+        throw IllegalStateException("profiles.json asset not found")
     }
 }

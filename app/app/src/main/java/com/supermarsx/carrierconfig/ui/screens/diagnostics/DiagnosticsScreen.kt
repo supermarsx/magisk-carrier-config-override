@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.supermarsx.carrierconfig.data.repository.*
 import com.supermarsx.carrierconfig.ui.components.*
 import com.supermarsx.carrierconfig.ui.theme.*
@@ -28,6 +29,7 @@ import com.supermarsx.carrierconfig.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiagnosticsScreen(
+    navController: NavHostController? = null,
     viewModel: DiagnosticsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()

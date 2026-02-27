@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
 import com.supermarsx.carrierconfig.ui.navigation.CCONavHost
+import com.supermarsx.carrierconfig.ui.navigation.Screen
 import com.supermarsx.carrierconfig.ui.theme.CCOTheme
 
 /**
@@ -23,6 +24,14 @@ class MainActivity : ComponentActivity() {
         
         // Enable edge-to-edge display
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        val startDestination = when (intent?.data?.host ?: intent?.data?.path?.removePrefix("/")) {
+            "deploy", "carrier_config" -> Screen.CarrierConfig.route
+            "export_report", "diagnostics" -> Screen.Diagnostics.route
+            "settings" -> Screen.Settings.route
+            "about" -> Screen.About.route
+            else -> Screen.Dashboard.route
+        }
         
         setContent {
             CCOTheme {
@@ -30,7 +39,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    CCONavHost()
+                    CCONavHost(startDestination = startDestination)
                 }
             }
         }

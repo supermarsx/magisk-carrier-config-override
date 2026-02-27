@@ -19,6 +19,7 @@ val GlassSurfaceStrong = Color(0x4DFFFFFF)    // 30% white - strong glass
 val GlassSurfaceSubtle = Color(0x0DFFFFFF)    // 5% white - very subtle
 val GlassBorder = Color(0x33FFFFFF)           // 20% white - border color
 val GlassTint = GlassSurfaceMedium
+val GlassBackground = BackgroundDeepDark
 
 // Gradient Overlays
 val GradientTop = Color(0xFF0D1B2E)

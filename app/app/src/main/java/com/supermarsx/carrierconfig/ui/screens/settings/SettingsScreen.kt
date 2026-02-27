@@ -119,7 +119,7 @@ fun SettingsScreen(
                     Column {
                         SettingsToggleItem(
                             icon = Icons.Default.Refresh,
-                            title = "Auto-refresh Dashboard",
+                            title = "Auto-refresh dashboard",
                             subtitle = "Automatically refresh device status on app open",
                             checked = state.autoRefresh,
                             onCheckedChange = { viewModel.setAutoRefresh(it) }
@@ -230,7 +230,7 @@ fun SettingsScreen(
                     Column {
                         SettingsClickableItem(
                             icon = Icons.Default.Info,
-                            title = "About CCO",
+                            title = "About",
                             subtitle = "Version 1.0.0-alpha",
                             onClick = onNavigateToAbout
                         )
@@ -251,7 +251,6 @@ fun SettingsScreen(
                             title = "Source Code",
                             subtitle = "github.com/supermarsx/cco",
                             onClick = {
-                                val context = navController.context
                                 val intent = android.content.Intent(
                                     android.content.Intent.ACTION_VIEW,
                                     android.net.Uri.parse("https://github.com/supermarsx/magisk-carrier-config-override")
