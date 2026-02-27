@@ -101,7 +101,7 @@ run_integration_tests() {
     
     echo -e "${BLUE}  • Device detected: $(adb devices | grep device | head -1 | awk '{print $1}')${NC}"
     
-    $GRADLE_CMD connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.supermarx.carrierconfig.integration.RepositoryIntegrationTest
+    $GRADLE_CMD connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.supermarsx.carrierconfig.integration.RepositoryIntegrationTest
     
     local EXIT_CODE=$?
     if [ $EXIT_CODE -eq 0 ]; then

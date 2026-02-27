@@ -17,7 +17,7 @@ from typing import Optional
 class FridaLauncher:
     """Launcher for Frida instrumentation sessions"""
     
-    PACKAGE_NAME = "dev.mars.carrierconfig"
+    PACKAGE_NAME = "com.supermarsx.carrierconfig"
     SCRIPT_DIR = Path(__file__).parent / "frida"
     
     def __init__(self, device: Optional[str] = None):

@@ -1,4 +1,4 @@
-package dev.mars.carrierconfig.data.repository
+package com.supermarsx.carrierconfig.data.repository
 
 import android.content.Context
 import android.net.ConnectivityManager

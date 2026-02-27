@@ -1,9 +1,9 @@
-package dev.mars.carrierconfig.integration
+package com.supermarsx.carrierconfig.integration
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import dev.mars.carrierconfig.data.repository.*
+import com.supermarsx.carrierconfig.data.repository.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before

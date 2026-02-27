@@ -150,7 +150,7 @@ export CCO_SKIP_TESTS=1
 cco-manager/
 ├── app/                          # Android application
 │   ├── app/                      # Main app module
-│   │   ├── src/main/java/com/supermarx/carrierconfig/
+│   │   ├── src/main/java/com/supermarsx/carrierconfig/
 │   │   │   ├── data/             # Data layer (repositories, models)
 │   │   │   ├── di/               # Dependency injection (Hilt)
 │   │   │   ├── domain/           # Business logic
@@ -219,7 +219,7 @@ fun CalculateCacheSize():Long{
 
 ```kotlin
 // 1. Package declaration
-package com.supermarx.carrierconfig.ui.screens.settings
+package com.supermarsx.carrierconfig.ui.screens.settings
 
 // 2. Imports (alphabetically sorted)
 import android.app.Application

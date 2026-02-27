@@ -1,4 +1,4 @@
-package dev.mars.carrierconfig.data.repository
+package com.supermarsx.carrierconfig.data.repository
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

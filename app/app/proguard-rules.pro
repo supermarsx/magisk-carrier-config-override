@@ -1,11 +1,11 @@
 # Proguard rules for CarrierConfig Override app
 
 # Keep application class
--keep class com.supermarx.carrierconfig.CarrierConfigApplication { *; }
+-keep class com.supermarsx.carrierconfig.CarrierConfigApplication { *; }
 
 # Keep data classes for JSON serialization
--keep class com.supermarx.carrierconfig.data.model.** { *; }
--keepclassmembers class com.supermarx.carrierconfig.data.model.** { *; }
+-keep class com.supermarsx.carrierconfig.data.model.** { *; }
+-keepclassmembers class com.supermarsx.carrierconfig.data.model.** { *; }
 
 # Kotlinx Serialization
 -keepattributes *Annotation*, InnerClasses

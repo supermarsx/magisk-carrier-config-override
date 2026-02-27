@@ -41,7 +41,7 @@ PROGRESS.md        # App development progress
 #### Implemented Components
 
 **1. Data Models** ✅
-- [CarrierConfigModels.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/model/CarrierConfigModels.kt)
+- [CarrierConfigModels.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/model/CarrierConfigModels.kt)
   - `CarrierConfigPreset` - Configuration preset definitions
   - `ConfigValue` - Type-safe values (Boolean, Int, String, StringArray)
   - `ConfigKey` - Key-value pairs with descriptions
@@ -51,7 +51,7 @@ PROGRESS.md        # App development progress
   - `CarrierConfigState` - Complete screen state
 
 **2. Repository Layer** ✅
-- [CarrierConfigRepository.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/repository/CarrierConfigRepository.kt)
+- [CarrierConfigRepository.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/repository/CarrierConfigRepository.kt)
   - **6 Predefined Presets**:
     1. WFC UI Only - Minimal visibility changes
     2. WFC Default Enabled - Auto-enable on boot
@@ -66,7 +66,7 @@ PROGRESS.md        # App development progress
   - Revert with backup restoration
 
 **3. ViewModel** ✅
-- [CarrierConfigViewModel.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/carrierconfig/CarrierConfigViewModel.kt)
+- [CarrierConfigViewModel.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/carrierconfig/CarrierConfigViewModel.kt)
   - StateFlow-based reactive state management
   - Preset selection handling
   - Custom key management (add/remove)
@@ -75,7 +75,7 @@ PROGRESS.md        # App development progress
   - Tab navigation state
 
 **4. UI Implementation** ✅
-- [CarrierConfigScreen.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/carrierconfig/CarrierConfigScreen.kt)
+- [CarrierConfigScreen.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/carrierconfig/CarrierConfigScreen.kt)
   - **3-Tab Interface**:
     - **Presets Tab**: Browse and select configuration presets
       - Card-based preset display
@@ -97,7 +97,7 @@ PROGRESS.md        # App development progress
   - Loading states during operations
 
 **5. Navigation Integration** ✅
-- Updated [CCONavHost.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/navigation/CCONavHost.kt)
+- Updated [CCONavHost.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/navigation/CCONavHost.kt)
   - Added CarrierConfig screen to navigation graph
   - Accessible via bottom navigation bar
   - Proper route configuration
@@ -107,7 +107,7 @@ PROGRESS.md        # App development progress
 ## 📊 Current App Architecture
 
 ```
-app/app/src/main/java/com/supermarx/carrierconfig/
+app/app/src/main/java/com/supermarsx/carrierconfig/
 ├── CCOApplication.kt                    # Hilt application
 ├── data/
 │   ├── model/

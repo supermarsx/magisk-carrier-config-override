@@ -1,12 +1,12 @@
-package dev.mars.carrierconfig.ui.screens.diagnostics
+package com.supermarsx.carrierconfig.ui.screens.diagnostics
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
-import dev.mars.carrierconfig.data.repository.ConnectivityTestRepository
-import dev.mars.carrierconfig.data.repository.DumpsysRepository
-import dev.mars.carrierconfig.data.repository.LogcatRepository
-import dev.mars.carrierconfig.ui.theme.CarrierConfigTheme
+import com.supermarsx.carrierconfig.data.repository.ConnectivityTestRepository
+import com.supermarsx.carrierconfig.data.repository.DumpsysRepository
+import com.supermarsx.carrierconfig.data.repository.LogcatRepository
+import com.supermarsx.carrierconfig.ui.theme.CarrierConfigTheme
 import org.junit.Rule
 import org.junit.Test
 

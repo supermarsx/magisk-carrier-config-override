@@ -1,4 +1,4 @@
-package dev.mars.carrierconfig.data.datastore
+package com.supermarsx.carrierconfig.data.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="dev.mars.carrierconfig">
+    package="com.supermarsx.carrierconfig">
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
-        android:name="dev.mars.carrierconfig.CCOApplication"
+        android:name="com.supermarsx.carrierconfig.CCOApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -29,7 +29,7 @@
         tools:targetApi="31">
         
         <activity
-            android:name="dev.mars.carrierconfig.ui.MainActivity"
+            android:name="com.supermarsx.carrierconfig.ui.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.CarrierConfig"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
@@ -59,7 +59,7 @@
 
         <!-- Broadcast receiver for system events -->
         <receiver
-            android:name="dev.mars.carrierconfig.system.SystemEventReceiver"
+            android:name="com.supermarsx.carrierconfig.system.SystemEventReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

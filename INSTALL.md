@@ -77,7 +77,7 @@ adb devices
 adb install cco-manager.apk
 
 # Launch app
-adb shell am start -n com.supermarx.carrierconfig/.MainActivity
+adb shell am start -n com.supermarsx.carrierconfig/.MainActivity
 
 # Grant root (Magisk prompt on device)
 ```
@@ -277,7 +277,7 @@ adb shell su -c whoami
 
 1. **Remove App**
    ```bash
-   adb uninstall com.supermarx.carrierconfig
+   adb uninstall com.supermarsx.carrierconfig
    ```
 
 2. **Clean Up Data**
@@ -286,7 +286,7 @@ adb shell su -c whoami
    adb shell rm -rf /sdcard/CCO/
    
    # Remove internal data (requires root)
-   adb shell su -c rm -rf /data/data/com.supermarx.carrierconfig/
+   adb shell su -c rm -rf /data/data/com.supermarsx.carrierconfig/
    ```
 
 3. **Revert Changes** (if CarrierConfig deployed)
@@ -300,9 +300,9 @@ adb shell su -c whoami
 
 ```bash
 # Remove all traces
-adb shell su -c "pm uninstall com.supermarx.carrierconfig && \
+adb shell su -c "pm uninstall com.supermarsx.carrierconfig && \
   rm -rf /sdcard/CCO/ && \
-  rm -rf /data/data/com.supermarx.carrierconfig/ && \
+  rm -rf /data/data/com.supermarsx.carrierconfig/ && \
   rm -rf /data/adb/cco/"
 
 # Reboot

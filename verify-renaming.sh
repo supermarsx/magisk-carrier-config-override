@@ -62,11 +62,11 @@ echo ""
 # Check package structure
 echo "4. Verifying package structure..."
 if [ -d "app/app/src/main/java/dev/mars/carrierconfig" ]; then
-  echo "   ✅ Package dev.mars.carrierconfig exists"
+  echo "   ✅ Package com.supermarsx.carrierconfig exists"
   echo "   Files in package:"
   find app/app/src/main/java/dev/mars/carrierconfig -name "*.kt" | wc -l | xargs echo "     " "Kotlin files"
 else
-  echo "   ❌ Package dev.mars.carrierconfig not found"
+  echo "   ❌ Package com.supermarsx.carrierconfig not found"
 fi
 
 echo ""

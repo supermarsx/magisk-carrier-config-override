@@ -9,7 +9,7 @@ CCO uses a comprehensive testing strategy covering unit tests, integration tests
 ```
 app/app/src/
 ├── test/java/                          # Unit Tests
-│   └── com/supermarx/carrierconfig/
+│   └── com/supermarsx/carrierconfig/
 │       ├── data/
 │       │   ├── datastore/
 │       │   │   └── PreferencesManagerTest.kt
@@ -24,7 +24,7 @@ app/app/src/
 │                   └── DiagnosticsViewModelTest.kt
 │
 └── androidTest/java/                   # Instrumentation Tests
-    └── com/supermarx/carrierconfig/
+    └── com/supermarsx/carrierconfig/
         ├── integration/
         │   └── RepositoryIntegrationTest.kt
         ├── ui/

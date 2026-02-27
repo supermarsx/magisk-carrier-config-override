@@ -100,7 +100,7 @@ cco-app/
 │   ├── proguard-rules.pro
 │   └── src/main/
 │       ├── AndroidManifest.xml
-│       ├── java/com/supermarx/carrierconfig/
+│       ├── java/com/supermarsx/carrierconfig/
 │       │   ├── CCOApplication.kt
 │       │   ├── ui/
 │       │   │   ├── MainActivity.kt

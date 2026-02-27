@@ -27,7 +27,7 @@ magisk-carrier-config-override/
 │   │   ├── proguard-rules.pro  # ProGuard rules
 │   │   └── src/main/
 │   │       ├── AndroidManifest.xml
-│   │       ├── java/com/supermarx/carrierconfig/
+│   │       ├── java/com/supermarsx/carrierconfig/
 │   │       │   ├── CCOApplication.kt
 │   │       │   ├── ui/
 │   │       │   │   ├── MainActivity.kt

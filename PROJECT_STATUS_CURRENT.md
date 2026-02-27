@@ -95,7 +95,7 @@ Milestone 4: ████░░░░░░░░░░░░░░░░  20% �
 
 ### Application Structure
 ```
-app/app/src/main/java/com/supermarx/carrierconfig/
+app/app/src/main/java/com/supermarsx/carrierconfig/
 ├── CCOApplication.kt                 # Hilt app
 ├── data/
 │   ├── model/

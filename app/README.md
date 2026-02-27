@@ -6,7 +6,7 @@ This repository's Android app module is `app/app`.
 
 - Gradle module: `:app`
 - Module directory: `app/app`
-- Current app id / namespace: `dev.mars.carrierconfig`
+- Current app id / namespace: `com.supermarsx.carrierconfig`
 - Primary UI entrypoint: `app/app/src/main/java/dev/mars/carrierconfig/ui/MainActivity.kt`
 
 ## Source Layout
@@ -18,7 +18,7 @@ app/
 │   └── src/main/
 │       ├── AndroidManifest.xml
 │       ├── java/dev/mars/carrierconfig/           # canonical entrypoints + nav + instrumentation
-│       └── java/com/supermarx/carrierconfig/      # shared repositories/components under migration
+│       └── java/com/supermarsx/carrierconfig/      # shared repositories/components under migration
 └── scripts/
     ├── dev.sh
     ├── build.sh
@@ -34,4 +34,4 @@ app/
 
 ## Diagnostics Export Path
 
-`/sdcard/Android/data/dev.mars.carrierconfig/files/cco_reports/`
+`/sdcard/Android/data/com.supermarsx.carrierconfig/files/cco_reports/`

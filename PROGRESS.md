@@ -65,7 +65,7 @@ This document tracks the implementation progress of the CCO Manager Android app 
 ### UI Components & Polish
 
 1. **GlassTextField Component** ✅
-   - [GlassTextField.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/components/GlassTextField.kt)
+   - [GlassTextField.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/components/GlassTextField.kt)
    - Glassmorphic text input with blur effect
    - Error state with validation messages
    - Leading/trailing icon support
@@ -139,7 +139,7 @@ Implemented 3 TODOs in DeviceRepository.kt:
 ### File & Directory Management
 
 1. **Activity Result Contracts** ✅
-   - [ActivityResultContracts.kt](app/app/src/main/java/com/supermarx/carrierconfig/util/ActivityResultContracts.kt) (135 lines)
+   - [ActivityResultContracts.kt](app/app/src/main/java/com/supermarsx/carrierconfig/util/ActivityResultContracts.kt) (135 lines)
    - `PickDirectoryContract` - System directory picker integration
    - `PickConfigFileContract` - JSON file picker for imports
    - `CreateFileContract` - File creation dialog
@@ -157,7 +157,7 @@ Implemented 3 TODOs in DeviceRepository.kt:
 ### Root Operations & System Control
 
 3. **Root Operations Wrappers** ✅
-   - [RootOperations.kt](app/app/src/main/java/com/supermarx/carrierconfig/util/RootOperations.kt) (380+ lines)
+   - [RootOperations.kt](app/app/src/main/java/com/supermarsx/carrierconfig/util/RootOperations.kt) (380+ lines)
    - **RootShell**: Centralized shell command execution
      - Single/multiple command execution
      - Result parsing with success/error handling
@@ -182,7 +182,7 @@ Implemented 3 TODOs in DeviceRepository.kt:
 ### Update Management
 
 4. **Update Checker** ✅
-   - [UpdateChecker.kt](app/app/src/main/java/com/supermarx/carrierconfig/util/UpdateChecker.kt) (180 lines)
+   - [UpdateChecker.kt](app/app/src/main/java/com/supermarsx/carrierconfig/util/UpdateChecker.kt) (180 lines)
    - GitHub Releases API integration
    - Semantic version comparison
    - Update availability detection
@@ -194,7 +194,7 @@ Implemented 3 TODOs in DeviceRepository.kt:
 ### System Integration
 
 5. **Broadcast Receiver** ✅
-   - [SystemEventReceiver.kt](app/app/src/main/java/com/supermarx/carrierconfig/system/SystemEventReceiver.kt) (110 lines)
+   - [SystemEventReceiver.kt](app/app/src/main/java/com/supermarsx/carrierconfig/system/SystemEventReceiver.kt) (110 lines)
    - Monitors 5 system events:
      - Connectivity changes (WiFi/Cellular)
      - Carrier config changes
@@ -206,7 +206,7 @@ Implemented 3 TODOs in DeviceRepository.kt:
    - Schedules delayed refresh after airplane mode/boot
 
 6. **WorkManager Background Tasks** ✅
-   - [BackgroundWorkers.kt](app/app/src/main/java/com/supermarx/carrierconfig/system/BackgroundWorkers.kt) (120 lines)
+   - [BackgroundWorkers.kt](app/app/src/main/java/com/supermarsx/carrierconfig/system/BackgroundWorkers.kt) (120 lines)
    - **StatusRefreshWorker**: Periodic status checks (every 6 hours)
      - Refreshes device, SIM, IMS status
      - Detects WFC issues
@@ -218,7 +218,7 @@ Implemented 3 TODOs in DeviceRepository.kt:
    - Scheduled automatically on app start
 
 7. **Notification System** ✅
-   - [NotificationHelper.kt](app/app/src/main/java/com/supermarx/carrierconfig/system/NotificationHelper.kt) (160 lines)
+   - [NotificationHelper.kt](app/app/src/main/java/com/supermarsx/carrierconfig/system/NotificationHelper.kt) (160 lines)
    - 3 notification channels:
      - **Status Alerts**: WFC/IMS issues (default importance)
      - **System Events**: Carrier config changes (low importance)
@@ -383,7 +383,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 **Completed Components**:
 
 1. **Data Models** ✅
-   - [CarrierConfigModels.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/model/CarrierConfigModels.kt)
+   - [CarrierConfigModels.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/model/CarrierConfigModels.kt)
      - `CarrierConfigPreset` - Configuration presets
      - `ConfigValue` - Type-safe configuration values (Boolean, Int, String, StringArray)
      - `ConfigKey` - Key-value pairs with metadata
@@ -393,7 +393,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - `CarrierConfigState` - Screen state management
 
 2. **Repository Layer** ✅
-   - [CarrierConfigRepository.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/repository/CarrierConfigRepository.kt)
+   - [CarrierConfigRepository.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/repository/CarrierConfigRepository.kt)
      - 6 predefined presets (WFC UI Only, Default Enabled, Editable Mode, Wi-Fi Preferred, Wi-Fi Only, Full Enablement)
      - Multi-path CarrierConfig detection (4 Samsung paths)
      - Prerequisites validation (Root, Magisk, Path detection)
@@ -403,7 +403,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - Deployment status tracking
 
 3. **ViewModel** ✅
-   - [CarrierConfigViewModel.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/carrierconfig/CarrierConfigViewModel.kt)
+   - [CarrierConfigViewModel.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/carrierconfig/CarrierConfigViewModel.kt)
      - State management for 3-tab interface
      - Preset selection logic
      - Custom key management (add/remove)
@@ -412,7 +412,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - Error handling and user feedback
 
 4. **UI Screen** ✅
-   - [CarrierConfigScreen.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/carrierconfig/CarrierConfigScreen.kt)
+   - [CarrierConfigScreen.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/carrierconfig/CarrierConfigScreen.kt)
      - **Tab 1: Presets** - Browse and select presets with cards
      - **Tab 2: Keys** - View all selected keys (preset + custom)
      - **Tab 3: Deploy** - Prerequisites check, deployment actions
@@ -423,7 +423,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - Error snackbar for user feedback
 
 5. **Navigation Integration** ✅
-   - [CCONavHost.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/navigation/CCONavHost.kt)
+   - [CCONavHost.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/navigation/CCONavHost.kt)
      - Integrated CarrierConfig screen into navigation
      - Bottom navigation bar access
 
@@ -448,7 +448,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 **Completed Components**:
 
 1. **UI Screen** ✅
-   - [EntitlementScreen.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/entitlement/EntitlementScreen.kt)
+   - [EntitlementScreen.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/entitlement/EntitlementScreen.kt)
      - Feature preview cards
      - Development roadmap display
      - Coming soon indicators
@@ -470,32 +470,32 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 **Completed Components**:
 
 1. **Diagnostics Screen** ✅ (FULLY IMPLEMENTED)
-   - [DiagnosticsScreen.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/diagnostics/DiagnosticsScreen.kt)
+   - [DiagnosticsScreen.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/diagnostics/DiagnosticsScreen.kt)
      - Full 3-tab interface with real data integration
      - **Logs Tab**: Real-time logcat with filtering, live/snapshot modes
      - **Dumpsys Tab**: Interactive service viewer (IMS, Phone, CarrierConfig, etc.)
      - **Tests Tab**: Automated connectivity test suite with results display
      - Export functionality for all tabs
-   - [DiagnosticsViewModel.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/diagnostics/DiagnosticsViewModel.kt)
+   - [DiagnosticsViewModel.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/diagnostics/DiagnosticsViewModel.kt)
      - Complete state management
      - Live logcat streaming coordination
      - Test execution orchestration
 
 2. **Diagnostics Backend** ✅ (NEW)
-   - [LogcatRepository.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/repository/LogcatRepository.kt)
+   - [LogcatRepository.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/repository/LogcatRepository.kt)
      - Live logcat streaming via Flow
      - Snapshot capture (500 lines)
      - Smart filtering (CarrierConfig, IMS, Telephony, WFC, All)
      - Log level filtering (Verbose → Fatal)
-   - [DumpsysRepository.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/repository/DumpsysRepository.kt)
+   - [DumpsysRepository.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/repository/DumpsysRepository.kt)
      - 6 system services (IMS, Phone, CarrierConfig, Telecom, Connectivity, Netstats)
      - Intelligent IMS info extraction
-   - [ConnectivityTestRepository.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/repository/ConnectivityTestRepository.kt)
+   - [ConnectivityTestRepository.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/repository/ConnectivityTestRepository.kt)
      - 6 automated tests (Network, DNS, Internet, WFC, IMS, Cellular)
      - Pass/fail tracking with detailed messages
 
 3. **Settings Screen** ✅
-   - [SettingsScreen.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/settings/SettingsScreen.kt)
+   - [SettingsScreen.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/settings/SettingsScreen.kt)
      - General settings (auto-refresh, notifications)
      - Appearance settings (theme, glass effect)
      - Advanced settings (debug mode, export directory, cache)
@@ -503,14 +503,14 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - About section with navigation
      - Danger zone (reset settings)
      - Loading states and snackbar feedback
-   - [SettingsViewModel.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/settings/SettingsViewModel.kt)
+   - [SettingsViewModel.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/settings/SettingsViewModel.kt)
      - DataStore integration for preferences
      - Export/import functionality
      - Cache clearing
      - Settings reset
 
 3. **About Screen** ✅
-   - [AboutScreen.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/settings/AboutScreen.kt)
+   - [AboutScreen.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/settings/AboutScreen.kt)
      - App version display
      - Feature list with cards
      - Requirements checklist
@@ -518,7 +518,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - Legal disclaimer
 
 4. **Preferences System** ✅
-   - [PreferencesManager.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/datastore/PreferencesManager.kt)
+   - [PreferencesManager.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/datastore/PreferencesManager.kt)
      - DataStore-based preferences storage
      - Type-safe preference keys
      - Flow-based reactive updates
@@ -526,7 +526,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - Bulk operations (reset, clear)
 
 5. **Export/Import System** ✅
-   - [ExportRepository.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/repository/ExportRepository.kt)
+   - [ExportRepository.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/repository/ExportRepository.kt)
      - Configuration export to JSON
      - Diagnostics report export (JSON + TXT)
      - Import configuration from file

@@ -112,7 +112,7 @@ The CCO Manager implementation has achieved **98% compliance** with the original
 | Export Report | JSON + text | ✅ Complete | ✅ |
 
 **Compliance**: 100% ✅  
-**File**: [DashboardScreen.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/dashboard/DashboardScreen.kt)
+**File**: [DashboardScreen.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/dashboard/DashboardScreen.kt)
 
 #### 4.2 Method 1 — CarrierConfig Overrides ✅ Complete
 
@@ -162,7 +162,7 @@ The CCO Manager implementation has achieved **98% compliance** with the original
 | Export ZIP | Single archive | ✅ Export functionality | ✅ |
 
 **Compliance**: 100% ✅  
-**File**: [DiagnosticsScreen.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/diagnostics/DiagnosticsScreen.kt)
+**File**: [DiagnosticsScreen.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/diagnostics/DiagnosticsScreen.kt)
 
 ---
 

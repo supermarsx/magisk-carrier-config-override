@@ -15,7 +15,7 @@
 
 #### Backend Repositories (3 new files, ~750 lines)
 
-**[LogcatRepository.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/repository/LogcatRepository.kt)**
+**[LogcatRepository.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/repository/LogcatRepository.kt)**
 - Real-time logcat streaming via Kotlin Flow
 - Snapshot capture (last 500 lines)
 - Smart filtering by category:
@@ -24,7 +24,7 @@
 - Threadtime format parsing with regex
 - Buffer clearing capability
 
-**[DumpsysRepository.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/repository/DumpsysRepository.kt)**
+**[DumpsysRepository.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/repository/DumpsysRepository.kt)**
 - 6 system services integration:
   - `dumpsys ims` - IMS registration & capabilities
   - `dumpsys phone` - Phone service state
@@ -37,7 +37,7 @@
 - Feature capability parsing
 - Batch operations for all services
 
-**[ConnectivityTestRepository.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/repository/ConnectivityTestRepository.kt)**
+**[ConnectivityTestRepository.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/repository/ConnectivityTestRepository.kt)**
 - Comprehensive automated test suite:
   1. Network Status - Active network detection
   2. DNS Resolution - Name resolution with timing
@@ -52,7 +52,7 @@
 
 #### Frontend Components
 
-**[DiagnosticsViewModel.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/diagnostics/DiagnosticsViewModel.kt)** (~220 lines)
+**[DiagnosticsViewModel.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/diagnostics/DiagnosticsViewModel.kt)** (~220 lines)
 - Complete state management for 3 tabs
 - Live logcat coordination
 - Dumpsys service selection
@@ -60,7 +60,7 @@
 - Export functionality integration
 - Reactive Flow-based updates
 
-**[DiagnosticsScreen.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/diagnostics/DiagnosticsScreen.kt)** (~380 lines)
+**[DiagnosticsScreen.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/diagnostics/DiagnosticsScreen.kt)** (~380 lines)
 - **Completely rewritten** with real data integration
 - **Logs Tab**:
   - Real-time streaming with play/stop FAB
@@ -84,15 +84,15 @@
 ### 2. Settings & Preferences System ✅
 
 #### Previously Completed
-- [PreferencesManager.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/datastore/PreferencesManager.kt)
-- [ExportRepository.kt](app/app/src/main/java/com/supermarx/carrierconfig/data/repository/ExportRepository.kt)
-- [SettingsViewModel.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/settings/SettingsViewModel.kt)
-- [SettingsScreen.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/settings/SettingsScreen.kt)
-- [AboutScreen.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/screens/settings/AboutScreen.kt)
+- [PreferencesManager.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/datastore/PreferencesManager.kt)
+- [ExportRepository.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/repository/ExportRepository.kt)
+- [SettingsViewModel.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/settings/SettingsViewModel.kt)
+- [SettingsScreen.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/settings/SettingsScreen.kt)
+- [AboutScreen.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/settings/AboutScreen.kt)
 
 #### New This Session
 
-**[Dialogs.kt](app/app/src/main/java/com/supermarx/carrierconfig/ui/components/Dialogs.kt)** (NEW - ~260 lines)
+**[Dialogs.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/components/Dialogs.kt)** (NEW - ~260 lines)
 - **ThemePickerDialog**: Theme selection (Dark, AMOLED, Auto)
 - **GlassStrengthPickerDialog**: Glass effect strength selector
 - **ConfirmationDialog**: Destructive action confirmation
@@ -148,7 +148,7 @@
 ### Architecture Overview
 
 ```
-app/app/src/main/java/com/supermarx/carrierconfig/
+app/app/src/main/java/com/supermarsx/carrierconfig/
 ├── data/
 │   ├── datastore/
 │   │   └── PreferencesManager.kt          [DataStore integration]
