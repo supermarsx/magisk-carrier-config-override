@@ -15,6 +15,7 @@ import argparse
 import json
 import subprocess
 import sys
+import time
 from typing import Dict, List, Optional
 
 class CCOClient:
@@ -105,11 +106,25 @@ class CCOClient:
             f"-d 'cco://export_report'"
         )
         self._adb("shell", intent)
-        
-        # Pull from device (assuming fixed location)
-        report_path = "/sdcard/CCO/reports/latest.json"
-        result = self._adb("pull", report_path, output_path)
-        return result.returncode == 0
+        time.sleep(2)
+
+        candidate_dirs = [
+            "/sdcard/CCO/reports",
+            f"/sdcard/Android/data/{self.PACKAGE_NAME}/files/CCO/exports",
+            f"/sdcard/Android/data/{self.PACKAGE_NAME}/files/CCO/reports",
+        ]
+
+        for base in candidate_dirs:
+            ls = self._adb("shell", "sh", "-c", f"ls -1t {base} 2>/dev/null | head -n 1")
+            latest = ls.stdout.strip()
+            if not latest:
+                continue
+            report_path = f"{base}/{latest}"
+            pull = self._adb("pull", report_path, output_path)
+            if pull.returncode == 0:
+                return True
+
+        return False
     
     def list_devices(self) -> List[str]:
         """List connected devices"""
@@ -228,8 +243,15 @@ def cmd_status(args):
     print(f"  Installed: {'Yes' if module_installed else 'No'}")
     
     if module_installed:
-        # Check active profile
-        result = client._adb("shell", "cat /data/adb/cco/current_profile 2>/dev/null || echo none")
+        # Check active profile (new and legacy markers)
+        result = client._adb(
+            "shell",
+            "sh",
+            "-c",
+            "if [ -f /data/adb/cco/current_profile ]; then cat /data/adb/cco/current_profile; "
+            "elif [ -f /data/adb/cco/active/override.xml ]; then basename /data/adb/cco/active/override.xml; "
+            "else echo none; fi"
+        )
         profile = result.stdout.strip()
         print(f"  Active Profile: {profile}")
     

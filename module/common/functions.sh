@@ -32,15 +32,15 @@ log_error() {
 
 # Detect CarrierConfig override path for this device
 detect_override_path() {
-    local candidate_paths=(
-        "/data/vendor/carrierconfig/override.xml"
-        "/data/vendor/carrierconfig/override_carrier.xml"
-        "/data/misc/carrierconfig/override.xml"
-        "/data/user_de/0/com.android.phone/files/carrierconfig_override.xml"
-    )
+    local candidate_paths="
+/data/vendor/carrierconfig/override.xml
+/data/vendor/carrierconfig/override_carrier.xml
+/data/misc/carrierconfig/override.xml
+/data/user_de/0/com.android.phone/files/carrierconfig_override.xml
+"
 
     # First, check if any path already has a file (indicates system uses it)
-    for path in "${candidate_paths[@]}"; do
+    for path in $candidate_paths; do
         if [ -f "$path" ]; then
             echo "$path"
             return 0
@@ -48,7 +48,7 @@ detect_override_path() {
     done
 
     # Next, check if directory exists
-    for path in "${candidate_paths[@]}"; do
+    for path in $candidate_paths; do
         local dir=$(dirname "$path")
         if [ -d "$dir" ]; then
             echo "$path"
