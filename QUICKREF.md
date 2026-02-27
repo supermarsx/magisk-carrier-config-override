@@ -46,8 +46,10 @@ Dashboard (Home)
 │  ├─ Presets Tab
 │  ├─ Keys Tab
 │  └─ Deploy Tab
-├─ Method 2 (Runtime Hooks) [Coming Soon]
-└─ Settings [Coming Soon]
+├─ Entitlement (Runtime Hooks)
+├─ Diagnostics
+├─ Settings
+└─ About
 ```
 
 ### Dashboard Cards
@@ -68,7 +70,7 @@ Dashboard (Home)
 
 ### How It Works
 1. App generates XML from selected CarrierConfig keys
-2. XML saved to `/data/adb/svtt/active/override.xml`
+2. XML saved to `/data/adb/cco/active/override.xml`
 3. Magisk module bind-mounts XML to system path
 4. System reads override instead of default config
 5. WFC UI appears based on override keys
@@ -125,10 +127,10 @@ carrier_promote_wfc_on_call_fail_bool = true
 3. Backup Current Config
    ├─ Check if override exists
    ├─ Create timestamped backup
-   └─ Store in /data/adb/svtt/backups/
+   └─ Store in /data/adb/cco/backups/
 
 4. Deploy Override
-   ├─ Write XML to /data/adb/svtt/active/
+   ├─ Write XML to /data/adb/cco/active/
    ├─ Set permissions (644)
    └─ Log deployment
 
@@ -150,7 +152,7 @@ carrier_promote_wfc_on_call_fail_bool = true
 
 ### Export Location
 ```
-/sdcard/Android/data/com.svtt.carrierconfig/files/svtt_reports/
+/sdcard/Android/data/com.supermarsx.carrierconfig/files/cco_reports/
 └─ YYYY-MM-DD_HH-MM-SS/
    ├─ diagnostic_report.json  # Machine-readable
    └─ diagnostic_report.txt   # Human-readable
@@ -181,7 +183,7 @@ carrier_promote_wfc_on_call_fail_bool = true
 adb shell su -c "ls -la /data/vendor/carrierconfig/"
 
 # Verify XML content
-adb shell su -c "cat /data/adb/svtt/active/override.xml"
+adb shell su -c "cat /data/adb/cco/active/override.xml"
 
 # Check bind-mount status (requires Magisk module)
 adb shell mount | grep carrierconfig
@@ -198,9 +200,9 @@ adb shell mount | grep carrierconfig
 ### App Crashes on Launch
 
 **Solutions**:
-1. Clear app data: Settings → Apps → SVTT → Clear Data
+1. Clear app data: Settings → Apps → CCO → Clear Data
 2. Reinstall APK
-3. Check logcat: `adb logcat | grep svtt`
+3. Check logcat: `adb logcat | grep -Ei "cco|carrierconfig|supermarsx"`
 4. Export and share crash logs
 
 ### Blocker Analysis Shows "Unknown"
@@ -232,7 +234,7 @@ Method 1: Via App
 └─ Method 1 → Deploy Tab → Revert Override → Reboot
 
 Method 2: Via ADB
-└─ adb shell su -c "rm /data/adb/svtt/active/override.xml"
+└─ adb shell su -c "rm /data/adb/cco/active/override.xml"
    adb reboot
 
 Method 3: Via Recovery

@@ -220,7 +220,7 @@ Implementation checklist for the CCO Manager.
   - [x] Module status checking
   - [x] Multi-path detection (4 Samsung paths)
   - [x] Path validation
-  - [x] SVTT data directory management
+  - [x] CCO data directory management
   - [x] Override deployment
   - [x] Backup system with rotation
   - [x] Revert functionality

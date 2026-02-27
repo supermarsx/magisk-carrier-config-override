@@ -8,7 +8,7 @@
 
 ## Source Tree Status
 
-Legacy source trees (SVTT at `app/src/`, dev.mars at `app/app/src/main/java/dev/mars/`) have been **deleted**. All code now lives in the single active tree:
+Legacy source trees (SVTT at `app/src/`, dev.mars at `app/app/src/main/java/dev/mars/`) have been **deleted**. Active app code now lives in a single tree:
 
 - **supermarsx** at `app/app/src/main/java/com/supermarsx/carrierconfig/` — 37 files, compiled by Gradle
 
