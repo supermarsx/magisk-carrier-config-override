@@ -91,10 +91,11 @@ class ConnectivityTestRepository @Inject constructor(
      * Test internet connectivity
      */
     private suspend fun testInternetConnectivity(): TestResult = withContext(Dispatchers.IO) {
+        var connection: HttpURLConnection? = null
         try {
             val startTime = System.currentTimeMillis()
             val url = URL("https://www.google.com/generate_204")
-            val connection = url.openConnection() as HttpURLConnection
+            connection = url.openConnection() as HttpURLConnection
             connection.connectTimeout = 10000
             connection.readTimeout = 10000
             connection.instanceFollowRedirects = false
@@ -102,7 +103,6 @@ class ConnectivityTestRepository @Inject constructor(
             
             val responseCode = connection.responseCode
             val duration = System.currentTimeMillis() - startTime
-            connection.disconnect()
             
             if (responseCode == 204 || responseCode == 200) {
                 TestResult.Passed("HTTP $responseCode in ${duration}ms")
@@ -111,6 +111,8 @@ class ConnectivityTestRepository @Inject constructor(
             }
         } catch (e: Exception) {
             TestResult.Failed("Connection failed: ${e.message}")
+        } finally {
+            connection?.disconnect()
         }
     }
     
@@ -220,15 +222,15 @@ class ConnectivityTestRepository @Inject constructor(
      * Test specific endpoint connectivity
      */
     suspend fun testEndpoint(url: String, timeout: Int = 5000): TestResult = withContext(Dispatchers.IO) {
+        var connection: HttpURLConnection? = null
         try {
             val startTime = System.currentTimeMillis()
-            val urlConnection = URL(url).openConnection() as HttpURLConnection
-            urlConnection.connectTimeout = timeout
-            urlConnection.readTimeout = timeout
+            connection = URL(url).openConnection() as HttpURLConnection
+            connection.connectTimeout = timeout
+            connection.readTimeout = timeout
             
-            val responseCode = urlConnection.responseCode
+            val responseCode = connection.responseCode
             val duration = System.currentTimeMillis() - startTime
-            urlConnection.disconnect()
             
             if (responseCode in 200..299) {
                 TestResult.Passed("HTTP $responseCode in ${duration}ms")
@@ -237,6 +239,8 @@ class ConnectivityTestRepository @Inject constructor(
             }
         } catch (e: Exception) {
             TestResult.Failed("Connection failed: ${e.message}")
+        } finally {
+            connection?.disconnect()
         }
     }
 }
