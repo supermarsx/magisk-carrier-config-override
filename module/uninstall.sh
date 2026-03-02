@@ -36,7 +36,11 @@ is_mounted() {
 
 for path in $CANDIDATE_PATHS; do
     if is_mounted "$path"; then
-        umount "$path"
+        if ! umount "$path" 2>/dev/null; then
+            # Retry after a short delay (mount may be busy)
+            sleep 1
+            umount -l "$path" 2>/dev/null || log_msg "WARNING: could not unmount $path"
+        fi
         log_msg "Unmounted: $path"
     fi
 done

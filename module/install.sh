@@ -89,8 +89,17 @@ else
 fi
 ui_print ""
 
-# Create initial log entry
+# Rotate / trim stale logs from a previous install (keep last 25 KB)
 LOG_FILE="/data/adb/cco/logs/module.log"
+if [ -f "$LOG_FILE" ]; then
+    LOG_SIZE=$(stat -c%s "$LOG_FILE" 2>/dev/null || stat -f%z "$LOG_FILE" 2>/dev/null || echo 0)
+    if [ "$LOG_SIZE" -gt 51200 ]; then
+        tail -c 25600 "$LOG_FILE" > "${LOG_FILE}.tmp" 2>/dev/null \
+            && mv "${LOG_FILE}.tmp" "$LOG_FILE" \
+            || rm -f "${LOG_FILE}.tmp"
+        ui_print "  Rotated old log file"
+    fi
+fi
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] CCO Module installed" >> "$LOG_FILE"
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Device: $DEVICE" >> "$LOG_FILE"
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Android: $ANDROID (SDK $SDK)" >> "$LOG_FILE"
@@ -109,9 +118,15 @@ ui_print "Logs: /data/adb/cco/logs/module.log"
 ui_print ""
 
 # Set module as installed
-set_perm_recursive "$MODPATH" 0 0 0755 0644
+if command -v set_perm_recursive >/dev/null 2>&1; then
+    set_perm_recursive "$MODPATH" 0 0 0755 0644
+else
+    find "$MODPATH" -type d -exec chmod 0755 {} \;
+    find "$MODPATH" -type f -exec chmod 0644 {} \;
+fi
 chmod 755 "$MODPATH/service.sh"
 chmod 755 "$MODPATH/post-fs-data.sh"
 chmod 755 "$MODPATH/uninstall.sh"
+chmod 755 "$MODPATH/install.sh"
 
 ui_print "Ready to use after reboot"

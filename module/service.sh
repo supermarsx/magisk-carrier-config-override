@@ -21,6 +21,16 @@ else
     log_error() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: $1" >> "$LOG_FILE"; }
 fi
 
+# ── Log rotation (keep last 50 KB) ──────────────────────────────────────────
+if [ -f "$LOG_FILE" ]; then
+    LOG_SIZE=$(stat -c%s "$LOG_FILE" 2>/dev/null || stat -f%z "$LOG_FILE" 2>/dev/null || echo 0)
+    if [ "$LOG_SIZE" -gt 51200 ]; then
+        tail -c 25600 "$LOG_FILE" > "${LOG_FILE}.tmp" 2>/dev/null \
+            && mv "${LOG_FILE}.tmp" "$LOG_FILE" \
+            || rm -f "${LOG_FILE}.tmp"
+    fi
+fi
+
 log_info "=========================================="
 log_info "CCO Service Script Starting"
 log_info "=========================================="
@@ -73,7 +83,17 @@ if [ ! -f "$ACTIVE_OVERRIDE" ]; then
 fi
 
 log_info "Active override file found"
-log_info "File size: $(stat -c%s "$ACTIVE_OVERRIDE" 2> /dev/null || stat -f%z "$ACTIVE_OVERRIDE" 2> /dev/null || echo "unknown") bytes"
+log_info "File size: $(stat -c%s "$ACTIVE_OVERRIDE" 2>/dev/null || stat -f%z "$ACTIVE_OVERRIDE" 2>/dev/null || echo "unknown") bytes"
+
+# ── Basic XML sanity check ──────────────────────────────────────────────────
+if ! grep -q '<carrier_config' "$ACTIVE_OVERRIDE" 2>/dev/null; then
+    log_error "Override file does not contain <carrier_config> element"
+    log_error "Refusing to mount an invalid override. Fix the file and reboot."
+    exit 1
+fi
+if ! grep -q '</carrier_config>' "$ACTIVE_OVERRIDE" 2>/dev/null; then
+    log_warn "Override file may be truncated (missing closing tag)"
+fi
 
 # CarrierConfig override path detection
 log_info "Detecting CarrierConfig override path..."
@@ -189,12 +209,22 @@ if [ $MOUNT_RESULT -eq 0 ]; then
         log_warn "Mount point verification inconclusive"
     fi
 
-    # Optionally trigger carrier config refresh
+    # Optionally trigger carrier config refresh per SIM slot
     log_info "Triggering CarrierConfig refresh..."
     if [ -x "$(command -v am)" ]; then
-        am broadcast -a android.telephony.action.CARRIER_CONFIG_CHANGED 2> /dev/null \
-            && log_info "✓ Broadcast sent successfully" \
-            || log_warn "Broadcast may have failed (manual reboot recommended)"
+        SLOT_COUNT=$(getprop persist.radio.multisim.config 2>/dev/null)
+        case "$SLOT_COUNT" in
+            dsds|dsda|tsts) MAX_SLOTS=2 ;;
+            *)              MAX_SLOTS=1 ;;
+        esac
+        SLOT=0
+        while [ $SLOT -lt $MAX_SLOTS ]; do
+            am broadcast -a android.telephony.action.CARRIER_CONFIG_CHANGED \
+                --ei android.telephony.extra.SLOT_INDEX $SLOT 2>/dev/null \
+                && log_info "✓ Broadcast sent for slot $SLOT" \
+                || log_warn "Broadcast may have failed for slot $SLOT"
+            SLOT=$((SLOT + 1))
+        done
     else
         log_info "Activity Manager not available, skipping broadcast"
     fi

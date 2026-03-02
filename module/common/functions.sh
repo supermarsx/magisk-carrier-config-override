@@ -138,7 +138,6 @@ safe_bind_mount() {
 # Check if module is disabled by user
 is_module_disabled() {
     [ -f "/data/adb/cco/disable" ]
-    return $?
 }
 
 # Get device information
