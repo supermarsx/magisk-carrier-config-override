@@ -70,6 +70,7 @@ class ProfileManager @Inject constructor(
         val schemaVersion: String
     )
     
+    @Volatile
     private var cachedDatabase: ProfileDatabase? = null
     
     /**

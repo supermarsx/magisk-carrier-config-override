@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.supermarsx.carrierconfig.instrumentation.FridaManager
 import com.supermarsx.carrierconfig.instrumentation.ProfileManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -228,17 +230,21 @@ class EntitlementViewModel @Inject constructor(
 
     fun exportSessionTrace(): String {
         val events = _sessionEvents.value
-        return buildString {
-            appendLine("{")
-            appendLine("  \"device\": { \"model\": \"${android.os.Build.MODEL}\", \"build\": \"${android.os.Build.FINGERPRINT}\" },")
-            appendLine("  \"events\": [")
-            events.forEachIndexed { i, ev ->
-                val comma = if (i < events.lastIndex) "," else ""
-                appendLine("    { \"t\": ${ev.timestamp}, \"type\": \"${ev.type.name}\", \"message\": \"${ev.message.replace("\"", "\\\"")}\" }$comma")
+        val gson = GsonBuilder().setPrettyPrinting().create()
+        val trace = mapOf(
+            "device" to mapOf(
+                "model" to android.os.Build.MODEL,
+                "build" to android.os.Build.FINGERPRINT
+            ),
+            "events" to events.map { ev ->
+                mapOf(
+                    "t" to ev.timestamp,
+                    "type" to ev.type.name,
+                    "message" to ev.message
+                )
             }
-            appendLine("  ]")
-            appendLine("}")
-        }
+        )
+        return gson.toJson(trace)
     }
 
     fun clearError() {

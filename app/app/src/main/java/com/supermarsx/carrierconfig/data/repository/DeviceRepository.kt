@@ -14,6 +14,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** Not in the public SDK – use string literal to avoid compile errors. */
+private const val ACTION_WIFI_CALLING_SETTINGS = "android.settings.WIFI_CALLING_SETTINGS"
+
 /**
  * Repository for device information and system queries
  */
@@ -32,8 +35,8 @@ class DeviceRepository @Inject constructor(
         context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
     }
     
-    private val subscriptionManager: SubscriptionManager by lazy {
-        context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+    private val subscriptionManager: SubscriptionManager? by lazy {
+        context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as? SubscriptionManager
     }
     
     /**
@@ -69,7 +72,7 @@ class DeviceRepository @Inject constructor(
             
             // Get active subscriptions
             val activeSubscriptions = try {
-                subscriptionManager.activeSubscriptionInfoList ?: emptyList()
+                subscriptionManager?.activeSubscriptionInfoList ?: emptyList()
             } catch (e: SecurityException) {
                 emptyList()
             }
@@ -231,7 +234,7 @@ class DeviceRepository @Inject constructor(
      */
     suspend fun openWiFiCallingSettings() = withContext(Dispatchers.Main) {
         try {
-            val intent = Intent(Settings.ACTION_WIFI_CALLING_SETTINGS).apply {
+            val intent = Intent(ACTION_WIFI_CALLING_SETTINGS).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
             context.startActivity(intent)
@@ -377,7 +380,7 @@ class DeviceRepository @Inject constructor(
      */
     private fun checkWFCActivityExists(): Boolean {
         return try {
-            val intent = Intent(Settings.ACTION_WIFI_CALLING_SETTINGS)
+            val intent = Intent(ACTION_WIFI_CALLING_SETTINGS)
             val activities = context.packageManager.queryIntentActivities(intent, 0)
             activities.isNotEmpty()
         } catch (e: Exception) {
