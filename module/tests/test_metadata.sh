@@ -60,6 +60,19 @@ test_metadata() {
         warn_test "Consider adding 'support=' URL to module.prop"
     fi
 
+    if grep -qE "^updateJson=" "$MODULE_DIR/module.prop"; then
+        pass_test "module.prop includes updateJson URL"
+    else
+        warn_test "Consider adding 'updateJson=' for auto-updates"
+    fi
+
+    print_test "Checking update.json..."
+    if [ -f "$MODULE_DIR/update.json" ]; then
+        pass_test "update.json exists for auto-update support"
+    else
+        warn_test "Consider adding update.json"
+    fi
+
     print_test "Checking README..."
     if [ -f "$MODULE_DIR/README.md" ]; then
         local readme_lines=$(wc -l < "$MODULE_DIR/README.md")

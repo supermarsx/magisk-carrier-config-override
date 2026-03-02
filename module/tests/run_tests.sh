@@ -57,6 +57,11 @@ run_all_tests() {
         "$SCRIPT_DIR/test_metadata.sh"
         "$SCRIPT_DIR/test_functions.sh"
         "$SCRIPT_DIR/test_security.sh"
+        "$SCRIPT_DIR/test_service_logic.sh"
+        "$SCRIPT_DIR/test_uninstall.sh"
+        "$SCRIPT_DIR/test_functions_unit.sh"
+        "$SCRIPT_DIR/test_edge_cases.sh"
+        "$SCRIPT_DIR/test_install_logic.sh"
     )
     
     local passed=0
@@ -105,14 +110,19 @@ show_usage() {
     echo "Usage: $0 [test-category]"
     echo ""
     echo "Available test categories:"
-    echo "  structure   - Module structure and required files"
-    echo "  syntax      - Shell script syntax validation"
-    echo "  permissions - File permission checks"
-    echo "  xml         - XML profile validation"
-    echo "  metadata    - Module metadata and documentation"
-    echo "  functions   - Functions library tests"
-    echo "  security    - Security checks"
-    echo "  all         - Run all tests (default)"
+    echo "  structure      - Module structure and required files"
+    echo "  syntax         - Shell script syntax validation"
+    echo "  permissions    - File permission checks"
+    echo "  xml            - XML profile validation"
+    echo "  metadata       - Module metadata and documentation"
+    echo "  functions      - Functions library tests"
+    echo "  security       - Security checks"
+    echo "  service_logic  - Service script logic paths"
+    echo "  uninstall      - Uninstall/cleanup logic"
+    echo "  functions_unit - Function library unit tests"
+    echo "  edge_cases     - Edge case and boundary tests"
+    echo "  install_logic  - Install script logic"
+    echo "  all            - Run all tests (default)"
     echo ""
     echo "Examples:"
     echo "  $0              # Run all tests"
@@ -151,6 +161,21 @@ main() {
             ;;
         security)
             run_test "$SCRIPT_DIR/test_security.sh"
+            ;;
+        service_logic)
+            run_test "$SCRIPT_DIR/test_service_logic.sh"
+            ;;
+        uninstall)
+            run_test "$SCRIPT_DIR/test_uninstall.sh"
+            ;;
+        functions_unit)
+            run_test "$SCRIPT_DIR/test_functions_unit.sh"
+            ;;
+        edge_cases)
+            run_test "$SCRIPT_DIR/test_edge_cases.sh"
+            ;;
+        install_logic)
+            run_test "$SCRIPT_DIR/test_install_logic.sh"
             ;;
         all)
             run_all_tests

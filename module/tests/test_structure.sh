@@ -34,6 +34,7 @@ test_module_structure() {
         "system.prop"
         "docs/CHANGELOG.md"
         "common/functions.sh"
+        "update.json"
     )
 
     for file in "${optional_files[@]}"; do
