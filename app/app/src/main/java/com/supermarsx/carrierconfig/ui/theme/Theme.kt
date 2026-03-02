@@ -53,6 +53,9 @@ fun CCOTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    // Currently only dark themes are supported (glassmorphism design).
+    // The darkTheme parameter is accepted so "Auto (System)" doesn't crash;
+    // a light scheme can be added later.
     val colorScheme = DarkColorScheme
     
     val view = LocalView.current

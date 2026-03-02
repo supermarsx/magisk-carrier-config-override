@@ -1,7 +1,7 @@
 # Proguard rules for CarrierConfig Override app
 
 # Keep application class
--keep class com.supermarsx.carrierconfig.CarrierConfigApplication { *; }
+-keep class com.supermarsx.carrierconfig.CCOApplication { *; }
 
 # Keep data classes for JSON serialization
 -keep class com.supermarsx.carrierconfig.data.model.** { *; }
