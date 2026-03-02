@@ -3,14 +3,9 @@ package com.supermarsx.carrierconfig.system
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.telephony.TelephonyManager
 import androidx.work.WorkManager
 import androidx.work.OneTimeWorkRequestBuilder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 /**
  * Broadcast receiver for system events
@@ -20,9 +15,6 @@ class SystemEventReceiver : BroadcastReceiver() {
     
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
-            ConnectivityManager.CONNECTIVITY_ACTION -> {
-                handleConnectivityChange(context)
-            }
             TelephonyManager.ACTION_CARRIER_CONFIG_CHANGED -> {
                 handleCarrierConfigChange(context)
             }
@@ -35,20 +27,6 @@ class SystemEventReceiver : BroadcastReceiver() {
             TelephonyManager.ACTION_PHONE_STATE_CHANGED -> {
                 handlePhoneStateChange(context)
             }
-        }
-    }
-    
-    private fun handleConnectivityChange(context: Context) {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
-        val network = cm?.activeNetwork
-        val capabilities = cm?.getNetworkCapabilities(network)
-        
-        val isWifiConnected = capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
-        val isCellularConnected = capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
-        
-        // Trigger IMS status refresh if connectivity changed
-        if (isWifiConnected || isCellularConnected) {
-            scheduleStatusRefresh(context)
         }
     }
     
@@ -96,13 +74,12 @@ class SystemEventReceiver : BroadcastReceiver() {
     }
     
     private fun showNotification(context: Context, title: String, message: String) {
-        CoroutineScope(Dispatchers.Main).launch {
-            NotificationHelper.showNotification(
-                context,
-                title = title,
-                message = message,
-                channelId = NotificationHelper.CHANNEL_SYSTEM_EVENTS
-            )
-        }
+        // NotificationHelper.showNotification is synchronous — no coroutine needed
+        NotificationHelper.showNotification(
+            context,
+            title = title,
+            message = message,
+            channelId = NotificationHelper.CHANNEL_SYSTEM_EVENTS
+        )
     }
 }

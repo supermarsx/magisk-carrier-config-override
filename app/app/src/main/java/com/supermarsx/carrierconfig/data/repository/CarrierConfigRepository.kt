@@ -6,6 +6,7 @@ import com.topjohnwu.superuser.Shell
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,12 +19,26 @@ class CarrierConfigRepository @Inject constructor(
 ) {
     
     companion object {
-        private val CARRIER_CONFIG_PATHS = listOf(
-            "/system/etc/CarrierConfig",
-            "/system/etc/carrier_config",
-            "/vendor/etc/CarrierConfig",
-            "/vendor/etc/carrier_config"
+        /**
+         * WFC mode integer mappings (per spec Section 5.3):
+         *   0 = Cellular preferred
+         *   1 = Wi-Fi preferred
+         *   2 = Wi-Fi only
+         */
+        const val WFC_MODE_CELLULAR_PREFERRED = 0
+        const val WFC_MODE_WIFI_PREFERRED = 1
+        const val WFC_MODE_WIFI_ONLY = 2
+
+        /** Runtime override paths where CarrierConfigManager reads overrides (spec Section 5.2) */
+        private val CARRIER_CONFIG_OVERRIDE_PATHS = listOf(
+            "/data/vendor/carrierconfig/override.xml",
+            "/data/vendor/carrierconfig/override_carrier.xml",
+            "/data/misc/carrierconfig/override.xml",
+            "/data/user_de/0/com.android.phone/files/carrierconfig_override.xml"
         )
+
+        /** CCO managed override storage */
+        private const val CCO_ACTIVE_OVERRIDE = "/data/adb/cco/active/override.xml"
     }
     
     /**
@@ -51,7 +66,7 @@ class CarrierConfigRepository @Inject constructor(
                     "carrier_wfc_ims_available_bool" to ConfigValue.BooleanValue(true),
                     "editable_wfc_mode_bool" to ConfigValue.BooleanValue(true),
                     "carrier_default_wfc_ims_enabled_bool" to ConfigValue.BooleanValue(true),
-                    "carrier_default_wfc_ims_mode_int" to ConfigValue.IntValue(1) // Cellular preferred
+                    "carrier_default_wfc_ims_mode_int" to ConfigValue.IntValue(WFC_MODE_CELLULAR_PREFERRED) // 0 = Cellular preferred
                 ),
                 recommendedFor = "Users who want WFC enabled on boot"
             ),
@@ -76,8 +91,8 @@ class CarrierConfigRepository @Inject constructor(
                     "carrier_wfc_ims_available_bool" to ConfigValue.BooleanValue(true),
                     "editable_wfc_mode_bool" to ConfigValue.BooleanValue(true),
                     "carrier_default_wfc_ims_enabled_bool" to ConfigValue.BooleanValue(true),
-                    "carrier_default_wfc_ims_mode_int" to ConfigValue.IntValue(2), // Wi-Fi preferred
-                    "carrier_default_wfc_ims_roaming_mode_int" to ConfigValue.IntValue(2)
+                    "carrier_default_wfc_ims_mode_int" to ConfigValue.IntValue(WFC_MODE_WIFI_PREFERRED), // 1 = Wi-Fi preferred
+                    "carrier_default_wfc_ims_roaming_mode_int" to ConfigValue.IntValue(WFC_MODE_WIFI_PREFERRED)
                 ),
                 recommendedFor = "Poor cellular coverage, good Wi-Fi"
             ),
@@ -90,8 +105,8 @@ class CarrierConfigRepository @Inject constructor(
                     "carrier_wfc_ims_available_bool" to ConfigValue.BooleanValue(true),
                     "editable_wfc_mode_bool" to ConfigValue.BooleanValue(true),
                     "carrier_default_wfc_ims_enabled_bool" to ConfigValue.BooleanValue(true),
-                    "carrier_default_wfc_ims_mode_int" to ConfigValue.IntValue(0), // Wi-Fi only
-                    "carrier_default_wfc_ims_roaming_mode_int" to ConfigValue.IntValue(0)
+                    "carrier_default_wfc_ims_mode_int" to ConfigValue.IntValue(WFC_MODE_WIFI_ONLY), // 2 = Wi-Fi only
+                    "carrier_default_wfc_ims_roaming_mode_int" to ConfigValue.IntValue(WFC_MODE_WIFI_ONLY)
                 ),
                 recommendedFor = "No cellular coverage, Wi-Fi only environments"
             ),
@@ -105,8 +120,8 @@ class CarrierConfigRepository @Inject constructor(
                     "editable_wfc_mode_bool" to ConfigValue.BooleanValue(true),
                     "editable_wfc_roaming_mode_bool" to ConfigValue.BooleanValue(true),
                     "carrier_default_wfc_ims_enabled_bool" to ConfigValue.BooleanValue(true),
-                    "carrier_default_wfc_ims_mode_int" to ConfigValue.IntValue(2),
-                    "carrier_default_wfc_ims_roaming_mode_int" to ConfigValue.IntValue(2),
+                    "carrier_default_wfc_ims_mode_int" to ConfigValue.IntValue(WFC_MODE_WIFI_PREFERRED),
+                    "carrier_default_wfc_ims_roaming_mode_int" to ConfigValue.IntValue(WFC_MODE_WIFI_PREFERRED),
                     "carrier_wfc_supports_wifi_only_bool" to ConfigValue.BooleanValue(true),
                     "carrier_wfc_supports_cellular_preferred_bool" to ConfigValue.BooleanValue(true),
                     "carrier_wfc_supports_wifi_preferred_bool" to ConfigValue.BooleanValue(true)
@@ -146,24 +161,43 @@ class CarrierConfigRepository @Inject constructor(
     }
     
     /**
-     * Detect the correct CarrierConfig path for this device
+     * Detect the correct runtime override path for this device.
+     * Checks the spec-defined candidate paths where CarrierConfigManager reads overrides.
      */
     private suspend fun detectCarrierConfigPath(): String? = withContext(Dispatchers.IO) {
-        for (path in CARRIER_CONFIG_PATHS) {
-            val result = Shell.cmd("test -d $path && echo 'exists'").exec()
+        // First check if a file already exists at any candidate path (indicates system uses it)
+        for (path in CARRIER_CONFIG_OVERRIDE_PATHS) {
+            val result = Shell.cmd("test -f $path && echo 'exists'").exec()
             if (result.isSuccess && result.out.firstOrNull() == "exists") {
                 return@withContext path
             }
         }
-        null
+        // Next check if the parent directory exists
+        for (path in CARRIER_CONFIG_OVERRIDE_PATHS) {
+            val dir = path.substringBeforeLast('/')
+            val result = Shell.cmd("test -d $dir && echo 'exists'").exec()
+            if (result.isSuccess && result.out.firstOrNull() == "exists") {
+                return@withContext path
+            }
+        }
+        // Default fallback to most common Samsung path
+        CARRIER_CONFIG_OVERRIDE_PATHS.firstOrNull()
     }
     
     /**
-     * Check if path is writable (via bind mount)
+     * Check if the override path (or its parent directory) is writable.
+     * When the file doesn't exist yet we test the parent directory instead.
      */
     private suspend fun checkPathWritable(path: String): Boolean = withContext(Dispatchers.IO) {
-        val result = Shell.cmd("test -w $path && echo 'writable'").exec()
-        result.isSuccess && result.out.firstOrNull() == "writable"
+        // If the file exists, test it directly
+        val fileResult = Shell.cmd("test -f $path && test -w $path && echo 'writable'").exec()
+        if (fileResult.isSuccess && fileResult.out.firstOrNull() == "writable") {
+            return@withContext true
+        }
+        // Otherwise test the parent directory
+        val dir = path.substringBeforeLast('/')
+        val dirResult = Shell.cmd("test -d $dir && test -w $dir && echo 'writable'").exec()
+        dirResult.isSuccess && dirResult.out.firstOrNull() == "writable"
     }
     
     /**
@@ -200,12 +234,20 @@ class CarrierConfigRepository @Inject constructor(
     }
     
     /**
-     * Deploy CarrierConfig override
+     * Deploy CarrierConfig override.
+     *
+     * Per spec Section 5.4:
+     *  1. App collects desired keys.
+     *  2. App writes override.xml into app-private storage.
+     *  3. App copies into /data/adb/cco/active/override.xml.
+     *  4. Module's service.sh bind-mounts at boot.
+     *  5. App prompts reboot.
      */
     suspend fun deployOverride(
         preset: CarrierConfigPreset,
         customKeys: List<ConfigKey>,
-        targetPath: String
+        targetPath: String,
+        simSlot: Int? = null
     ): DeploymentResult = withContext(Dispatchers.IO) {
         try {
             // Combine preset keys and custom keys
@@ -216,30 +258,39 @@ class CarrierConfigRepository @Inject constructor(
             // Generate XML
             val xml = generateXML(allKeys)
             
-            // Create temporary file
-            val tempFile = "/data/local/tmp/carrierconfig_override.xml"
-            val writeResult = Shell.cmd("echo '$xml' > $tempFile").exec()
-            if (!writeResult.isSuccess) {
-                return@withContext DeploymentResult.Error("Failed to create XML file")
+            // Write to app-private temp file first
+            val tempFile = File(context.cacheDir, "carrierconfig_override.xml")
+            tempFile.writeText(xml)
+            
+            // Determine CCO active override path (per-slot support)
+            val activeOverride = if (simSlot != null) {
+                "/data/adb/cco/active/override_sim${simSlot}.xml"
+            } else {
+                CCO_ACTIVE_OVERRIDE
             }
             
-            // Backup original if exists
-            val overrideFile = "$targetPath/carrierconfig_override.xml"
-            val backupResult = Shell.cmd(
-                "test -f $overrideFile && cp $overrideFile ${overrideFile}.backup || true"
+            // Ensure directory structure
+            Shell.cmd("mkdir -p /data/adb/cco/active /data/adb/cco/overrides /data/adb/cco/logs /data/adb/cco/backup").exec()
+            
+            // Backup original override if exists
+            Shell.cmd(
+                "test -f $activeOverride && cp $activeOverride /data/adb/cco/backup/override_backup_$(date +%Y%m%d_%H%M%S).xml || true"
             ).exec()
             
-            // Copy to target (would use Magisk bind mount in production)
-            val deployResult = Shell.cmd("cp $tempFile $overrideFile").exec()
+            // Copy to CCO active location
+            val deployResult = Shell.cmd("cp ${tempFile.absolutePath} $activeOverride").exec()
             if (!deployResult.isSuccess) {
-                return@withContext DeploymentResult.Error("Failed to deploy override")
+                return@withContext DeploymentResult.Error("Failed to deploy override to $activeOverride")
             }
             
-            // Set permissions
-            Shell.cmd("chmod 644 $overrideFile").exec()
+            // Also copy a named copy to overrides directory
+            Shell.cmd("cp ${tempFile.absolutePath} /data/adb/cco/overrides/${preset.id}.xml").exec()
             
-            // Cleanup
-            Shell.cmd("rm $tempFile").exec()
+            // Set permissions
+            Shell.cmd("chmod 644 $activeOverride").exec()
+            
+            // Cleanup temp
+            tempFile.delete()
             
             DeploymentResult.Success
         } catch (e: Exception) {
@@ -248,29 +299,23 @@ class CarrierConfigRepository @Inject constructor(
     }
     
     /**
-     * Revert CarrierConfig override
+     * Revert CarrierConfig override — unmounts bind mount and removes active override file.
+     * A reboot is still recommended to fully clear the cached carrier config.
      */
     suspend fun revertOverride(targetPath: String): DeploymentResult = withContext(Dispatchers.IO) {
         try {
-            val overrideFile = "$targetPath/carrierconfig_override.xml"
-            val backupFile = "${overrideFile}.backup"
-            
-            // Check if backup exists
-            val backupCheck = Shell.cmd("test -f $backupFile && echo 'exists'").exec()
-            if (backupCheck.isSuccess && backupCheck.out.firstOrNull() == "exists") {
-                // Restore from backup
-                val restoreResult = Shell.cmd("cp $backupFile $overrideFile").exec()
-                if (!restoreResult.isSuccess) {
-                    return@withContext DeploymentResult.Error("Failed to restore from backup")
-                }
-            } else {
-                // Remove override file
-                val removeResult = Shell.cmd("rm -f $overrideFile").exec()
-                if (!removeResult.isSuccess) {
-                    return@withContext DeploymentResult.Error("Failed to remove override")
-                }
+            // Unmount the bind mount first (so the target reverts to its original content)
+            Shell.cmd("umount $targetPath 2>/dev/null || true").exec()
+
+            // Remove the CCO active override
+            val removeResult = Shell.cmd("rm -f $CCO_ACTIVE_OVERRIDE").exec()
+            if (!removeResult.isSuccess) {
+                return@withContext DeploymentResult.Error("Failed to remove active override")
             }
-            
+
+            // Also clean per-slot overrides
+            Shell.cmd("rm -f /data/adb/cco/active/override_sim*.xml").exec()
+
             DeploymentResult.Success
         } catch (e: Exception) {
             DeploymentResult.Error("Revert failed: ${e.message}", e.stackTraceToString())
@@ -278,19 +323,18 @@ class CarrierConfigRepository @Inject constructor(
     }
     
     /**
-     * Get current deployment status
+     * Get current deployment status by checking CCO active override.
      */
     suspend fun getDeploymentStatus(targetPath: String): CarrierConfigDeployment = withContext(Dispatchers.IO) {
-        val overrideFile = "$targetPath/carrierconfig_override.xml"
-        val checkResult = Shell.cmd("test -f $overrideFile && echo 'exists'").exec()
+        val checkResult = Shell.cmd("test -f $CCO_ACTIVE_OVERRIDE && echo 'exists'").exec()
         val isDeployed = checkResult.isSuccess && checkResult.out.firstOrNull() == "exists"
         
-        val backupCheck = Shell.cmd("test -f ${overrideFile}.backup && echo 'exists'").exec()
-        val backupExists = backupCheck.isSuccess && backupCheck.out.firstOrNull() == "exists"
+        val backupCheck = Shell.cmd("ls /data/adb/cco/backup/*.xml 2>/dev/null | head -1").exec()
+        val backupExists = backupCheck.isSuccess && backupCheck.out.isNotEmpty()
         
         CarrierConfigDeployment(
             isDeployed = isDeployed,
-            deploymentPath = if (isDeployed) targetPath else null,
+            deploymentPath = if (isDeployed) CCO_ACTIVE_OVERRIDE else null,
             backupExists = backupExists
         )
     }

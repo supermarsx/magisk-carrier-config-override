@@ -22,6 +22,12 @@ class DeviceRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     
+    companion object {
+        // Regex patterns for privacy-sensitive data (spec Section 8.2)
+        private val PHONE_NUMBER_REGEX = Regex("""\+?\d[\d\-\s]{8,14}\d""")
+        private val IMSI_REGEX = Regex("""\b\d{15}\b""")
+    }
+
     private val telephonyManager: TelephonyManager by lazy {
         context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
     }
@@ -300,13 +306,14 @@ class DeviceRepository @Inject constructor(
                 appendLine("=== End Report ===")
             }
             
-            // Save to external storage
-            val externalDir = android.os.Environment.getExternalStorageDirectory()
-            val exportDir = java.io.File(externalDir, "CCO/reports")
+            // Save to app-scoped external storage (scoped storage compliant)
+            val externalDir = context.getExternalFilesDir(null)
+                ?: context.filesDir
+            val exportDir = java.io.File(externalDir, "reports")
             exportDir.mkdirs()
             
             val reportFile = java.io.File(exportDir, "diagnostic_report_$timestamp.txt")
-            reportFile.writeText(reportText)
+            reportFile.writeText(redactSensitiveData(reportText))
             
             ExportResult.Success(reportFile.absolutePath)
         } catch (e: Exception) {
@@ -323,6 +330,24 @@ class DeviceRepository @Inject constructor(
         } catch (e: Exception) {
             false
         }
+    }
+
+    /**
+     * Redact privacy-sensitive data from text (spec Section 8.2).
+     * Removes phone numbers, IMSI, and ensures ICCID is already masked.
+     */
+    fun redactSensitiveData(text: String): String {
+        var result = text
+        // Redact phone numbers (replace digits keeping last 4)
+        result = PHONE_NUMBER_REGEX.replace(result) { match ->
+            val digits = match.value.filter { it.isDigit() }
+            if (digits.length >= 7) "••••••${digits.takeLast(4)}" else match.value
+        }
+        // Redact IMSI (15-digit numeric strings)
+        result = IMSI_REGEX.replace(result) { match ->
+            "•••••••••••${match.value.takeLast(4)}"
+        }
+        return result
     }
     
     /**

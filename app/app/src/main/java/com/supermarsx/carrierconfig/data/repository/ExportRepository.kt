@@ -8,10 +8,14 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.firstOrNull
 
 /**
  * Repository for data export/import operations
@@ -36,21 +40,41 @@ class ExportRepository @Inject constructor(
      */
     suspend fun exportConfiguration(
         includePresets: Boolean = true,
-        includeSettings: Boolean = true
+        includeSettings: Boolean = true,
+        preferencesManager: com.supermarsx.carrierconfig.data.datastore.PreferencesManager? = null
     ): ExportResult = withContext(Dispatchers.IO) {
         try {
+            // Read real preferences when manager is available, otherwise use defaults
+            val settings = if (includeSettings && preferencesManager != null) {
+                kotlinx.coroutines.flow.firstOrNull(
+                    preferencesManager.getAllPreferences()
+                )?.let { prefs ->
+                    AppSettings(
+                        autoRefresh = prefs["auto_refresh"] as? Boolean ?: true,
+                        enableNotifications = prefs["enable_notifications"] as? Boolean ?: false,
+                        debugMode = prefs["debug_mode"] as? Boolean ?: false,
+                        theme = prefs["theme"] as? String ?: "dark"
+                    )
+                } ?: AppSettings(
+                    autoRefresh = true,
+                    enableNotifications = false,
+                    debugMode = false,
+                    theme = "dark"
+                )
+            } else if (includeSettings) {
+                AppSettings(
+                    autoRefresh = true,
+                    enableNotifications = false,
+                    debugMode = false,
+                    theme = "dark"
+                )
+            } else null
+
             val config = AppConfiguration(
                 version = "1.0.0",
                 exportDate = System.currentTimeMillis(),
-                settings = if (includeSettings) {
-                    AppSettings(
-                        autoRefresh = true,
-                        enableNotifications = false,
-                        debugMode = false,
-                        theme = "dark"
-                    )
-                } else null,
-                customKeys = emptyList() // Custom keys stored separately in preset system
+                settings = settings,
+                customKeys = emptyList()
             )
             
             val jsonString = json.encodeToString(config)
@@ -82,16 +106,20 @@ class ExportRepository @Inject constructor(
     /**
      * Import configuration from JSON string
      */
-    suspend fun importConfigurationFromString(jsonString: String): ImportResult = withContext(Dispatchers.IO) {
+    suspend fun importConfigurationFromString(
+        jsonString: String,
+        preferencesManager: com.supermarsx.carrierconfig.data.datastore.PreferencesManager? = null
+    ): ImportResult = withContext(Dispatchers.IO) {
         try {
             val config = json.decodeFromString<AppConfiguration>(jsonString)
             
-            // Apply configuration settings
+            // Apply configuration settings via PreferencesManager
             config.settings?.let { settings ->
-                // Settings would be applied via PreferencesManager
-                // For now, just validate the import worked
-                if (settings.theme.isNotEmpty()) {
-                    // Successfully imported settings
+                preferencesManager?.let { pm ->
+                    pm.setTheme(settings.theme)
+                    pm.setAutoRefresh(settings.autoRefresh)
+                    pm.setEnableNotifications(settings.enableNotifications)
+                    pm.setDebugMode(settings.debugMode)
                 }
             }
             
@@ -140,6 +168,64 @@ class ExportRepository @Inject constructor(
             ExportResult.Success(jsonFile.absolutePath)
         } catch (e: Exception) {
             ExportResult.Error("Export failed: ${e.message}")
+        }
+    }
+
+    /**
+     * Export full diagnostics ZIP per spec Section 7.3.
+     *
+     * Contents:
+     * - report.json
+     * - report.txt  (human-readable)
+     * - logs/radio.log
+     * - dumpsys/ims.txt
+     * - dumpsys/carrier_config.txt
+     */
+    suspend fun exportDiagnosticsZip(
+        reportJson: String,
+        reportTxt: String,
+        radioLog: String,
+        dumpsysIms: String,
+        dumpsysCarrierConfig: String
+    ): ExportResult = withContext(Dispatchers.IO) {
+        try {
+            val externalDir = context.getExternalFilesDir(null)
+            val dir = File(externalDir, EXPORT_DIR)
+            dir.mkdirs()
+
+            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+            val zipFile = File(dir, "cco_diagnostics_$timestamp.zip")
+
+            ZipOutputStream(FileOutputStream(zipFile)).use { zos ->
+                // report.json
+                zos.putNextEntry(ZipEntry("report.json"))
+                zos.write(reportJson.toByteArray())
+                zos.closeEntry()
+
+                // report.txt
+                zos.putNextEntry(ZipEntry("report.txt"))
+                zos.write(reportTxt.toByteArray())
+                zos.closeEntry()
+
+                // logs/radio.log
+                zos.putNextEntry(ZipEntry("logs/radio.log"))
+                zos.write(radioLog.toByteArray())
+                zos.closeEntry()
+
+                // dumpsys/ims.txt
+                zos.putNextEntry(ZipEntry("dumpsys/ims.txt"))
+                zos.write(dumpsysIms.toByteArray())
+                zos.closeEntry()
+
+                // dumpsys/carrier_config.txt
+                zos.putNextEntry(ZipEntry("dumpsys/carrier_config.txt"))
+                zos.write(dumpsysCarrierConfig.toByteArray())
+                zos.closeEntry()
+            }
+
+            ExportResult.Success(zipFile.absolutePath)
+        } catch (e: Exception) {
+            ExportResult.Error("ZIP export failed: ${e.message}")
         }
     }
 
@@ -200,7 +286,7 @@ class ExportRepository @Inject constructor(
         }
         
         dir.listFiles()
-            ?.filter { it.isFile && (it.extension == "json" || it.extension == "txt") }
+            ?.filter { it.isFile && it.extension in listOf("json", "txt", "zip") }
             ?.map { file ->
                 ExportFile(
                     name = file.name,

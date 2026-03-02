@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -23,6 +24,7 @@ import com.supermarsx.carrierconfig.ui.screens.dashboard.DashboardScreen
 import com.supermarsx.carrierconfig.ui.screens.diagnostics.DiagnosticsScreen
 import com.supermarsx.carrierconfig.ui.screens.carrierconfig.CarrierConfigScreen
 import com.supermarsx.carrierconfig.ui.screens.entitlement.EntitlementScreen
+import com.supermarsx.carrierconfig.ui.screens.settings.LicensesScreen
 import com.supermarsx.carrierconfig.ui.screens.settings.SettingsScreen
 import com.supermarsx.carrierconfig.ui.theme.AccentPrimary
 import com.supermarsx.carrierconfig.ui.theme.BackgroundDark
@@ -62,11 +64,15 @@ fun CCONavHost(
             }
             composable(Screen.Settings.route) {
                 SettingsScreen(
-                    onNavigateToAbout = { navController.navigate(Screen.About.route) }
+                    onNavigateToAbout = { navController.navigate(Screen.About.route) },
+                    onNavigateToLicenses = { navController.navigate(Screen.Licenses.route) }
                 )
             }
             composable(Screen.About.route) {
                 AboutScreen(onNavigateBack = { navController.popBackStack() })
+            }
+            composable(Screen.Licenses.route) {
+                LicensesScreen(navController = navController)
             }
         }
     }
@@ -91,7 +97,7 @@ fun CCOBottomNavigation(navController: NavHostController) {
     NavigationBar(
         containerColor = BackgroundDark,
         contentColor = TextPrimary,
-        tonalElevation = androidx.compose.ui.unit.dp(0f)
+        tonalElevation = 0.dp
     ) {
         items.forEach { item ->
             val selected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true

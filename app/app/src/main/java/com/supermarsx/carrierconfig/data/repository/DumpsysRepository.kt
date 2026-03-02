@@ -152,7 +152,7 @@ class DumpsysRepository @Inject constructor(
         if (output.contains("RCS", ignoreCase = true)) {
             features.add("RCS")
         }
-        if (output.contains("UT", ignoreCase = true)) {
+        if (Regex("\\bUT\\b").containsMatchIn(output)) {
             features.add("UT (XCAP)")
         }
         if (output.contains("SMS", ignoreCase = true)) {

@@ -68,30 +68,8 @@ class DashboardViewModel @Inject constructor(
     }
     
     fun runDiagnostics() {
-        viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
-            try {
-                // Reload all dashboard data for fresh diagnostics
-                loadDashboardData()
-                
-                // Run additional checks
-                val deviceInfo = deviceRepository.getDeviceInfo()
-                val simInfo = deviceRepository.getSIMInfo()
-                val imsStatus = deviceRepository.getIMSStatus()
-                
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    deviceInfo = deviceInfo,
-                    simInfo = simInfo,
-                    imsStatus = imsStatus
-                )
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    error = "Diagnostics scan failed: ${e.message}"
-                )
-            }
-        }
+        // Delegate to loadDashboardData which already refreshes all data
+        loadDashboardData()
     }
     
     fun openWFCSettings() {

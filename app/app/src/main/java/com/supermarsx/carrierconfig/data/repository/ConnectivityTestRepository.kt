@@ -177,7 +177,8 @@ class ConnectivityTestRepository @Inject constructor(
         return try {
             val dataState = telephonyManager.dataState
             val dataEnabled = telephonyManager.isDataEnabled
-            val networkType = telephonyManager.networkType
+            @Suppress("DEPRECATION")
+            val networkType = telephonyManager.dataNetworkType
             
             val stateString = when (dataState) {
                 TelephonyManager.DATA_CONNECTED -> "Connected"

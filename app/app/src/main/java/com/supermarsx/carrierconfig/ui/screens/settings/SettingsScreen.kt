@@ -31,6 +31,7 @@ import com.supermarsx.carrierconfig.util.UriHelper
 @Composable
 fun SettingsScreen(
     onNavigateToAbout: () -> Unit = {},
+    onNavigateToLicenses: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -241,7 +242,7 @@ fun SettingsScreen(
                             icon = Icons.Default.Description,
                             title = "Licenses",
                             subtitle = "Open source licenses",
-                            onClick = { onNavigateToAbout }
+                            onClick = onNavigateToLicenses
                         )
                         
                         HorizontalDivider(color = GlassBorder.copy(alpha = 0.3f))

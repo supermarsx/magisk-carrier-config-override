@@ -3,6 +3,7 @@ package com.supermarsx.carrierconfig.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.supermarsx.carrierconfig.ui.theme.AccentPrimary
 import com.supermarsx.carrierconfig.ui.theme.AccentPrimaryGlow
+import com.supermarsx.carrierconfig.ui.theme.AccentSecondary
 import com.supermarsx.carrierconfig.ui.theme.GlassSurfaceMedium
 import com.supermarsx.carrierconfig.ui.theme.TextPrimary
 
@@ -52,23 +54,24 @@ fun GlassButton(
         )
     }
     
-    Box(
-        modifier = modifier
-            .background(
-                brush = if (enabled && variant == ButtonVariant.Primary) {
-                    Brush.radialGradient(
-                        colors = listOf(
-                            AccentPrimaryGlow,
-                            Color.Transparent
-                        )
+    Box(modifier = modifier) {
+        // Glow layer behind the button (blurred separately so text stays crisp)
+        if (enabled && variant == ButtonVariant.Primary) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .blur(24.dp)
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                AccentPrimaryGlow,
+                                Color.Transparent
+                            )
+                        ),
+                        shape = RoundedCornerShape(12.dp)
                     )
-                } else {
-                    Brush.linearGradient(listOf(Color.Transparent, Color.Transparent))
-                },
-                shape = RoundedCornerShape(12.dp)
             )
-            .then(if (enabled && variant == ButtonVariant.Primary) Modifier.blur(24.dp) else Modifier)
-    ) {
+        }
         Button(
             onClick = onClick,
             enabled = enabled,

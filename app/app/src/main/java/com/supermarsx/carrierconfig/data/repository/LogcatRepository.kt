@@ -12,6 +12,15 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
+ * Logcat buffer selector per spec Section 7.1
+ */
+enum class LogcatBuffer(val flag: String, val displayName: String) {
+    MAIN("-b main", "Main"),
+    RADIO("-b radio", "Radio"),
+    ALL("-b main -b radio", "All Buffers")
+}
+
+/**
  * Repository for logcat monitoring and filtering
  */
 @Singleton
@@ -58,7 +67,8 @@ class LogcatRepository @Inject constructor(
      */
     fun monitorLogcat(
         filterType: LogcatFilterType = LogcatFilterType.ALL,
-        minLevel: LogLevel = LogLevel.DEBUG
+        minLevel: LogLevel = LogLevel.DEBUG,
+        buffer: LogcatBuffer = LogcatBuffer.ALL
     ): Flow<LogcatEntry> = flow {
         withContext(Dispatchers.IO) {
             val tags = when (filterType) {
@@ -70,12 +80,9 @@ class LogcatRepository @Inject constructor(
             }
             
             try {
-                // Clear logcat first
-                Runtime.getRuntime().exec("logcat -c").waitFor()
-                
-                // Build logcat command with tag filters
+                // Build logcat command with tag filters and buffer selector
                 val tagFilters = tags.joinToString(" ") { "$it:${minLevel.priority}" }
-                val command = "logcat -v threadtime $tagFilters *:S"
+                val command = "logcat ${buffer.flag} -v threadtime $tagFilters *:S"
                 
                 val process = Runtime.getRuntime().exec(command)
                 val reader = BufferedReader(InputStreamReader(process.inputStream))
@@ -107,7 +114,8 @@ class LogcatRepository @Inject constructor(
      */
     suspend fun getLogcatSnapshot(
         filterType: LogcatFilterType = LogcatFilterType.ALL,
-        lineCount: Int = 500
+        lineCount: Int = 500,
+        buffer: LogcatBuffer = LogcatBuffer.ALL
     ): List<LogcatEntry> = withContext(Dispatchers.IO) {
         val entries = mutableListOf<LogcatEntry>()
         
@@ -121,7 +129,7 @@ class LogcatRepository @Inject constructor(
             }
             
             val tagFilters = tags.joinToString(" ") { "$it:D" }
-            val command = "logcat -v threadtime -t $lineCount $tagFilters *:S"
+            val command = "logcat ${buffer.flag} -v threadtime -t $lineCount $tagFilters *:S"
             
             val process = Runtime.getRuntime().exec(command)
             val reader = BufferedReader(InputStreamReader(process.inputStream))
@@ -180,6 +188,40 @@ class LogcatRepository @Inject constructor(
             Runtime.getRuntime().exec("logcat -c").waitFor()
         } catch (e: Exception) {
             // Ignore errors
+        }
+    }
+
+    /**
+     * Get radio buffer snapshot for IMS/telephony debugging (spec Section 7.1).
+     * Returns raw text suitable for inclusion in the diagnostics ZIP.
+     */
+    suspend fun getRadioLogSnapshot(lineCount: Int = 1000): String = withContext(Dispatchers.IO) {
+        try {
+            val command = "logcat -b radio -v threadtime -t $lineCount"
+            val process = Runtime.getRuntime().exec(command)
+            val reader = BufferedReader(InputStreamReader(process.inputStream))
+            val output = reader.readText()
+            process.waitFor()
+            reader.close()
+            output
+        } catch (e: Exception) {
+            "Error capturing radio log: ${e.message}"
+        }
+    }
+
+    /**
+     * Get IMS-related getprop output (spec Section 7.1).
+     */
+    suspend fun getImsProperties(): String = withContext(Dispatchers.IO) {
+        try {
+            val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", "getprop | grep -i ims"))
+            val reader = BufferedReader(InputStreamReader(process.inputStream))
+            val output = reader.readText()
+            process.waitFor()
+            reader.close()
+            output.ifBlank { "(no IMS properties found)" }
+        } catch (e: Exception) {
+            "Error reading properties: ${e.message}"
         }
     }
 }

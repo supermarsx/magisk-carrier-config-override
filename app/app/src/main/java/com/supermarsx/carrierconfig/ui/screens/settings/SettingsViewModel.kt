@@ -377,16 +377,17 @@ class SettingsViewModel @Inject constructor(
                 preferencesManager.autoBackup,
                 preferencesManager.backupFrequency
             ) { values ->
+                @Suppress("UNCHECKED_CAST")
                 SettingsState(
-                    autoRefresh = values[0] as Boolean,
-                    enableNotifications = values[1] as Boolean,
-                    theme = values[2] as String,
-                    glassEffectEnabled = values[3] as Boolean,
-                    glassStrength = values[4] as String,
-                    debugMode = values[5] as Boolean,
-                    exportDirectory = values[6] as String,
-                    autoBackup = values[7] as Boolean,
-                    backupFrequency = values[8] as String
+                    autoRefresh = (values[0] as? Boolean) ?: true,
+                    enableNotifications = (values[1] as? Boolean) ?: false,
+                    theme = (values[2] as? String) ?: "dark",
+                    glassEffectEnabled = (values[3] as? Boolean) ?: true,
+                    glassStrength = (values[4] as? String) ?: "medium",
+                    debugMode = (values[5] as? Boolean) ?: false,
+                    exportDirectory = (values[6] as? String) ?: "",
+                    autoBackup = (values[7] as? Boolean) ?: false,
+                    backupFrequency = (values[8] as? String) ?: "weekly"
                 )
             }.collect { newState ->
                 _state.update { it.copy(
