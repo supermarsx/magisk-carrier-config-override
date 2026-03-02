@@ -3,8 +3,10 @@ package com.supermarsx.carrierconfig.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -63,51 +65,56 @@ class LogcatRepository @Inject constructor(
     }
     
     /**
-     * Start monitoring logcat with filters
+     * Start monitoring logcat with filters.
+     *
+     * Uses callbackFlow so that emissions happen safely from the IO dispatcher
+     * without violating the flow invariant. The underlying logcat process is
+     * destroyed when the flow collector cancels.
      */
     fun monitorLogcat(
         filterType: LogcatFilterType = LogcatFilterType.ALL,
         minLevel: LogLevel = LogLevel.DEBUG,
         buffer: LogcatBuffer = LogcatBuffer.ALL
-    ): Flow<LogcatEntry> = flow {
-        withContext(Dispatchers.IO) {
-            val tags = when (filterType) {
-                LogcatFilterType.CARRIER_CONFIG -> CARRIER_CONFIG_TAGS
-                LogcatFilterType.IMS -> IMS_TAGS
-                LogcatFilterType.TELEPHONY -> TELEPHONY_TAGS
-                LogcatFilterType.WFC -> WFC_TAGS
-                LogcatFilterType.ALL -> CARRIER_CONFIG_TAGS + IMS_TAGS + TELEPHONY_TAGS + WFC_TAGS
-            }
-            
-            try {
-                // Build logcat command with tag filters and buffer selector
-                val tagFilters = tags.joinToString(" ") { "$it:${minLevel.priority}" }
-                val command = "logcat ${buffer.flag} -v threadtime $tagFilters *:S"
-                
-                val process = Runtime.getRuntime().exec(command)
-                val reader = BufferedReader(InputStreamReader(process.inputStream))
-                
-                var line: String?
-                while (reader.readLine().also { line = it } != null) {
-                    line?.let { 
-                        parseLogcatLine(it)?.let { entry ->
-                            emit(entry)
-                        }
+    ): Flow<LogcatEntry> = callbackFlow {
+        val tags = when (filterType) {
+            LogcatFilterType.CARRIER_CONFIG -> CARRIER_CONFIG_TAGS
+            LogcatFilterType.IMS -> IMS_TAGS
+            LogcatFilterType.TELEPHONY -> TELEPHONY_TAGS
+            LogcatFilterType.WFC -> WFC_TAGS
+            LogcatFilterType.ALL -> CARRIER_CONFIG_TAGS + IMS_TAGS + TELEPHONY_TAGS + WFC_TAGS
+        }
+
+        val tagFilters = tags.joinToString(" ") { "$it:${minLevel.priority}" }
+        val command = "logcat ${buffer.flag} -v threadtime $tagFilters *:S"
+
+        val process = Runtime.getRuntime().exec(command)
+        try {
+            val reader = BufferedReader(InputStreamReader(process.inputStream))
+            var line: String?
+            while (reader.readLine().also { line = it } != null) {
+                line?.let {
+                    parseLogcatLine(it)?.let { entry ->
+                        trySend(entry)
                     }
                 }
-            } catch (e: Exception) {
-                // Error handling - emit error entry
-                emit(LogcatEntry(
+            }
+        } catch (e: Exception) {
+            trySend(
+                LogcatEntry(
                     timestamp = System.currentTimeMillis(),
                     level = LogLevel.ERROR,
                     tag = "LogcatRepository",
                     message = "Error monitoring logcat: ${e.message}",
                     pid = 0,
                     tid = 0
-                ))
-            }
+                )
+            )
+        } finally {
+            process.destroy()
         }
-    }
+
+        awaitClose { process.destroy() }
+    }.flowOn(Dispatchers.IO)
     
     /**
      * Get snapshot of current logs
@@ -119,19 +126,19 @@ class LogcatRepository @Inject constructor(
     ): List<LogcatEntry> = withContext(Dispatchers.IO) {
         val entries = mutableListOf<LogcatEntry>()
         
+        val tags = when (filterType) {
+            LogcatFilterType.CARRIER_CONFIG -> CARRIER_CONFIG_TAGS
+            LogcatFilterType.IMS -> IMS_TAGS
+            LogcatFilterType.TELEPHONY -> TELEPHONY_TAGS
+            LogcatFilterType.WFC -> WFC_TAGS
+            LogcatFilterType.ALL -> CARRIER_CONFIG_TAGS + IMS_TAGS + TELEPHONY_TAGS + WFC_TAGS
+        }
+        
+        val tagFilters = tags.joinToString(" ") { "$it:D" }
+        val command = "logcat ${buffer.flag} -v threadtime -t $lineCount $tagFilters *:S"
+        
+        val process = Runtime.getRuntime().exec(command)
         try {
-            val tags = when (filterType) {
-                LogcatFilterType.CARRIER_CONFIG -> CARRIER_CONFIG_TAGS
-                LogcatFilterType.IMS -> IMS_TAGS
-                LogcatFilterType.TELEPHONY -> TELEPHONY_TAGS
-                LogcatFilterType.WFC -> WFC_TAGS
-                LogcatFilterType.ALL -> CARRIER_CONFIG_TAGS + IMS_TAGS + TELEPHONY_TAGS + WFC_TAGS
-            }
-            
-            val tagFilters = tags.joinToString(" ") { "$it:D" }
-            val command = "logcat ${buffer.flag} -v threadtime -t $lineCount $tagFilters *:S"
-            
-            val process = Runtime.getRuntime().exec(command)
             val reader = BufferedReader(InputStreamReader(process.inputStream))
             
             var line: String?
@@ -144,9 +151,10 @@ class LogcatRepository @Inject constructor(
             }
             
             process.waitFor()
-            reader.close()
-        } catch (e: Exception) {
-            // Return empty list on error
+        } catch (_: Exception) {
+            // Return partial list on error
+        } finally {
+            process.destroy()
         }
         
         entries
@@ -184,10 +192,13 @@ class LogcatRepository @Inject constructor(
      * Clear logcat buffer
      */
     suspend fun clearLogcat() = withContext(Dispatchers.IO) {
+        val process = Runtime.getRuntime().exec("logcat -c")
         try {
-            Runtime.getRuntime().exec("logcat -c").waitFor()
-        } catch (e: Exception) {
+            process.waitFor()
+        } catch (_: Exception) {
             // Ignore errors
+        } finally {
+            process.destroy()
         }
     }
 
@@ -196,16 +207,17 @@ class LogcatRepository @Inject constructor(
      * Returns raw text suitable for inclusion in the diagnostics ZIP.
      */
     suspend fun getRadioLogSnapshot(lineCount: Int = 1000): String = withContext(Dispatchers.IO) {
+        val command = "logcat -b radio -v threadtime -t $lineCount"
+        val process = Runtime.getRuntime().exec(command)
         try {
-            val command = "logcat -b radio -v threadtime -t $lineCount"
-            val process = Runtime.getRuntime().exec(command)
             val reader = BufferedReader(InputStreamReader(process.inputStream))
             val output = reader.readText()
             process.waitFor()
-            reader.close()
             output
         } catch (e: Exception) {
             "Error capturing radio log: ${e.message}"
+        } finally {
+            process.destroy()
         }
     }
 
@@ -213,15 +225,16 @@ class LogcatRepository @Inject constructor(
      * Get IMS-related getprop output (spec Section 7.1).
      */
     suspend fun getImsProperties(): String = withContext(Dispatchers.IO) {
+        val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", "getprop | grep -i ims"))
         try {
-            val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", "getprop | grep -i ims"))
             val reader = BufferedReader(InputStreamReader(process.inputStream))
             val output = reader.readText()
             process.waitFor()
-            reader.close()
             output.ifBlank { "(no IMS properties found)" }
         } catch (e: Exception) {
             "Error reading properties: ${e.message}"
+        } finally {
+            process.destroy()
         }
     }
 }
