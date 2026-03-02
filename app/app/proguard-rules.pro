@@ -7,6 +7,10 @@
 -keep class com.supermarsx.carrierconfig.data.model.** { *; }
 -keepclassmembers class com.supermarsx.carrierconfig.data.model.** { *; }
 
+# Keep ProfileManager inner data classes used by Gson reflection
+-keep class com.supermarsx.carrierconfig.instrumentation.ProfileManager$* { *; }
+-keepclassmembers class com.supermarsx.carrierconfig.instrumentation.ProfileManager$* { *; }
+
 # Kotlinx Serialization
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.AnnotationsKt
