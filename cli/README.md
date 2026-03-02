@@ -1,125 +1,171 @@
-# ccoctl - CLI Utility
+# ccoctl — CLI Utility
 
-Command-line interface for the CarrierConfig Override Manager.
-
-## Overview
-
-`ccoctl` is a Python-based CLI tool that provides ADB-friendly access to CCO functionality, suitable for automation and CI/CD integration.
+Command-line interface for the CarrierConfig Override Manager. Provides ADB-friendly access to CCO functionality for diagnostics, deployment, instrumentation, and automation.
 
 ## Installation
 
 ### Prerequisites
+
 - Python 3.7+
 - ADB (Android Debug Bridge)
 - Connected Android device with CCO app installed
+- `frida-tools` for instrumentation commands: `pip install frida-tools`
 
-### Install
+### Setup
 
 ```bash
-# Make executable
 chmod +x ccoctl
 
 # Optional: Add to PATH
 sudo cp ccoctl /usr/local/bin/
+# Or: export PATH="$PATH:/path/to/magisk-carrier-config-override/cli"
 ```
 
-## Usage
+## Commands
 
-### List connected devices
+### devices — List Connected Devices
+
 ```bash
 ccoctl devices
 ```
 
-### Show device information
-```bash
-ccoctl info
+Use `-d SERIAL` with any command to target a specific device when multiple are connected.
 
-# Include IMS status
-ccoctl info --ims
+### status — Comprehensive Status
+
+```bash
+ccoctl status
 ```
 
-### Deploy CarrierConfig preset
+Output includes device info, CCO app installed status, Magisk module status, active profile, and IMS registration.
+
+### info — Device Information
+
 ```bash
+ccoctl info          # Basic info
+ccoctl info --ims    # Include IMS status
+```
+
+Output: manufacturer, model, Android version, build fingerprint, security patch, root status, IMS registration (with `--ims`).
+
+### deploy — Deploy Configuration
+
+```bash
+ccoctl deploy <preset_name>
+```
+
+Available presets: `expose_wfc_ui`, `wfc_default_enabled`, `editable_wfc_mode`, `wifi_preferred`, `wifi_only`, `generic`
+
+**Note:** Reboot required after deployment.
+
+### export — Export Report
+
+```bash
+ccoctl export                     # Default location
+ccoctl export -o report.json      # Custom output path
+```
+
+Report includes device info, IMS status, CarrierConfig state, settings values, test results.
+
+### dumpsys — System Dumps
+
+```bash
+ccoctl dumpsys ims              # IMS service dump
+ccoctl dumpsys carrier_config   # CarrierConfig dump
+```
+
+### logs — Log Collection
+
+```bash
+ccoctl logs              # CCO and Frida logs (streaming)
+ccoctl logs --cco        # CCO app only
+ccoctl logs --frida      # Frida only
+ccoctl logs --ims        # IMS logs
+ccoctl logs -t 100       # Last 100 lines
+ccoctl logs --clear      # Clear logs
+```
+
+### frida — Frida Instrumentation
+
+```bash
+ccoctl frida                         # Launch with default script
+ccoctl frida -s /path/to/script.js   # Custom script
+ccoctl frida --pause                 # Pause on start
+ccoctl frida --debug                 # Debug mode
+```
+
+See the [Instrumentation Guide](../instrumentation/README.md) for details.
+
+### test — Device Testing
+
+```bash
+ccoctl test              # Run all tests
+ccoctl test -c root      # Root access test
+ccoctl test -c module    # Module installation test
+ccoctl test -c config    # CarrierConfig test
+ccoctl test -c ims       # IMS availability test
+```
+
+### diagnose — Comprehensive Diagnostics
+
+```bash
+ccoctl diagnose                            # Run diagnostics
+ccoctl diagnose -o report.json             # Save to file
+ccoctl diagnose --logs -o full_report.json # Include logs
+```
+
+## Usage Examples
+
+### Daily Workflow
+
+```bash
+ccoctl status
 ccoctl deploy expose_wfc_ui
-```
-
-Available presets:
-- `expose_wfc_ui` - Make WFC settings visible
-- `wfc_default_enabled` - Enable WFC by default
-- `editable_wfc_mode` - Allow mode changes
-- `wifi_preferred` - Set Wi-Fi preferred mode
-- `wifi_only` - Set Wi-Fi only mode
-
-### Export diagnostic report
-```bash
-ccoctl export -o report.json
-```
-
-### View dumpsys output
-```bash
-# IMS status
-ccoctl dumpsys ims
-
-# CarrierConfig
-ccoctl dumpsys carrier_config
-```
-
-### Multiple devices
-
-When multiple devices are connected, specify target:
-```bash
-ccoctl -d DEVICE_SERIAL info
-```
-
-## Examples
-
-### Full diagnostic workflow
-```bash
-# Check device
-ccoctl info --ims
-
-# Deploy configuration
-ccoctl deploy expose_wfc_ui
-
-# Reboot device (manual)
 adb reboot
-
-# Verify after reboot
-ccoctl info --ims
-
-# Export report
-ccoctl export -o diagnostic_report.json
+adb wait-for-device
+ccoctl status
 ```
 
 ### CI/CD Integration
+
+```yaml
+# .github/workflows/device-test.yml
+- name: Deploy and Test
+  run: |
+    ccoctl deploy expose_wfc_ui
+    adb reboot && adb wait-for-device
+    ccoctl diagnose -o $GITHUB_WORKSPACE/report.json
+    ccoctl test
+```
+
+### Scripting
+
 ```bash
 #!/bin/bash
-# Automated testing script
+set -e
 
-# Wait for device
-adb wait-for-device
+ccoctl status | grep -q "Rooted: Yes" || { echo "Not rooted"; exit 1; }
+ccoctl deploy expose_wfc_ui
+adb reboot && adb wait-for-device && sleep 30
+ccoctl test || {
+  ccoctl diagnose -o failed_$(date +%Y%m%d_%H%M%S).json --logs
+  exit 1
+}
+echo "Deployment successful"
+```
 
-# Get device info
-ccoctl info > device_info.txt
+### Batch Operations (Multiple Devices)
 
-# Deploy preset
-ccoctl deploy expose_wfc_ui || exit 1
-
-# Reboot and wait
-adb reboot
-adb wait-for-device
-
-# Export results
-sleep 30  # Wait for system to stabilize
-ccoctl export -o results.json
-
-# Parse results (using jq)
-cat results.json | jq '.ims_status.vowifi_available'
+```bash
+for device in $(ccoctl devices | grep -v "Connected" | awk '{print $2}'); do
+  echo "Deploying to $device"
+  ccoctl -d $device deploy expose_wfc_ui
+done
 ```
 
 ## Output Format
 
-All structured output is in JSON format for easy parsing:
+All structured output is JSON:
 
 ```json
 {
@@ -138,35 +184,22 @@ All structured output is in JSON format for easy parsing:
 ## Troubleshooting
 
 ### "No devices connected"
-```bash
-# Check ADB connection
-adb devices
 
-# Enable USB debugging on device
-# Settings → Developer Options → USB Debugging
+```bash
+adb devices
+# Enable USB debugging: Settings → Developer Options → USB Debugging
 ```
 
 ### "CCO app not installed"
+
 ```bash
-# Install CCO app
 adb install cco-app.apk
 ```
 
 ### Permission denied
-```bash
-# Grant ADB permissions on device
-# Check device screen for authorization prompt
-```
 
-## Requirements
-
-- Python 3.7+
-- `adb` in PATH
-- Android device with:
-  - USB debugging enabled
-  - CCO app installed
-  - Root access (for full functionality)
+Check device screen for ADB authorization prompt.
 
 ## License
 
-MIT License - See repository root
+MIT License — see repository root.

@@ -2,40 +2,89 @@
 
 Complete installation instructions for the CarrierConfig Override Manager.
 
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Component Installation](#component-installation)
+- [Post-Installation Setup](#post-installation-setup)
+- [Verification](#verification)
+- [Troubleshooting](#troubleshooting)
+- [Uninstallation](#uninstallation)
+
+---
+
 ## Prerequisites
 
-### Required
-- Samsung Galaxy device running One UI 5/6/7 (Android 13-15)
-- Root access (Magisk 24.0+)
+### Device Requirements
+
+- **Device**: Samsung smartphone (Galaxy S/A series, Fold, Flip)
+- **Android Version**: Android 13–15 (API 33–35)
+- **Firmware**: One UI 5/6/7
+- **Architecture**: ARM64 (arm64-v8a)
+- **Storage**: 100+ MB free space
+
+### Root Access
+
+- **Root**: Required (Magisk 24.0+ or KernelSU)
+- **Magisk Manager**: Latest version installed and working
+- **Root Shell**: Verified working (test with `su` command)
+
+### Recommended
+
+- Device backup before installation
+- Non-critical/test device for first-time use
 - USB debugging enabled
 - ADB installed on computer (for advanced features)
 
-### Recommended
-- Device backup
-- Understanding of Android system modification risks
-- Non-critical/test device for first-time use
+---
 
 ## Component Installation
 
-### 1. Android App (cco-app)
+### 1. Android App
 
-#### Option A: From Release APK
-1. Download `cco-app-release.apk` from [Releases](https://github.com/YOUR_USERNAME/magisk-carrier-config-override/releases)
-2. Enable "Install from Unknown Sources" in Android settings
-3. Install APK on device
-4. Grant root access when prompted
-5. Grant required permissions (Phone, Storage)
+#### Option A: From Release APK (Recommended)
 
-#### Option B: Build from Source
+1. **Download the APK** from [Releases](https://github.com/supermarsx/magisk-carrier-config-override/releases)
+
+2. **Transfer to device**
+
+   ```bash
+   adb push cco-manager.apk /sdcard/Download/
+   ```
+
+3. **Install APK**
+   - Open file manager on device
+   - Navigate to Downloads folder
+   - Tap `cco-manager.apk`
+   - Grant install from unknown sources if prompted
+   - Tap "Install"
+
+4. **Grant Root Access**
+   - Open CCO Manager
+   - Magisk prompt will appear — tap "Grant"
+   - Choose "Always allow" for convenience
+
+#### Option B: ADB Install
+
 ```bash
-cd cco-app
-./gradlew assembleRelease
+adb devices
+adb install cco-manager.apk
+adb shell am start -n com.supermarsx.carrierconfig/.MainActivity
+```
+
+#### Option C: Build from Source
+
+```bash
+git clone https://github.com/supermarsx/magisk-carrier-config-override.git
+cd magisk-carrier-config-override/app
+./scripts/build.sh
 adb install app/build/outputs/apk/release/app-release.apk
 ```
 
-### 2. Magisk Module (cco-carrierconfig)
+### 2. Magisk Module
 
 #### Via CCO App (Recommended)
+
 1. Open CCO app
 2. Navigate to CarrierConfig tab
 3. Tap "Install Magisk Module"
@@ -43,29 +92,29 @@ adb install app/build/outputs/apk/release/app-release.apk
 5. Reboot when complete
 
 #### Manual Installation
-```bash
-# Create module zip
-cd cco-carrierconfig
-zip -r cco-carrierconfig.zip . -x "*.md" -x ".git/*"
 
-# Install via Magisk Manager
+```bash
+cd module
+zip -r cco-carrierconfig.zip . -x "*.md" -x ".git/*" -x "tests/*" -x "scripts/*"
+
+# Install via Magisk Manager:
 # 1. Open Magisk Manager
 # 2. Tap "Modules" → "Install from storage"
 # 3. Select cco-carrierconfig.zip
 # 4. Reboot
 ```
 
-### 3. Frida Backend (Optional - Method 2)
+### 3. Frida Backend (Optional — Method 2)
 
 #### Install Frida Server
+
 ```bash
-# Download Frida server for your architecture
-# arm64 for most modern Samsung devices
-wget https://github.com/frida/frida/releases/download/16.1.11/frida-server-16.1.11-android-arm64.xz
-unxz frida-server-16.1.11-android-arm64.xz
+# Download for ARM64 (most modern Samsung devices)
+wget https://github.com/frida/frida/releases/latest/download/frida-server-android-arm64.xz
+unxz frida-server-android-arm64.xz
 
 # Push to device
-adb push frida-server-16.1.11-android-arm64 /data/local/tmp/frida-server
+adb push frida-server-android-arm64 /data/local/tmp/frida-server
 adb shell "chmod 755 /data/local/tmp/frida-server"
 
 # Start Frida server (run after each reboot)
@@ -73,114 +122,170 @@ adb shell "su -c '/data/local/tmp/frida-server &'"
 ```
 
 #### Install Python Frida Client (on computer)
+
 ```bash
 pip3 install frida-tools
 ```
 
-### 4. CLI Utility (Optional)
+### 4. LSPosed Module (Optional — Method 2)
+
+1. Install LSPosed framework (follow [LSPosed docs](https://github.com/LSPosed/LSPosed))
+2. Build and install CCO LSPosed module:
+
+   ```bash
+   cd instrumentation/lsposed
+   ./gradlew assembleRelease
+   adb install -r build/outputs/apk/release/lsposed-release.apk
+   ```
+
+3. Enable in LSPosed Manager → select target scope → reboot
+
+### 5. CLI Utility (Optional)
 
 ```bash
-cd ccoctl
-chmod +x ccoctl
+chmod +x cli/ccoctl
 
-# Optional: Install system-wide
-sudo cp ccoctl /usr/local/bin/
+# Optional: Add to PATH
+sudo cp cli/ccoctl /usr/local/bin/
 ```
+
+---
 
 ## Post-Installation Setup
 
 ### First Launch
-1. Open CCO app
-2. Grant root access when prompted
-3. Grant phone state permission when prompted
-4. Complete initial device scan
-5. Review dashboard for device status
 
-### Verify Installation
+1. **Root Permission Prompt** — Magisk will ask for root access. Tap "Grant" and enable "Remember choice."
+2. **Permissions** — Grant Phone and Storage permissions when prompted.
+3. **Dashboard** — Review device info, SIM status, IMS status, and WFC UI detection.
+
+### Initial Diagnostics
+
+1. Tap **"Run Diagnostics"** on the Dashboard
+2. Wait for scan to complete (5–10 seconds)
+3. Review blocker analysis and recommendations
+
+### Configure Settings
+
+- **General**: Enable auto-refresh, configure notifications
+- **Appearance**: Select theme (Dark/AMOLED), adjust glass effect strength
+- **Advanced**: Enable debug mode for detailed logs, set export directory
+
+---
+
+## Verification
+
+### Verify Root Access
+
 ```bash
-# Check Magisk module status
-adb shell "ls -la /data/adb/cco"
+adb shell su -c whoami
+# Should output: root
+```
 
+The Dashboard's Device Info card should show "Root: Yes".
+
+### Verify All Components
+
+```bash
 # Check app installation
-adb shell "pm list packages | grep cco"
+adb shell "pm list packages | grep supermarsx"
+
+# Check Magisk module status
+adb shell "ls -la /data/adb/modules/cco*"
 
 # Check Frida (if installed)
 frida-ps -U
 ```
 
-## Permissions
+### Verify App Functionality
 
-The app requires the following permissions:
+1. **Dashboard**: All cards display data (not "Unknown")
+2. **Diagnostics**: Logs appear in Logcat tab
+3. **CarrierConfig**: Prerequisites show green checkmarks
+4. **Settings**: All options save and persist
 
-- **Root Access**: For CarrierConfig deployment and system queries
-- **Phone State**: To read SIM and carrier information
-- **Network State**: To monitor IMS status
-- **Storage**: To export reports and logs
+---
 
-## Troubleshooting Installation
+## Troubleshooting
 
-### "Installation failed"
+### Installation Failed
+
 - Ensure "Install from Unknown Sources" is enabled
 - Check device storage space (minimum 50MB free)
 - Try uninstalling old version first
 
-### "Root access denied"
-- Open Magisk Manager and verify root is working
-- Grant CCO superuser access in Magisk
-- Reboot and try again
+### Root Access Denied
 
-### Magisk module not loading
+1. Open Magisk Manager
+2. Check if CCO Manager is in granted list
+3. If denied, remove and re-grant
+4. Reboot device and try again
+
+### App Crashes on Launch
+
+1. Check Android version (must be 13+)
+2. Clear app data: Settings → Apps → CCO Manager → Storage → Clear Data
+3. Reinstall APK
+4. Check logcat: `adb logcat | grep CCO`
+
+### No Data in Dashboard
+
+1. Grant Phone permission: Settings → Apps → CCO Manager → Permissions
+2. Insert active SIM card
+3. Pull down to refresh
+4. Check if root access is granted
+
+### Magisk Module Not Loading
+
 ```bash
-# Check Magisk logs
 adb shell "cat /data/adb/magisk.log | grep cco"
-
-# Verify module is enabled
 adb shell "ls -la /data/adb/modules"
 ```
 
-### Frida not connecting
+### Frida Not Connecting
+
 ```bash
-# Verify Frida server is running
 adb shell "ps | grep frida"
-
-# Check USB connection
 adb devices
-
-# Test connection
 frida-ps -U
 ```
+
+For more troubleshooting, see the [Troubleshooting Guide](TROUBLESHOOTING.md).
+
+---
 
 ## Uninstallation
 
 ### Remove App
+
 ```bash
 adb uninstall com.supermarsx.carrierconfig
-# Or: Settings → Apps → CCO → Uninstall
+# Or: Settings → Apps → CCO Manager → Uninstall
 ```
 
 ### Remove Magisk Module
-1. Open Magisk Manager
-2. Tap on CCO module
-3. Tap "Uninstall"
-4. Reboot
 
-### Clean All Data
+1. Open Magisk Manager → Modules → CCO → Uninstall → Reboot
+
+### Revert CarrierConfig Changes
+
+Before uninstalling, open the app → CarrierConfig tab → "Revert Override" → Reboot.
+
+### Complete Cleanup
+
 ```bash
-# Remove CCO data directory
-adb shell "su -c 'rm -rf /data/adb/cco'"
+adb shell su -c "pm uninstall com.supermarsx.carrierconfig && \
+  rm -rf /sdcard/CCO/ && \
+  rm -rf /data/data/com.supermarsx.carrierconfig/ && \
+  rm -rf /data/adb/cco/"
+adb reboot
 ```
+
+---
 
 ## Next Steps
 
-After installation:
-1. Read [Safety Guidelines](SAFETY.md)
-2. Follow [Quick Start Guide](README.md#quick-start)
-3. Review [Troubleshooting Guide](TROUBLESHOOTING.md)
-4. Check device-specific notes (if available)
-
-## Support
-
-For installation issues:
-- Check [Troubleshooting Guide](TROUBLESHOOTING.md)
-- Search [GitHub Issues](https://github.com/YOUR_USERNAME/magisk-carrier-config-override/issues)
-- Ask in [Discussions](https://github.com/YOUR_USERNAME/magisk-carrier-config-override/discussions)
+- [Safety Guidelines](SAFETY.md) — Read before making system changes
+- [Documentation Index](README.md) — Full docs navigation
+- [Troubleshooting](TROUBLESHOOTING.md) — Detailed problem solving
+- [Export/Import Guide](EXPORT_IMPORT_GUIDE.md) — Backup and restore configurations

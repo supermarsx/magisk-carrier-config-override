@@ -79,13 +79,15 @@ git checkout -b feature/your-feature-name
 ### Android Studio Configuration
 
 1. **Import Project**
-   ```
+
+   ```text
    File > Open > Select app/ directory
    Wait for Gradle sync to complete
    ```
 
 2. **Configure SDK**
-   ```
+
+   ```text
    Tools > SDK Manager
    Install Android 13 (API 33) SDK
    Install Android SDK Build-Tools 34.0.0
@@ -97,7 +99,8 @@ git checkout -b feature/your-feature-name
    - Jetpack Compose Previews
 
 4. **Code Style**
-   ```
+
+   ```text
    File > Settings > Editor > Code Style > Kotlin
    Scheme: Kotlin style guide
    Import: Use .editorconfig from project root
@@ -146,8 +149,8 @@ export CCO_SKIP_TESTS=1
 
 ## Project Structure
 
-```
-cco-manager/
+```text
+magisk-carrier-config-override/
 ├── app/                          # Android application
 │   ├── app/                      # Main app module
 │   │   ├── src/main/java/com/supermarsx/carrierconfig/
@@ -165,15 +168,22 @@ cco-manager/
 ├── module/                       # Magisk module
 │   ├── install.sh                # Installation script
 │   ├── service.sh                # Boot service
-│   └── profiles/                 # Configuration profiles
+│   ├── profiles/                 # Configuration profiles
+│   ├── scripts/                  # Dev/test/lint scripts
+│   ├── tests/                    # Shell test suite
+│   └── docs/                     # Module documentation
 ├── cli/                          # Command-line utility
 │   └── ccoctl                    # CLI tool script
 ├── instrumentation/              # Frida/LSPosed hooks
-│   └── frida/                    # Frida agent scripts
+│   ├── frida/                    # Frida agent scripts
+│   ├── lsposed/                  # LSPosed Xposed module
+│   └── shared/                   # Hook profiles database
 ├── docs/                         # Documentation
 │   ├── INSTALL.md                # Installation guide
-│   ├── CONTRIBUTING.md           # This file
+│   ├── SPEC_COMPLIANCE.md        # Spec compliance & gap analysis
+│   ├── TESTING.md                # Testing guide
 │   └── TROUBLESHOOTING.md        # User troubleshooting
+├── CONTRIBUTING.md               # This file
 └── README.md                     # Project overview
 ```
 
@@ -335,7 +345,7 @@ fun calculateCacheSize(): Long {
 
 ### Test Structure
 
-```
+```text
 src/test/              # Unit tests (JVM)
   ├── repository/      # Repository tests
   ├── viewmodel/       # ViewModel tests
@@ -398,11 +408,13 @@ class SettingsViewModelTest {
 ### Test Coverage
 
 Aim for:
+
 - **80%+ overall coverage**
 - **90%+ for business logic**
 - **70%+ for UI code**
 
 Check coverage:
+
 ```bash
 ./gradlew jacocoTestReport
 open app/build/reports/jacoco/test/html/index.html
@@ -423,7 +435,7 @@ open app/build/reports/jacoco/test/html/index.html
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
-```
+```text
 feat(settings): add cache size calculation
 
 - Implement calculateCacheSize() in ViewModel
@@ -435,6 +447,7 @@ Closes #123
 ```
 
 Types:
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation
@@ -446,18 +459,21 @@ Types:
 ### Pull Request Process
 
 1. **Update Your Branch**
+
    ```bash
    git fetch upstream
    git rebase upstream/main
    ```
 
 2. **Run Tests**
+
    ```bash
    ./scripts/test.sh
    ./scripts/lint.sh
    ```
 
 3. **Push to Your Fork**
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -499,7 +515,7 @@ Types:
 
 Follow [Semantic Versioning](https://semver.org/):
 
-```
+```text
 MAJOR.MINOR.PATCH (e.g., 1.2.3)
 
 MAJOR: Breaking changes
@@ -510,6 +526,7 @@ PATCH: Bug fixes
 ### Release Workflow
 
 1. **Update Version**
+
    ```kotlin
    // app/build.gradle.kts
    versionCode = 10
@@ -517,6 +534,7 @@ PATCH: Bug fixes
    ```
 
 2. **Update Changelog**
+
    ```markdown
    # docs/CHANGELOG.md
    
@@ -530,12 +548,14 @@ PATCH: Bug fixes
    ```
 
 3. **Create Release Tag**
+
    ```bash
    git tag -a v1.2.3 -m "Release version 1.2.3"
    git push upstream v1.2.3
    ```
 
 4. **Build Release APK**
+
    ```bash
    ./scripts/package.sh
    ```
@@ -559,6 +579,7 @@ PATCH: Bug fixes
 ## Recognition
 
 Contributors are recognized in:
+
 - [docs/CHANGELOG.md](docs/CHANGELOG.md)
 - [README.md](README.md) Contributors section
 - GitHub commit history

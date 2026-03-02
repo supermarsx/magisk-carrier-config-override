@@ -5,11 +5,9 @@ Toolkit for Samsung CarrierConfig override workflows, Magisk module deployment, 
 ## Repository Status
 
 This repository is consolidated on the `com.supermarsx` namespace:
+
 - canonical app module at `app/app/src/main/...` under `com.supermarsx.carrierconfig`
 - module/CLI/instrumentation paths standardized on `cco`
-- root-level docs include both current and historical milestone/session notes
-
-Treat this as an active integration state, not a finalized release branch.
 
 ## Repository Layout
 
@@ -18,11 +16,10 @@ Treat this as an active integration state, not a finalized release branch.
 ├── app/                  Android application sources and scripts
 ├── module/               Magisk module scripts, profiles, and tests
 ├── instrumentation/      Frida + LSPosed tooling and profiles
-├── cli/                  CLI utility (`ccoctl`)
+├── cli/                  CLI utility (ccoctl)
 ├── docs/                 Project docs, guides, and specs
-├── QUICKREF.md           User/developer quick reference
-├── MODULE_DEV_QUICKREF.md
-└── DOCS_MAP.md           Documentation entrypoint
+├── CONTRIBUTING.md       Contribution guide
+└── license.md            License
 ```
 
 ## Quick Start
@@ -41,13 +38,14 @@ There is currently no Gradle wrapper committed in the repo root. Use Android Stu
 
 ## Key Documentation
 
-- `DOCS_MAP.md`
-- `docs/README.md`
-- `docs/INSTALL.md`
-- `docs/TROUBLESHOOTING.md`
-- `docs/spec-design.md`
-- `docs/spec-1.md`
+- [docs/README.md](docs/README.md) — Documentation index
+- [docs/INSTALL.md](docs/INSTALL.md) — Installation guide
+- [docs/SAFETY.md](docs/SAFETY.md) — Safety guidelines
+- [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — Problem solving
+- [docs/spec-1.md](docs/spec-1.md) — Technical specification
+- [docs/spec-design.md](docs/spec-design.md) — Design specification
+- [docs/SPEC_COMPLIANCE.md](docs/SPEC_COMPLIANCE.md) — Compliance & gap analysis
 
 ## Contribution
 
-Use `CONTRIBUTING.md` for branch, testing, and review expectations.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for branch, testing, and review expectations.

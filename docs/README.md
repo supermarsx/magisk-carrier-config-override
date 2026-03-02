@@ -1,77 +1,55 @@
 # CCO Documentation
 
-This directory contains comprehensive documentation for the CarrierConfig Override (CCO) project.
+## Getting Started
 
-## 📖 Documentation Index
+- **[Installation Guide](INSTALL.md)** — Complete setup for app, module, Frida, LSPosed, CLI
+- **[Safety Guidelines](SAFETY.md)** — Critical safety information before use
+- **[Troubleshooting](TROUBLESHOOTING.md)** — Common issues and solutions
 
-### Getting Started
-- **[Installation Guide](INSTALL.md)** - Complete installation instructions for the app and module
-- **[Safety Guidelines](SAFETY.md)** - Critical safety information before use
-- **[Troubleshooting](TROUBLESHOOTING.md)** - Common issues and their solutions
+## Guides
 
-### Project Information
-- **[Project Status](PROJECT_STATUS.md)** - Current development progress and roadmap
-- **[Changelog](CHANGELOG.md)** - Version history and release notes
-- **[Bootstrap Summary](BOOTSTRAP_SUMMARY.md)** - Initial project setup details
+- **[Export/Import Guide](EXPORT_IMPORT_GUIDE.md)** — Settings, presets, hook profiles, diagnostic reports
+- **[Testing Guide](TESTING.md)** — Test suite, running tests, coverage targets
 
-### Technical Documentation
-- **[Design Specification](spec-design.md)** - Architecture and design philosophy
-- **[Technical Specification](spec-1.md)** - Detailed technical implementation
-- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
+## Technical Reference
 
-### Component-Specific Documentation
+- **[Technical Specification](spec-1.md)** — Requirements and implementation spec
+- **[Design Specification](spec-design.md)** — Glassmorphism theme, colors, typography, components
+- **[Spec Compliance & Gaps](SPEC_COMPLIANCE.md)** — Implementation status and remaining work
+- **[Changelog](CHANGELOG.md)** — Version history
 
-#### Android App
-- See [App Development Progress](../PROGRESS.md) for detailed app development tracking
+## Contributing
 
-#### Magisk Module
-- See [module/README.md](../module/README.md) for module usage
-- See [module/docs/](../module/docs/) for module development documentation
+- **[Contributing Guide](../CONTRIBUTING.md)** — Dev setup, coding standards, PR process
 
-#### CLI Tools
-- See [cli/README.md](../cli/README.md) for CLI utility documentation
+## Component Documentation
 
-## 🔗 Quick Links
+| Component | Location |
+| --- | --- |
+| Android App | [app/README.md](../app/README.md), [app/scripts/README.md](../app/scripts/README.md) |
+| Magisk Module | [module/README.md](../module/README.md), [module/docs/](../module/docs/) |
+| CLI Tools | [cli/README.md](../cli/README.md) |
+| Instrumentation | [instrumentation/README.md](../instrumentation/README.md) |
+| LSPosed Module | [instrumentation/lsposed/README.md](../instrumentation/lsposed/README.md) |
 
-| Topic | Document |
-|-------|----------|
-| First-time setup | [INSTALL.md](INSTALL.md) |
-| Safety warnings | [SAFETY.md](SAFETY.md) |
-| Not working? | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) |
-| Project roadmap | [PROJECT_STATUS.md](PROJECT_STATUS.md) |
-| Latest changes | [CHANGELOG.md](CHANGELOG.md) |
-| Want to help? | [CONTRIBUTING.md](CONTRIBUTING.md) |
+## Quick References
 
-## 📝 Documentation Structure
+- [Module Dev Scripts](../module/docs/SCRIPTS.md) — Module build, test, lint commands
+- [Module Profiles](../module/docs/PROFILES.md) — Override profile documentation
 
-```
+## Documentation Structure
+
+```text
 docs/
-├── README.md                    # This file - documentation index
-├── INSTALL.md                   # Installation instructions
-├── SAFETY.md                    # Safety guidelines
-├── TROUBLESHOOTING.md           # Problem solving
-├── PROJECT_STATUS.md            # Project status and roadmap
-├── CHANGELOG.md                 # Version history
-├── BOOTSTRAP_SUMMARY.md         # Project bootstrap
-├── CONTRIBUTING.md              # Contribution guide
-├── spec-design.md               # Design specification
-└── spec-1.md                    # Technical specification
-
-../PROGRESS.md                   # App development progress
-../BUILD_SUMMARY.md              # Build system summary  
-../MODULE_DEV_QUICKREF.md        # Module development quick reference
-../QUICKREF.md                   # General quick reference
-
-../module/docs/                  # Module-specific documentation
-├── DEVELOPMENT_SUMMARY.md       # Module development guide
-├── SCRIPTS.md                   # Shell script documentation
-├── PROFILES.md                  # Configuration profiles
-├── CHANGELOG.md                 # Module changelog
-└── README.md                    # Module documentation
-
-../cli/README.md                 # CLI tool documentation
+├── README.md              # This file
+├── INSTALL.md             # Installation instructions
+├── SAFETY.md              # Safety guidelines
+├── TROUBLESHOOTING.md     # Problem solving
+├── TESTING.md             # Testing guide + quick reference
+├── EXPORT_IMPORT_GUIDE.md # Export/import workflows
+├── SPEC_COMPLIANCE.md     # Spec compliance & gap analysis
+├── CHANGELOG.md           # Version history
+├── CONTRIBUTING.md        # → Redirects to ../CONTRIBUTING.md
+├── spec-1.md              # Technical specification
+└── spec-design.md         # Design specification
 ```
-
-## 🤝 Contribution
-
-Found a documentation issue? Please see [CONTRIBUTING.md](CONTRIBUTING.md) to learn how to submit improvements.

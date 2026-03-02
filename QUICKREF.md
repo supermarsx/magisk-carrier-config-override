@@ -3,6 +3,7 @@
 ## 🚀 Getting Started
 
 ### First Time Setup
+
 1. Install APK on rooted Samsung device
 2. Grant root access when prompted
 3. Open app → Dashboard loads device status
@@ -11,7 +12,8 @@
 ### Deploy WFC Override (Method 1)
 
 #### Quick Deploy (Recommended)
-```
+
+```text
 Dashboard → Method 1 → Presets Tab
 → Select "Full WFC Enablement"
 → Deploy Tab → Deploy Override
@@ -20,7 +22,8 @@ Dashboard → Method 1 → Presets Tab
 ```
 
 #### Custom Configuration
-```
+
+```text
 Dashboard → Method 1 → Keys Tab
 → Tap "+" to add custom keys
 → Review selection
@@ -29,7 +32,8 @@ Dashboard → Method 1 → Keys Tab
 ```
 
 #### Revert Changes
-```
+
+```text
 Method 1 → Deploy Tab
 → Revert Override
 → Reboot device
@@ -40,7 +44,8 @@ Method 1 → Deploy Tab
 ## 📱 App Structure
 
 ### Navigation
-```
+
+```text
 Dashboard (Home)
 ├─ Method 1 (CarrierConfig Override)
 │  ├─ Presets Tab
@@ -53,6 +58,7 @@ Dashboard (Home)
 ```
 
 ### Dashboard Cards
+
 1. **Device Info** - Model, One UI version, kernel, root status
 2. **SIM Info** - Carrier, MCC/MNC, network type
 3. **IMS Status** - VoLTE, VoWiFi, registration
@@ -60,6 +66,7 @@ Dashboard (Home)
 5. **Blocker Analysis** - Intelligent detection & recommendations
 
 ### Actions
+
 - **Run Diagnostics** - Refresh all status cards
 - **Open WFC Settings** - Launch Wi-Fi Calling settings (if available)
 - **Export Report** - Generate diagnostic report
@@ -69,6 +76,7 @@ Dashboard (Home)
 ## 🎯 Method 1: CarrierConfig Override
 
 ### How It Works
+
 1. App generates XML from selected CarrierConfig keys
 2. XML saved to `/data/adb/cco/active/override.xml`
 3. Magisk module bind-mounts XML to system path
@@ -78,7 +86,7 @@ Dashboard (Home)
 ### Presets
 
 | Preset | Purpose | Keys Modified | Recommended |
-|--------|---------|---------------|-------------|
+| -------- | --------- | --------------- | ------------- |
 | **Expose WFC UI** | Show settings only | 2 keys | Basic |
 | **WFC Default Enabled** | Auto-enable on boot | 3 keys | Medium |
 | **Editable WFC Mode** | Allow mode selection | 4 keys | Medium |
@@ -107,13 +115,15 @@ carrier_promote_wfc_on_call_fail_bool = true
 ```
 
 ### Prerequisites Checklist
+
 - ✅ Root access granted
 - ✅ Magisk 24+ installed and working
 - ✅ Valid CarrierConfig path detected
 - ✅ Keys selected (at least 1)
 
 ### Deployment Process
-```
+
+```text
 1. Prerequisites Check
    ├─ Verify root access
    ├─ Check Magisk installation
@@ -143,6 +153,7 @@ carrier_promote_wfc_on_call_fail_bool = true
 ## 📊 Diagnostics Export
 
 ### Report Contents
+
 - Device information (model, OS, root)
 - SIM information (carrier, network)
 - IMS status (registration, features)
@@ -151,7 +162,8 @@ carrier_promote_wfc_on_call_fail_bool = true
 - Timestamp and metadata
 
 ### Export Location
-```
+
+```text
 /sdcard/Android/data/com.supermarsx.carrierconfig/files/cco_reports/
 └─ YYYY-MM-DD_HH-MM-SS/
    ├─ diagnostic_report.json  # Machine-readable
@@ -159,6 +171,7 @@ carrier_promote_wfc_on_call_fail_bool = true
 ```
 
 ### Sharing Reports
+
 1. Export Report from Dashboard
 2. Navigate to export location using file manager
 3. Share JSON or TXT file via email/messaging
@@ -171,6 +184,7 @@ carrier_promote_wfc_on_call_fail_bool = true
 ### WFC UI Not Appearing After Deploy
 
 **Checklist**:
+
 1. Did you reboot after deployment? (Required)
 2. Is Magisk module enabled?
 3. Check Deploy tab → Prerequisites all green?
@@ -178,6 +192,7 @@ carrier_promote_wfc_on_call_fail_bool = true
 5. Export diagnostic report for analysis
 
 **Manual Verification**:
+
 ```bash
 # Check if override exists
 adb shell su -c "ls -la /data/vendor/carrierconfig/"
@@ -192,6 +207,7 @@ adb shell mount | grep carrierconfig
 ### Deployment Fails
 
 **Common Causes**:
+
 - No root access → Grant root permission
 - Magisk not installed → Install Magisk 24+
 - No valid path found → Device may not support CarrierConfig override
@@ -200,6 +216,7 @@ adb shell mount | grep carrierconfig
 ### App Crashes on Launch
 
 **Solutions**:
+
 1. Clear app data: Settings → Apps → CCO → Clear Data
 2. Reinstall APK
 3. Check logcat: `adb logcat | grep -Ei "cco|carrierconfig|supermarsx"`
@@ -208,6 +225,7 @@ adb shell mount | grep carrierconfig
 ### Blocker Analysis Shows "Unknown"
 
 **Reasons**:
+
 - Insufficient permissions → Grant all requested permissions
 - Detection heuristics uncertain → Try deployment anyway
 - Device model not recognized → May still work
@@ -217,19 +235,22 @@ adb shell mount | grep carrierconfig
 ## 🛡️ Safety Tips
 
 ### Before Deploying
+
 1. ✅ **Backup device** - Full system backup recommended
 2. ✅ **Export diagnostic report** - For restore reference
 3. ✅ **Test on non-critical device** - If possible
 4. ✅ **Know how to revert** - Practice revert process
 
 ### After Deploying
+
 1. ✅ **Test emergency calls** - Verify 911/112 works
 2. ✅ **Check carrier billing** - Ensure no extra charges
 3. ✅ **Monitor IMS status** - Use Dashboard to check health
 4. ✅ **Keep backup available** - In case revert needed
 
 ### Emergency Revert
-```
+
+```text
 Method 1: Via App
 └─ Method 1 → Deploy Tab → Revert Override → Reboot
 
@@ -246,7 +267,8 @@ Method 3: Via Recovery
 ## 📁 File Locations
 
 ### App Data
-```
+
+```text
 /data/data/com.supermarsx.carrierconfig/
 ├─ files/
 │  └─ cco_reports/           # Exported diagnostic reports
@@ -254,7 +276,8 @@ Method 3: Via Recovery
 ```
 
 ### CCO System Data
-```
+
+```text
 /data/adb/cco/
 ├─ active/
 │  └─ override.xml           # Active override configuration
@@ -264,7 +287,8 @@ Method 3: Via Recovery
 ```
 
 ### CarrierConfig Paths (Samsung)
-```
+
+```text
 Priority 1: /data/vendor/carrierconfig/override.xml
 Priority 2: /data/vendor/carrierconfig/override_carrier.xml
 Priority 3: /data/misc/carrierconfig/override.xml
@@ -276,6 +300,7 @@ Priority 4: /data/user_de/0/com.android.phone/files/carrierconfig_override.xml
 ## 🎨 UI Reference
 
 ### Status Colors
+
 - **Green** - Active, Working, Success
 - **Red** - Inactive, Blocked, Error
 - **Yellow** - Warning, Uncertain
@@ -284,11 +309,13 @@ Priority 4: /data/user_de/0/com.android.phone/files/carrierconfig_override.xml
 - **Purple** - Secondary Action
 
 ### Button Types
+
 - **Primary** (Cyan) - Main actions (Deploy, Export)
 - **Secondary** (Purple) - Alternative actions (Revert)
 - **Outlined** (Transparent) - Tertiary actions (Cancel)
 
 ### Card Types
+
 - **Default** - Standard information display
 - **Elevated** - Important status/warnings
 - **Outlined** - Less emphasis, grouped info
@@ -299,7 +326,7 @@ Priority 4: /data/user_de/0/com.android.phone/files/carrierconfig_override.xml
 ## 🔑 Key Terminology
 
 | Term | Meaning |
-|------|---------|
+| ------ | --------- |
 | **WFC** | Wi-Fi Calling |
 | **VoWiFi** | Voice over Wi-Fi (same as WFC) |
 | **VoLTE** | Voice over LTE |
@@ -315,18 +342,21 @@ Priority 4: /data/user_de/0/com.android.phone/files/carrierconfig_override.xml
 ## 📞 Support Resources
 
 ### Documentation
+
 - [Main README](README.md) - Project overview
 - [App README](app/README.md) - Technical details
 - [Design Spec](docs/spec-design.md) - UI/UX design system
-- [Bootstrap TODO](todo-bootstrap.md) - Implementation roadmap
 - [Progress Summary](PROGRESS.md) - Development status
+- [Docs Map](DOCS_MAP.md) - Documentation navigation
 
 ### Community
+
 - **GitHub Issues** - Bug reports and feature requests
 - **GitHub Discussions** - General questions and help
 - **Wiki** (Coming Soon) - Detailed guides and tutorials
 
 ### Before Asking for Help
+
 1. Export diagnostic report from app
 2. Check troubleshooting section above
 3. Search existing GitHub issues

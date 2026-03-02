@@ -37,6 +37,7 @@ This document tracks the implementation progress of the CCO Manager Android app 
 **Overall Progress**: ~98% Complete 🎯
 
 **Recent Updates** (Feb 5, 2026 - Milestone 4 Complete! 🎉):
+
 - ✅ **MILESTONE 4 COMPLETE**: All advanced features and UI polish finalized
 - ✅ **CarrierConfigScreen**: Complete UI for preset management (preset selection, deployment, status monitoring)
 - ✅ **EntitlementScreen**: Runtime instrumentation control (Frida/LSPosed backend selection, profile management, session control)
@@ -49,7 +50,7 @@ This document tracks the implementation progress of the CCO Manager Android app 
 - ✅ 8 hook profiles (OneUI 4/5/6, carrier-specific, aggressive bypass) (Milestone 3)
 - ✅ IPC/event logging system for real-time monitoring (Milestone 3)
 - ✅ CCO app integration (FridaManager, ProfileManager) (Milestone 3)
-- ✅ Complete instrumentation documentation (INSTRUMENTATION_GUIDE.md) (Milestone 3)
+- ✅ Complete instrumentation documentation (instrumentation/README.md) (Milestone 3)
 - ✅ Activity Result API for file/directory picking
 - ✅ Root operations wrappers (RootShell, SuFileManager, ServiceRestarter)
 - ✅ Update checker with GitHub Releases API
@@ -156,7 +157,7 @@ Implemented 3 TODOs in DeviceRepository.kt:
 
 ### Root Operations & System Control
 
-3. **Root Operations Wrappers** ✅
+1. **Root Operations Wrappers** ✅
    - [RootOperations.kt](app/app/src/main/java/com/supermarsx/carrierconfig/util/RootOperations.kt) (380+ lines)
    - **RootShell**: Centralized shell command execution
      - Single/multiple command execution
@@ -181,7 +182,7 @@ Implemented 3 TODOs in DeviceRepository.kt:
 
 ### Update Management
 
-4. **Update Checker** ✅
+1. **Update Checker** ✅
    - [UpdateChecker.kt](app/app/src/main/java/com/supermarsx/carrierconfig/util/UpdateChecker.kt) (180 lines)
    - GitHub Releases API integration
    - Semantic version comparison
@@ -193,7 +194,7 @@ Implemented 3 TODOs in DeviceRepository.kt:
 
 ### System Integration
 
-5. **Broadcast Receiver** ✅
+1. **Broadcast Receiver** ✅
    - [SystemEventReceiver.kt](app/app/src/main/java/com/supermarsx/carrierconfig/system/SystemEventReceiver.kt) (110 lines)
    - Monitors 5 system events:
      - Connectivity changes (WiFi/Cellular)
@@ -205,7 +206,7 @@ Implemented 3 TODOs in DeviceRepository.kt:
    - Shows notifications for carrier config changes
    - Schedules delayed refresh after airplane mode/boot
 
-6. **WorkManager Background Tasks** ✅
+2. **WorkManager Background Tasks** ✅
    - [BackgroundWorkers.kt](app/app/src/main/java/com/supermarsx/carrierconfig/system/BackgroundWorkers.kt) (120 lines)
    - **StatusRefreshWorker**: Periodic status checks (every 6 hours)
      - Refreshes device, SIM, IMS status
@@ -217,7 +218,7 @@ Implemented 3 TODOs in DeviceRepository.kt:
    - Hilt integration for dependency injection
    - Scheduled automatically on app start
 
-7. **Notification System** ✅
+3. **Notification System** ✅
    - [NotificationHelper.kt](app/app/src/main/java/com/supermarsx/carrierconfig/system/NotificationHelper.kt) (160 lines)
    - 3 notification channels:
      - **Status Alerts**: WFC/IMS issues (default importance)
@@ -231,7 +232,7 @@ Implemented 3 TODOs in DeviceRepository.kt:
 
 ### Visual Identity
 
-8. **App Icon & Resources** ✅
+1. **App Icon & Resources** ✅
    - [ic_launcher_foreground.xml](app/app/src/main/res/drawable/ic_launcher_foreground.xml) (60 lines)
      - Glassmorphic design matching app theme
      - WiFi signal arcs in cyan (#00D9FF)
@@ -245,14 +246,14 @@ Implemented 3 TODOs in DeviceRepository.kt:
 
 ### Application Infrastructure
 
-9. **CCOApplication Updates** ✅
+1. **CCOApplication Updates** ✅
    - Implemented `Configuration.Provider` for WorkManager
    - Injected `HiltWorkerFactory` for Hilt workers
    - Initialize notification channels on startup
    - Schedule background workers (status refresh, update checks)
    - Custom WorkManager configuration
 
-10. **AndroidManifest Updates** ✅
+2. **AndroidManifest Updates** ✅
     - Added permissions:
       - `POST_NOTIFICATIONS` (Android 13+)
       - `RECEIVE_BOOT_COMPLETED` (for auto-start)
@@ -260,7 +261,7 @@ Implemented 3 TODOs in DeviceRepository.kt:
       - Connectivity, carrier config, airplane mode, boot, phone state
     - Removed default WorkManager initialization (using custom)
 
-11. **Build Configuration** ✅
+3. **Build Configuration** ✅
     - Added Hilt WorkManager integration dependencies
     - Added `androidx.hilt:hilt-work:1.1.0`
     - Added `androidx.hilt:hilt-compiler:1.1.0` (KSP)
@@ -272,9 +273,10 @@ Implemented 3 TODOs in DeviceRepository.kt:
 
 **Runtime Hooks System - 100% Complete!**
 
-See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive documentation.
+See [instrumentation/README.md](instrumentation/README.md) for comprehensive documentation.
 
 **Summary**:
+
 - ✅ Complete Frida instrumentation system (1,500+ lines JavaScript)
 - ✅ Full LSPosed Xposed module (1,000+ lines Kotlin)
 - ✅ Recording & replay engine
@@ -286,6 +288,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 - ✅ 25+ hooked methods (IMS/CarrierConfig/Settings/Telephony)
 
 **Key Features**:
+
 - Frida Backend: Dynamic instrumentation with recording/replay for testing
 - LSPosed Backend: Persistent Xposed module for daily use
 - 8 profiles: Generic (OneUI 4/5/6), Carrier-specific (T-Mobile, AT&T, Verizon), Aggressive bypass
@@ -369,6 +372,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - Result feedback with file paths
 
 **Key Achievements**:
+
 - ✅ Beautiful, functional UI with glassmorphism design
 - ✅ Comprehensive device detection and status monitoring
 - ✅ Intelligent blocker analysis with actionable insights
@@ -428,6 +432,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - Bottom navigation bar access
 
 **Key Achievements**:
+
 - ✅ Complete preset system with 6 production-ready configurations
 - ✅ Type-safe XML generation with proper value handling
 - ✅ Multi-path Samsung device support (4 paths)
@@ -455,6 +460,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - Glassmorphism design
 
 **Remaining Work**:
+
 - ⏳ Frida script architecture
 - ⏳ Hook profile system
 - ⏳ One UI version detection
@@ -509,7 +515,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - Cache clearing
      - Settings reset
 
-3. **About Screen** ✅
+4. **About Screen** ✅
    - [AboutScreen.kt](app/app/src/main/java/com/supermarsx/carrierconfig/ui/screens/settings/AboutScreen.kt)
      - App version display
      - Feature list with cards
@@ -517,7 +523,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - Developer info
      - Legal disclaimer
 
-4. **Preferences System** ✅
+5. **Preferences System** ✅
    - [PreferencesManager.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/datastore/PreferencesManager.kt)
      - DataStore-based preferences storage
      - Type-safe preference keys
@@ -525,7 +531,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - Default values management
      - Bulk operations (reset, clear)
 
-5. **Export/Import System** ✅
+6. **Export/Import System** ✅
    - [ExportRepository.kt](app/app/src/main/java/com/supermarsx/carrierconfig/data/repository/ExportRepository.kt)
      - Configuration export to JSON
      - Diagnostics report export (JSON + TXT)
@@ -534,7 +540,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - External storage management
      - Export file listing
 
-6. **Dashboard Enhancements** ✅
+7. **Dashboard Enhancements** ✅
    - Floating Action Button with quick actions
      - Refresh
      - Run diagnostics
@@ -543,7 +549,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
    - Expandable FAB with animated menu
    - Labeled action buttons
 
-7. **Build Automation** ✅
+8. **Build Automation** ✅
    - [app/scripts/dev.sh](app/scripts/dev.sh) - Main development script with 15+ commands
    - [app/scripts/build.sh](app/scripts/build.sh) - Quick build with size display
    - [app/scripts/test.sh](app/scripts/test.sh) - Test runner with device detection
@@ -551,6 +557,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
    - [app/scripts/README.md](app/scripts/README.md) - Comprehensive documentation
 
 **Remaining Work**:
+
 - ⏳ Real-time logcat filtering implementation
 - ⏳ Dumpsys integration (phone, ims, carrier_config)
 - ⏳ Automated connectivity tests
@@ -636,6 +643,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
      - Deep linking support (planned)
 
 **Key Achievements**:
+
 - ✅ Complete preset system with 6 production-ready configs
 - ✅ Type-safe XML generation with validation
 - ✅ Multi-path Samsung device support
@@ -651,6 +659,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 **Objective**: Implement Frida/LSPosed runtime entitlement simulation
 
 **Planned Components**:
+
 - [ ] Frida script structure
 - [ ] Hook profiles for One UI 5/6/7
 - [ ] IMS entitlement simulation
@@ -664,6 +673,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 **Objective**: Add advanced diagnostics, CLI, and settings
 
 **Planned Components**:
+
 - [ ] Full diagnostics screen with log viewer
 - [ ] Logcat/dumpsys snapshot capture
 - [ ] CLI utility integration
@@ -678,6 +688,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 ## 📊 Statistics
 
 ### Code Metrics
+
 - **Total Files Created**: 25+
 - **Lines of Code**: ~5,000+
 - **Repositories**: 9
@@ -688,12 +699,14 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 - **Presets**: 6
 
 ### Coverage by Milestone
+
 - **Milestone 1**: 100% ✅
 - **Milestone 2**: 100% ✅
 - **Milestone 3**: 0% ⏳
 - **Milestone 4**: 0% ⏳
 
 ### Overall Progress
+
 - **Total Project**: ~40% complete
 - **Core App**: 90% complete (pending Method 2)
 - **Magisk Module**: 0% (scripts needed)
@@ -704,6 +717,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 ## 🎨 Design Implementation
 
 ### Theme System
+
 - **Primary Color**: Cyan (#00D9FF)
 - **Secondary Color**: Purple (#B24BF3)
 - **Background**: Deep Dark (#0A0E14)
@@ -712,6 +726,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 - **Typography**: Roboto with 8-level scale
 
 ### Component Library
+
 - ✅ GlassCard (4 variants)
 - ✅ GlassButton (3 styles)
 - ✅ StatusChip (5 types)
@@ -724,6 +739,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 ## 🔧 Technical Stack
 
 ### Build System
+
 - **Gradle**: 8.2.1
 - **AGP**: 8.2.1
 - **Kotlin**: 1.9.22
@@ -732,6 +748,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 - **Compile SDK**: 34
 
 ### Core Libraries
+
 - **Jetpack Compose**: BOM 2024.01.00
 - **Material 3**: Latest
 - **Hilt**: 2.50
@@ -740,6 +757,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 - **libsu**: 5.2.2
 
 ### Future Libraries
+
 - **Room**: 2.6.1 (planned)
 - **DataStore**: 1.0.0 (planned)
 - **WorkManager**: 2.9.0 (planned)
@@ -750,6 +768,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 ## 🚀 Next Steps
 
 ### Immediate Priorities
+
 1. **Magisk Module Scripts** (High Priority)
    - Create `service.sh` for boot-time bind-mount
    - Create `post-fs-data.sh` for early mount
@@ -775,6 +794,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
    - Add FAQ section
 
 ### Future Enhancements
+
 - Import/export preset configurations
 - Community preset repository
 - One-click Magisk module installer
@@ -786,6 +806,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 ## 📝 Notes & Observations
 
 ### What's Working Well
+
 - ✅ Glassmorphism theme looks stunning on AMOLED displays
 - ✅ MVVM architecture keeps code clean and testable
 - ✅ Hilt DI makes adding new features easy
@@ -794,6 +815,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 - ✅ Multi-path detection covers most Samsung devices
 
 ### Challenges Encountered
+
 - 🔶 One UI version detection requires multiple fallback methods
 - 🔶 Samsung uses different CarrierConfig paths across models/versions
 - 🔶 IMS status parsing is fragile due to dumpsys format changes
@@ -801,6 +823,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 - 🔶 Blur effects require Android 12+ (fallback implemented)
 
 ### Lessons Learned
+
 - Always provide fallbacks for system-specific features
 - Heuristic detection is more reliable than exact matching for Samsung
 - UI state management is critical for complex flows
@@ -812,6 +835,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 ## 🎯 Success Criteria
 
 ### Milestone 1 ✅
+
 - [x] Dashboard displays accurate device info
 - [x] IMS status parsing works correctly
 - [x] Blocker analysis provides useful insights
@@ -819,6 +843,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 - [x] UI is polished and performant
 
 ### Milestone 2 ✅
+
 - [x] Presets cover common use cases
 - [x] XML generation is valid and type-safe
 - [x] Deployment succeeds on supported paths
@@ -826,6 +851,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 - [x] UI guides user through process clearly
 
 ### Milestone 3 ✅
+
 - [x] Frida hook system with modular architecture
 - [x] LSPosed Xposed module with persistent hooks
 - [x] Recording & replay engine
@@ -838,6 +864,7 @@ See [MILESTONE_3_COMPLETE.md](docs/MILESTONE_3_COMPLETE.md) for comprehensive do
 - [x] Profile management system
 
 ### Milestone 4 ⏳
+
 - [ ] Full diagnostics capture all relevant data
 - [ ] CLI works via ADB intents
 - [ ] Settings persist across restarts

@@ -8,6 +8,7 @@
 ## 📦 Overview
 
 CCO Manager provides comprehensive export/import functionality for all major app configurations, allowing you to:
+
 - **Backup** your settings and configurations
 - **Share** custom presets and profiles with others
 - **Migrate** configurations between devices
@@ -18,9 +19,11 @@ CCO Manager provides comprehensive export/import functionality for all major app
 ## 🎯 What Can Be Exported/Imported
 
 ### 1. **App Settings & Preferences** ✅
+
 **Location**: Settings → Backup & Data
 
 **What's Included**:
+
 - General settings (auto-refresh, notifications)
 - Appearance settings (theme, glass strength)
 - Advanced settings (debug mode, export directory)
@@ -31,12 +34,14 @@ CCO Manager provides comprehensive export/import functionality for all major app
 **Use Case**: Backup all app preferences, migrate settings to new device
 
 **How to Export**:
+
 1. Open **Settings** screen
 2. Scroll to **Backup & Data** section
 3. Tap **Export Configuration**
 4. File saved to `/sdcard/CCO/exports/config_[timestamp].json`
 
 **How to Import**:
+
 1. Open **Settings** screen
 2. Scroll to **Backup & Data** section
 3. Tap **Import Configuration**
@@ -45,10 +50,12 @@ CCO Manager provides comprehensive export/import functionality for all major app
 
 ---
 
-### 2. **CarrierConfig Presets** ✅ NEW!
+### 2. **CarrierConfig Presets** ✅
+
 **Location**: CarrierConfig screen → Top bar actions
 
 **What's Included**:
+
 - Preset ID and name
 - Preset description
 - All CarrierConfig key overrides
@@ -60,6 +67,7 @@ CCO Manager provides comprehensive export/import functionality for all major app
 **Use Case**: Share custom CarrierConfig presets, backup modified presets
 
 **How to Export**:
+
 1. Open **CarrierConfig** screen
 2. Select a preset from the list
 3. Tap **Download icon** (top bar)
@@ -68,6 +76,7 @@ CCO Manager provides comprehensive export/import functionality for all major app
 6. File saved as `[preset-id].json`
 
 **How to Import**:
+
 1. Open **CarrierConfig** screen
 2. Tap **Upload icon** (top bar)
 3. Select preset JSON file
@@ -75,6 +84,7 @@ CCO Manager provides comprehensive export/import functionality for all major app
 5. Can now deploy imported preset
 
 **Example Preset JSON**:
+
 ```json
 {
   "id": "custom_wifi_calling",
@@ -92,10 +102,12 @@ CCO Manager provides comprehensive export/import functionality for all major app
 
 ---
 
-### 3. **Hook Profiles (Frida/LSPosed)** ✅ NEW!
+### 3. **Hook Profiles (Frida/LSPosed)** ✅
+
 **Location**: Entitlement screen → Top bar actions
 
 **What's Included**:
+
 - Profile ID, name, description
 - Device compatibility info (manufacturer, model, OS version)
 - Carrier targeting (MCC/MNC)
@@ -109,6 +121,7 @@ CCO Manager provides comprehensive export/import functionality for all major app
 **Use Case**: Share custom hook profiles, community contributions, device-specific configs
 
 **How to Export**:
+
 1. Open **Entitlement** screen
 2. Select a profile from the list
 3. Tap **Download icon** (top bar)
@@ -117,6 +130,7 @@ CCO Manager provides comprehensive export/import functionality for all major app
 6. File saved as `[profile-id].json`
 
 **How to Import**:
+
 1. Open **Entitlement** screen
 2. Tap **Upload icon** (top bar)
 3. Select profile JSON file
@@ -124,6 +138,7 @@ CCO Manager provides comprehensive export/import functionality for all major app
 5. Can now use imported profile for instrumentation
 
 **Example Profile JSON**:
+
 ```json
 {
   "id": "custom_oneui6_s24",
@@ -163,9 +178,11 @@ CCO Manager provides comprehensive export/import functionality for all major app
 ---
 
 ### 4. **Diagnostics Reports** ✅
+
 **Location**: Dashboard → Export Report
 
 **What's Included**:
+
 - Device information (model, OS, kernel)
 - SIM status (carrier, MCC/MNC, network type)
 - IMS status (VoLTE/VoWiFi availability)
@@ -178,6 +195,7 @@ CCO Manager provides comprehensive export/import functionality for all major app
 **Use Case**: Troubleshooting, bug reports, community support
 
 **How to Export**:
+
 1. Open **Dashboard**
 2. Tap **FAB** (floating action button)
 3. Select **Export Report**
@@ -190,12 +208,14 @@ CCO Manager provides comprehensive export/import functionality for all major app
 ## 🔄 Common Workflows
 
 ### Backup Everything
+
 1. **Export app settings** (Settings → Backup & Data)
 2. **Export all custom presets** (CarrierConfig screen)
 3. **Export custom profiles** (Entitlement screen)
 4. Store files in cloud storage or backup location
 
 ### Share Custom Configuration
+
 1. Create and test your custom preset/profile
 2. Export to JSON file
 3. Share file via:
@@ -206,6 +226,7 @@ CCO Manager provides comprehensive export/import functionality for all major app
    - Direct file transfer
 
 ### Migrate to New Device
+
 1. Export all configs from old device
 2. Install CCO Manager on new device
 3. Import app settings first
@@ -214,6 +235,7 @@ CCO Manager provides comprehensive export/import functionality for all major app
 6. Verify functionality
 
 ### Community Contribution
+
 1. Create optimized profile for your device
 2. Test thoroughly
 3. Export profile to JSON
@@ -225,16 +247,19 @@ CCO Manager provides comprehensive export/import functionality for all major app
 ## 📁 File Locations
 
 ### Export Directory
+
 **Default**: `/sdcard/CCO/exports/`  
 **Customizable**: Yes (Settings → Advanced → Export Directory)
 
 ### File Naming Convention
+
 - **App configs**: `config_[YYYYMMDD_HHmmss].json`
 - **Diagnostics**: `diagnostics_[YYYYMMDD_HHmmss].json`
 - **Presets**: `[preset-id].json` (user-defined)
 - **Profiles**: `[profile-id].json` (user-defined)
 
 ### Storage Requirements
+
 - App settings: ~5-10 KB
 - CarrierConfig preset: ~2-5 KB
 - Hook profile: ~10-20 KB
@@ -245,18 +270,22 @@ CCO Manager provides comprehensive export/import functionality for all major app
 ## 🔒 Security & Privacy
 
 ### What's NOT Exported
+
 - **Sensitive data**: IMSI, IMEI, phone numbers, SIM serial
 - **Credentials**: Root tokens, API keys
 - **System state**: Running processes, memory dumps
 - **Personal data**: Call logs, contacts, messages
 
 ### Data Sanitization
+
 All exports automatically sanitize sensitive information:
+
 - Device identifiers replaced with generic values
 - Personal information redacted
 - Only configuration data included
 
 ### Safe Sharing
+
 - ✅ **Safe to share**: App settings, presets, profiles
 - ⚠️ **Review first**: Diagnostics reports (may contain carrier info)
 - ❌ **Never share**: Full system dumps, logs with personal data
@@ -268,6 +297,7 @@ All exports automatically sanitize sensitive information:
 ### JSON Schema
 
 #### App Configuration
+
 ```typescript
 {
   version: string,           // App version
@@ -285,6 +315,7 @@ All exports automatically sanitize sensitive information:
 ```
 
 #### CarrierConfig Preset
+
 ```typescript
 {
   id: string,                // Unique preset ID
@@ -297,6 +328,7 @@ All exports automatically sanitize sensitive information:
 ```
 
 #### Hook Profile
+
 ```typescript
 {
   id: string,
@@ -323,7 +355,9 @@ All exports automatically sanitize sensitive information:
 ```
 
 ### Import Validation
+
 All imports are validated for:
+
 1. **JSON syntax**: Valid JSON structure
 2. **Schema compliance**: Required fields present
 3. **Type checking**: Correct data types
@@ -331,6 +365,7 @@ All imports are validated for:
 5. **Security**: No malicious content
 
 ### Error Handling
+
 - Invalid JSON → Error message with parse details
 - Missing fields → Fallback to defaults
 - Incompatible version → Warning with migration option
@@ -341,9 +376,11 @@ All imports are validated for:
 ## 🐛 Troubleshooting
 
 ### Import Fails
+
 **Problem**: "Failed to import configuration"
 
 **Solutions**:
+
 1. Verify file is valid JSON (use JSON validator)
 2. Check file permissions (must be readable)
 3. Ensure file extension is `.json`
@@ -351,18 +388,22 @@ All imports are validated for:
 5. Check logs for detailed error message
 
 ### Export Directory Not Found
+
 **Problem**: "Export failed: Directory not found"
 
 **Solutions**:
+
 1. Grant storage permissions to CCO Manager
 2. Create directory manually: `/sdcard/CCO/exports/`
 3. Change export directory in Settings → Advanced
 4. Check available storage space
 
 ### Profile Not Loading
+
 **Problem**: Imported profile doesn't appear in list
 
 **Solutions**:
+
 1. Verify profile JSON structure
 2. Check for duplicate profile ID
 3. Ensure compatibility section is valid
@@ -374,6 +415,7 @@ All imports are validated for:
 ## 📚 Examples & Use Cases
 
 ### Use Case 1: Backup Before System Update
+
 ```bash
 # Before update
 1. Export app settings
@@ -390,7 +432,9 @@ All imports are validated for:
 ```
 
 ### Use Case 2: Share with Community
+
 ```markdown
+
 ## My Custom S24 Profile
 
 **Device**: Samsung Galaxy S24 Ultra (SM-S928U)  
@@ -399,6 +443,7 @@ All imports are validated for:
 **Android**: 14
 
 **What it does**:
+
 - Enables WiFi Calling UI
 - Forces VoLTE provisioning
 - Unlocks WFC mode selection
@@ -406,6 +451,7 @@ All imports are validated for:
 **Download**: Add your shared file URL here (example filename: `s24_ultra_tmobile.json`).
 
 **Installation**:
+
 1. Open CCO Manager
 2. Navigate to Entitlement screen
 3. Tap Upload icon
@@ -414,6 +460,7 @@ All imports are validated for:
 ```
 
 ### Use Case 3: Development Testing
+
 ```bash
 # Export baseline
 ./export_baseline.sh
@@ -433,18 +480,21 @@ diff baseline.json modified.json
 ## 🎓 Best Practices
 
 ### Export Strategy
+
 1. **Regular backups**: Weekly or before major changes
 2. **Version naming**: Include date or version in filename
 3. **Cloud storage**: Keep exports in Google Drive/Dropbox
 4. **Test restores**: Verify imports work before needed
 
 ### Import Strategy
+
 1. **Review first**: Check JSON content before importing
 2. **Backup current**: Export current config before import
 3. **Trusted sources**: Only import from verified sources
 4. **Test separately**: Import one item at a time to isolate issues
 
 ### Sharing Strategy
+
 1. **Document well**: Include device info, OS version, carrier
 2. **Test thoroughly**: Ensure config works on your device first
 3. **Include instructions**: How to install and use
@@ -456,8 +506,8 @@ diff baseline.json modified.json
 ## 🔗 Related Documentation
 
 - [INSTALL.md](INSTALL.md) - Installation and setup
-- [INSTRUMENTATION_GUIDE.md](../instrumentation/INSTRUMENTATION_GUIDE.md) - Hook profiles guide
-- [CONTRIBUTING.md](CONTRIBUTING.md) - How to contribute profiles
+- [Instrumentation Guide](../instrumentation/README.md) - Hook profiles guide
+- [Contributing Guide](../CONTRIBUTING.md) - How to contribute profiles
 - [README.md](../README.md) - Main documentation
 
 ---
@@ -465,12 +515,15 @@ diff baseline.json modified.json
 ## 📞 Support
 
 ### Getting Help
+
 - **GitHub Issues**: Report bugs or request features
 - **Discussions**: Ask questions, share configs
 - **XDA Forum**: Community support and custom profiles
 
 ### Contributing
+
 We welcome contributions of:
+
 - Device-specific profiles
 - Carrier-specific configurations
 - Bug fixes and improvements
@@ -480,4 +533,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
-*End of Export & Import Guide*
+---
