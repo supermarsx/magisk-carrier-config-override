@@ -209,20 +209,21 @@ class CarrierConfigRepository @Inject constructor(
         xmlBuilder.appendLine("<carrier_config>")
         
         keys.forEach { key ->
+            val safeName = escapeXml(key.key)
             when (val value = key.value) {
                 is ConfigValue.BooleanValue -> {
-                    xmlBuilder.appendLine("    <boolean name=\"${key.key}\" value=\"${value.value}\" />")
+                    xmlBuilder.appendLine("    <boolean name=\"$safeName\" value=\"${value.value}\" />")
                 }
                 is ConfigValue.IntValue -> {
-                    xmlBuilder.appendLine("    <int name=\"${key.key}\" value=\"${value.value}\" />")
+                    xmlBuilder.appendLine("    <int name=\"$safeName\" value=\"${value.value}\" />")
                 }
                 is ConfigValue.StringValue -> {
-                    xmlBuilder.appendLine("    <string name=\"${key.key}\">${value.value}</string>")
+                    xmlBuilder.appendLine("    <string name=\"$safeName\">${escapeXml(value.value)}</string>")
                 }
                 is ConfigValue.StringArrayValue -> {
-                    xmlBuilder.appendLine("    <string-array name=\"${key.key}\">")
+                    xmlBuilder.appendLine("    <string-array name=\"$safeName\">")
                     value.values.forEach { item ->
-                        xmlBuilder.appendLine("        <item>$item</item>")
+                        xmlBuilder.appendLine("        <item>${escapeXml(item)}</item>")
                     }
                     xmlBuilder.appendLine("    </string-array>")
                 }
@@ -232,6 +233,16 @@ class CarrierConfigRepository @Inject constructor(
         xmlBuilder.appendLine("</carrier_config>")
         return xmlBuilder.toString()
     }
+
+    /**
+     * Escape XML special characters in attribute values and text content.
+     */
+    private fun escapeXml(s: String): String = s
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;")
+        .replace("'", "&apos;")
     
     /**
      * Deploy CarrierConfig override.
