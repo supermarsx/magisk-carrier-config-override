@@ -68,7 +68,7 @@ class FridaManager @Inject constructor(
             
             // Copy frida-server from assets to temp
             val tempFile = File(context.cacheDir, "frida-server-arm64")
-            val fridaBinary = openAssetText("frida-server-arm64", "instrumentation/frida-server-arm64")
+            val fridaBinary = openAsset("frida-server-arm64", "instrumentation/frida-server-arm64")
                 ?: return@withContext Result.failure(
                     IllegalStateException("Missing frida-server-arm64 asset")
                 )
@@ -181,7 +181,7 @@ class FridaManager @Inject constructor(
             Timber.tag(TAG).d("Deploying agent with profile: $profile")
             
             // Copy agent from assets
-            val agentContent = openAssetText(
+            val agentContent = openAsset(
                 "frida/agent-complete.js",
                 "instrumentation/agent-complete.js"
             )
@@ -277,7 +277,10 @@ class FridaManager @Inject constructor(
         return result.out.firstOrNull()?.toIntOrNull()
     }
 
-    private fun openAssetText(vararg candidates: String): java.io.InputStream? {
+    /**
+     * Open the first matching asset from [candidates], returning its InputStream.
+     */
+    private fun openAsset(vararg candidates: String): java.io.InputStream? {
         for (path in candidates) {
             try {
                 return context.assets.open(path)
