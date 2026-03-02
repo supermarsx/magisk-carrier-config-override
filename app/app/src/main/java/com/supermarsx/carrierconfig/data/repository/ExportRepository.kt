@@ -46,9 +46,8 @@ class ExportRepository @Inject constructor(
         try {
             // Read real preferences when manager is available, otherwise use defaults
             val settings = if (includeSettings && preferencesManager != null) {
-                kotlinx.coroutines.flow.firstOrNull(
-                    preferencesManager.getAllPreferences()
-                )?.let { prefs ->
+                preferencesManager.getAllPreferences()
+                    .firstOrNull()?.let { prefs ->
                     AppSettings(
                         autoRefresh = prefs["auto_refresh"] as? Boolean ?: true,
                         enableNotifications = prefs["enable_notifications"] as? Boolean ?: false,

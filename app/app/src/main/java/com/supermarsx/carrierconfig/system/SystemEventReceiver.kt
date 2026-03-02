@@ -3,6 +3,7 @@ package com.supermarsx.carrierconfig.system
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.telephony.CarrierConfigManager
 import android.telephony.TelephonyManager
 import androidx.work.WorkManager
 import androidx.work.OneTimeWorkRequestBuilder
@@ -15,7 +16,7 @@ class SystemEventReceiver : BroadcastReceiver() {
     
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
-            TelephonyManager.ACTION_CARRIER_CONFIG_CHANGED -> {
+            CarrierConfigManager.ACTION_CARRIER_CONFIG_CHANGED -> {
                 handleCarrierConfigChange(context)
             }
             Intent.ACTION_AIRPLANE_MODE_CHANGED -> {

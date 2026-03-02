@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.supermarsx.carrierconfig.data.repository.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -41,10 +42,12 @@ class DiagnosticsViewModelTest {
         exportRepository = mock()
 
         // Stub default logcat snapshot (called in init)
-        whenever(logcatRepository.getLogcatSnapshot(
-            filterType = LogcatFilterType.ALL,
-            lineCount = 500
-        )).thenReturn(emptyList())
+        runBlocking {
+            whenever(logcatRepository.getLogcatSnapshot(
+                filterType = LogcatFilterType.ALL,
+                lineCount = 500
+            )).thenReturn(emptyList())
+        }
     }
 
     @After

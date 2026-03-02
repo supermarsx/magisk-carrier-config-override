@@ -3,7 +3,7 @@ package com.supermarsx.carrierconfig.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.matchParentSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -59,7 +59,7 @@ fun GlassButton(
         if (enabled && variant == ButtonVariant.Primary) {
             Box(
                 modifier = Modifier
-                    .matchParentSize()
+                    .fillMaxSize()
                     .blur(24.dp)
                     .background(
                         brush = Brush.radialGradient(
