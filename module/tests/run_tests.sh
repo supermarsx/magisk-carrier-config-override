@@ -62,6 +62,7 @@ run_all_tests() {
         "$SCRIPT_DIR/test_functions_unit.sh"
         "$SCRIPT_DIR/test_edge_cases.sh"
         "$SCRIPT_DIR/test_install_logic.sh"
+        "$SCRIPT_DIR/test_chaining.sh"
     )
     
     local passed=0
@@ -122,6 +123,7 @@ show_usage() {
     echo "  functions_unit - Function library unit tests"
     echo "  edge_cases     - Edge case and boundary tests"
     echo "  install_logic  - Install script logic"
+    echo "  chaining       - Cross-script integration chains"
     echo "  all            - Run all tests (default)"
     echo ""
     echo "Examples:"
@@ -176,6 +178,9 @@ main() {
             ;;
         install_logic)
             run_test "$SCRIPT_DIR/test_install_logic.sh"
+            ;;
+        chaining)
+            run_test "$SCRIPT_DIR/test_chaining.sh"
             ;;
         all)
             run_all_tests
