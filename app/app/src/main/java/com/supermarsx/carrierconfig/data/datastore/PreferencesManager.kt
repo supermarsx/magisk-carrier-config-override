@@ -8,6 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -57,7 +58,7 @@ class PreferencesManager @Inject constructor(
     // =========================================================================
     
     val autoRefresh: Flow<Boolean> = dataStore.data
-        .catch { handleException(it) }
+        .catch { recoverOrThrow(it, ::emptyPreferences) }
         .map { it[AUTO_REFRESH] ?: true }
     
     suspend fun setAutoRefresh(enabled: Boolean) {
@@ -65,7 +66,7 @@ class PreferencesManager @Inject constructor(
     }
     
     val enableNotifications: Flow<Boolean> = dataStore.data
-        .catch { handleException(it) }
+        .catch { recoverOrThrow(it, ::emptyPreferences) }
         .map { it[ENABLE_NOTIFICATIONS] ?: false }
     
     suspend fun setEnableNotifications(enabled: Boolean) {
@@ -77,7 +78,7 @@ class PreferencesManager @Inject constructor(
     // =========================================================================
     
     val theme: Flow<String> = dataStore.data
-        .catch { handleException(it) }
+        .catch { recoverOrThrow(it, ::emptyPreferences) }
         .map { it[THEME] ?: "dark" }
     
     suspend fun setTheme(theme: String) {
@@ -85,7 +86,7 @@ class PreferencesManager @Inject constructor(
     }
     
     val glassEffectEnabled: Flow<Boolean> = dataStore.data
-        .catch { handleException(it) }
+        .catch { recoverOrThrow(it, ::emptyPreferences) }
         .map { it[GLASS_EFFECT_ENABLED] ?: true }
     
     suspend fun setGlassEffectEnabled(enabled: Boolean) {
@@ -93,7 +94,7 @@ class PreferencesManager @Inject constructor(
     }
     
     val glassStrength: Flow<String> = dataStore.data
-        .catch { handleException(it) }
+        .catch { recoverOrThrow(it, ::emptyPreferences) }
         .map { it[GLASS_STRENGTH] ?: "medium" }
     
     suspend fun setGlassStrength(strength: String) {
@@ -105,7 +106,7 @@ class PreferencesManager @Inject constructor(
     // =========================================================================
     
     val debugMode: Flow<Boolean> = dataStore.data
-        .catch { handleException(it) }
+        .catch { recoverOrThrow(it, ::emptyPreferences) }
         .map { it[DEBUG_MODE] ?: false }
     
     suspend fun setDebugMode(enabled: Boolean) {
@@ -113,7 +114,7 @@ class PreferencesManager @Inject constructor(
     }
     
     val exportDirectory: Flow<String> = dataStore.data
-        .catch { handleException(it) }
+        .catch { recoverOrThrow(it, ::emptyPreferences) }
         .map { it[EXPORT_DIRECTORY] ?: "" }
     
     suspend fun setExportDirectory(directory: String) {
@@ -125,7 +126,7 @@ class PreferencesManager @Inject constructor(
     // =========================================================================
     
     val autoBackup: Flow<Boolean> = dataStore.data
-        .catch { handleException(it) }
+        .catch { recoverOrThrow(it, ::emptyPreferences) }
         .map { it[AUTO_BACKUP] ?: false }
     
     suspend fun setAutoBackup(enabled: Boolean) {
@@ -133,7 +134,7 @@ class PreferencesManager @Inject constructor(
     }
     
     val backupFrequency: Flow<String> = dataStore.data
-        .catch { handleException(it) }
+        .catch { recoverOrThrow(it, ::emptyPreferences) }
         .map { it[BACKUP_FREQUENCY] ?: "weekly" }
     
     suspend fun setBackupFrequency(frequency: String) {
@@ -141,7 +142,7 @@ class PreferencesManager @Inject constructor(
     }
     
     val lastBackupTimestamp: Flow<Long> = dataStore.data
-        .catch { handleException(it) }
+        .catch { recoverOrThrow(it, ::emptyPreferences) }
         .map { it[LAST_BACKUP_TIMESTAMP] ?: 0L }
     
     suspend fun setLastBackupTimestamp(timestamp: Long) {
@@ -153,7 +154,7 @@ class PreferencesManager @Inject constructor(
     // =========================================================================
     
     val isFirstRun: Flow<Boolean> = dataStore.data
-        .catch { handleException(it) }
+        .catch { recoverOrThrow(it, ::emptyPreferences) }
         .map { it[FIRST_RUN] ?: true }
     
     suspend fun setFirstRunComplete() {
@@ -194,19 +195,22 @@ class PreferencesManager @Inject constructor(
      * Get all preferences as a map
      */
     fun getAllPreferences(): Flow<Map<String, Any>> = dataStore.data
-        .catch { handleException(it) }
+        .catch { recoverOrThrow(it, ::emptyPreferences) }
         .map { prefs ->
             prefs.asMap().mapKeys { it.key.name }
                 .mapValues { it.value ?: "" }
         }
     
     /**
-     * Handle DataStore exceptions
+     * Recover from IOException by emitting empty defaults; rethrow anything else.
      */
-    private suspend fun <T> handleException(exception: Throwable): T {
+    private suspend fun <T> kotlinx.coroutines.flow.FlowCollector<T>.recoverOrThrow(
+        exception: Throwable,
+        fallback: () -> T
+    ) {
         if (exception is IOException) {
-            // Log error
-            throw exception
+            Timber.e(exception, "DataStore read failed — emitting defaults")
+            emit(fallback())
         } else {
             throw exception
         }
