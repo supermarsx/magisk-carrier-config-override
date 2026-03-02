@@ -4,6 +4,7 @@
 # Runs after boot is complete, applies CarrierConfig overrides
 ###############################################################################
 
+
 MODDIR=${0%/*}
 CCO_DATA="/data/adb/cco"
 ACTIVE_OVERRIDE="$CCO_DATA/active/override.xml"
@@ -148,11 +149,13 @@ fi
 # Set SELinux context on target
 log_info "Setting SELinux context..."
 if [ -x "$(command -v chcon)" ]; then
-    chcon u:object_r:radio_data_file:s0 "$TARGET_PATH" 2> /dev/null \
-        && log_info "Applied radio_data_file context" \
-        || chcon u:object_r:vendor_data_file:s0 "$TARGET_PATH" 2> /dev/null \
-        && log_info "Applied vendor_data_file context" \
-        || log_warn "Could not set SELinux context (may not be required)"
+    if chcon u:object_r:radio_data_file:s0 "$TARGET_PATH" 2> /dev/null; then
+        log_info "Applied radio_data_file context"
+    elif chcon u:object_r:vendor_data_file:s0 "$TARGET_PATH" 2> /dev/null; then
+        log_info "Applied vendor_data_file context"
+    else
+        log_warn "Could not set SELinux context (may not be required)"
+    fi
 else
     log_info "chcon not available, skipping SELinux context"
 fi
