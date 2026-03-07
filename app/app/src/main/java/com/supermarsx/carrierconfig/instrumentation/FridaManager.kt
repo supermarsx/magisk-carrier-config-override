@@ -249,7 +249,7 @@ class FridaManager @Inject constructor(
      *
      * Checks whether the target process is currently instrumented by looking
      * for the injected agent on the device and inspecting Frida server state.
-     * Returns {@code null} when Frida is not running or the target is not
+     * Returns `null` when Frida is not running or the target is not
      * being instrumented.
      */
     suspend fun getSessionInfo(target: String): SessionInfo? = withContext(Dispatchers.IO) {

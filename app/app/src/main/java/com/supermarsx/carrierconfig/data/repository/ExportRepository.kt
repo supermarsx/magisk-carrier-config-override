@@ -274,6 +274,9 @@ class ExportRepository @Inject constructor(
         keys: List<CustomKeyData>
     ): ExportResult = withContext(Dispatchers.IO) {
         try {
+            if (keys.isEmpty()) {
+                return@withContext ExportResult.Error("Profile must contain at least one key")
+            }
             val profile = ProfileData(
                 version = "1.0.0",
                 exportDate = System.currentTimeMillis(),
