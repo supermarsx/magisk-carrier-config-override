@@ -266,6 +266,63 @@ class ExportRepository @Inject constructor(
     }
     
     /**
+     * Export a carrier-config profile (preset + custom keys) to a shareable JSON file.
+     */
+    suspend fun exportProfile(
+        presetId: String,
+        presetName: String,
+        keys: List<CustomKeyData>
+    ): ExportResult = withContext(Dispatchers.IO) {
+        try {
+            val profile = ProfileData(
+                version = "1.0.0",
+                exportDate = System.currentTimeMillis(),
+                presetId = presetId,
+                presetName = presetName,
+                keys = keys
+            )
+            val jsonString = json.encodeToString(profile)
+            val file = saveToFile(jsonString, "profile_$presetId", "json", CONFIG_DIR)
+            ExportResult.Success(file.absolutePath)
+        } catch (e: Exception) {
+            ExportResult.Error("Profile export failed: ${e.message}")
+        }
+    }
+
+    /**
+     * Import a carrier-config profile from a JSON string.
+     *
+     * Returns an [ImportProfileResult] containing the parsed [ProfileData]
+     * on success, or an error message on failure.
+     */
+    suspend fun importProfile(jsonString: String): ImportProfileResult = withContext(Dispatchers.IO) {
+        try {
+            val profile = json.decodeFromString<ProfileData>(jsonString)
+            if (profile.keys.isEmpty()) {
+                return@withContext ImportProfileResult.Error("Profile contains no keys")
+            }
+            ImportProfileResult.Success(profile)
+        } catch (e: Exception) {
+            ImportProfileResult.Error("Invalid profile format: ${e.message}")
+        }
+    }
+
+    /**
+     * Import a carrier-config profile from a file path.
+     */
+    suspend fun importProfileFromFile(filePath: String): ImportProfileResult = withContext(Dispatchers.IO) {
+        try {
+            val file = File(filePath)
+            if (!file.exists()) {
+                return@withContext ImportProfileResult.Error("File not found")
+            }
+            importProfile(file.readText())
+        } catch (e: Exception) {
+            ImportProfileResult.Error("Profile import failed: ${e.message}")
+        }
+    }
+
+    /**
      * Get export directory path
      */
     fun getExportDirectory(): String {
@@ -357,4 +414,24 @@ sealed class ExportResult {
 sealed class ImportResult {
     data class Success(val version: String) : ImportResult()
     data class Error(val message: String) : ImportResult()
+}
+
+/**
+ * Shareable carrier-config profile containing a preset and its keys.
+ */
+@Serializable
+data class ProfileData(
+    val version: String,
+    val exportDate: Long,
+    val presetId: String,
+    val presetName: String,
+    val keys: List<CustomKeyData>
+)
+
+/**
+ * Result of a profile import operation.
+ */
+sealed class ImportProfileResult {
+    data class Success(val profile: ProfileData) : ImportProfileResult()
+    data class Error(val message: String) : ImportProfileResult()
 }

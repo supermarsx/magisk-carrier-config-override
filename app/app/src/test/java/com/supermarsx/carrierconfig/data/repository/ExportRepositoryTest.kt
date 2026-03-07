@@ -277,4 +277,89 @@ class ExportRepositoryTest {
         assertThat(decoded.customKeys.map { it.key })
             .containsExactly("key1", "key2", "key3").inOrder()
     }
+
+    // =========================================================================
+    // ProfileData serialization
+    // =========================================================================
+
+    @Test
+    fun `ProfileData round-trips through JSON`() {
+        val profile = ProfileData(
+            version = "1.0.0",
+            exportDate = 1709424000000L,
+            presetId = "full_enablement",
+            presetName = "Full WFC Enablement",
+            keys = listOf(
+                CustomKeyData("carrier_wfc_ims_available_bool", "boolean", "true"),
+                CustomKeyData("carrier_default_wfc_ims_mode_int", "int", "1")
+            )
+        )
+
+        val encoded = json.encodeToString(profile)
+        val decoded = json.decodeFromString<ProfileData>(encoded)
+
+        assertThat(decoded).isEqualTo(profile)
+        assertThat(decoded.presetId).isEqualTo("full_enablement")
+        assertThat(decoded.keys).hasSize(2)
+    }
+
+    @Test
+    fun `ProfileData with empty keys serializes correctly`() {
+        val profile = ProfileData(
+            version = "1.0.0",
+            exportDate = 0L,
+            presetId = "custom",
+            presetName = "Custom Profile",
+            keys = emptyList()
+        )
+
+        val encoded = json.encodeToString(profile)
+        val decoded = json.decodeFromString<ProfileData>(encoded)
+
+        assertThat(decoded.keys).isEmpty()
+        assertThat(decoded.presetName).isEqualTo("Custom Profile")
+    }
+
+    @Test
+    fun `ProfileData deserialization ignores unknown keys`() {
+        val jsonStr = """
+        {
+            "version": "1.0.0",
+            "exportDate": 0,
+            "presetId": "test",
+            "presetName": "Test",
+            "keys": [],
+            "extraField": 42
+        }
+        """.trimIndent()
+
+        val profile = json.decodeFromString<ProfileData>(jsonStr)
+        assertThat(profile.presetId).isEqualTo("test")
+    }
+
+    // =========================================================================
+    // ImportProfileResult
+    // =========================================================================
+
+    @Test
+    fun `ImportProfileResult Success carries profile`() {
+        val profile = ProfileData("1.0.0", 0L, "id", "Name", emptyList())
+        val result = ImportProfileResult.Success(profile)
+        assertThat(result.profile.presetId).isEqualTo("id")
+    }
+
+    @Test
+    fun `ImportProfileResult Error carries message`() {
+        val result = ImportProfileResult.Error("bad format")
+        assertThat(result.message).isEqualTo("bad format")
+    }
+
+    @Test
+    fun `ImportProfileResult sealed class variants`() {
+        val profile = ProfileData("1.0.0", 0L, "id", "Name", emptyList())
+        val success: ImportProfileResult = ImportProfileResult.Success(profile)
+        val error: ImportProfileResult = ImportProfileResult.Error("fail")
+        assertThat(success).isInstanceOf(ImportProfileResult.Success::class.java)
+        assertThat(error).isInstanceOf(ImportProfileResult.Error::class.java)
+    }
 }
